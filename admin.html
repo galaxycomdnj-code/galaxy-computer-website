@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Galaxy Computer Admin</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:20px}
+.container{max-width:600px;margin:auto;background:white;padding:22px;border-radius:12px}
+h2{color:#f07818}
+input,textarea,select,button{width:100%;padding:12px;margin:8px 0;box-sizing:border-box}
+button{background:#f07818;color:white;border:0;border-radius:6px;font-weight:bold}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="container">
+<h2>Galaxy Computer Admin</h2>
+
+<div id="loginBox">
+<h3>Admin Login</h3>
+<input id="email" type="email" placeholder="Admin Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+</div>
+
+<div id="panel" class="hidden">
+<h3>পণ্য যোগ করুন</h3>
+<input id="pname" placeholder="Product Name">
+<textarea id="pdesc" placeholder="Description"></textarea>
+<input id="price" type="number" placeholder="Price">
+<input id="category" placeholder="Category">
+<input id="pimage" placeholder="Image URL (optional)">
+<button onclick="addProduct()">Add Product</button>
+
+<hr>
+<h3>সার্ভিস যোগ করুন</h3>
+<input id="sname" placeholder="Service Name">
+<textarea id="sdesc" placeholder="Description"></textarea>
+<input id="simage" placeholder="Image URL (optional)">
+<button onclick="addService()">Add Service</button>
+
+<button onclick="logout()">Logout</button>
+</div>
+<p id="message"></p>
+</div>
+
+<script type="module">
+import { createClient } from
+'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://wfuvzfiwnpbgbzzeygei.supabase.co/rest/v1/';
+const SUPABASE_KEY = 'sb_publishable_FMsWzO2LqaTzM8tem94M2w_i3HhnWHR';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const msg = document.getElementById('message');
+
+window.login = async function(){
+  msg.textContent = 'Logging in...';
+  const {data,error} = await supabase.auth.signInWithPassword({
+    email: document.getElementById('email').value,
+    password: document.getElementById('password').value
+  });
+
+  if(error){msg.textContent=error.message;return;}
+
+  const {data:admin,error:adminError} = await supabase
+    .from('admins')
+    .select('user_id')
+    .eq('user_id',data.user.id)
+    .maybeSingle();
+
+  if(adminError || !admin){
+    await supabase.auth.signOut();
+    msg.textContent='আপনার Admin অনুমতি নেই।';
+    return;
+  }
+
+  document.getElementById('loginBox').classList.add('hidden');
+  document.getElementById('panel').classList.remove('hidden');
+  msg.textContent='Login successful!';
+};
+
+window.addProduct = async function(){
+  const {error} = await supabase.from('products').insert([{
+    name:document.getElementById('pname').value,
+    description:document.getElementById('pdesc').value,
+    price:document.getElementById('price').value || null,
+    category:document.getElementById('category').value,
+    image_url:document.getElementById('pimage').value || null
+  }]);
+  msg.textContent=error ? error.message : 'Product added successfully!';
+};
+
+window.addService = async function(){
+  const {error} = await supabase.from('services').insert([{
+    name:document.getElementById('sname').value,
+    description:document.getElementById('sdesc').value,
+    image_url:document.getElementById('simage').value || null
+  }]);
+  msg.textContent=error ? error.message : 'Service added successfully!';
+};
+
+window.logout = async function(){
+  await supabase.auth.signOut();
+  location.reload();
+};
+</script>
+</body>
+</html>
