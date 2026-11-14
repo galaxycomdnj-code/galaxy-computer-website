@@ -1,46 +1,50 @@
+
 <!DOCTYPE html>
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Galaxy Computer Admin</title>
+<title>Galaxy Computer | Admin Panel</title>
 <style>
-body{font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:20px}
-.container{max-width:600px;margin:auto;background:white;padding:22px;border-radius:12px}
+*{box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#101820;margin:0;padding:20px;color:#222}
+.container{max-width:600px;margin:30px auto;background:white;padding:24px;border-radius:12px}
 h2{color:#f07818}
-input,textarea,select,button{width:100%;padding:12px;margin:8px 0;box-sizing:border-box}
-button{background:#f07818;color:white;border:0;border-radius:6px;font-weight:bold}
+input,textarea,button{width:100%;padding:13px;margin:8px 0;border:1px solid #ddd;border-radius:6px;font-size:15px}
+button{background:#f07818;color:white;border:0;font-weight:bold;cursor:pointer}
 .hidden{display:none}
+#message{overflow-wrap:anywhere}
 </style>
 </head>
 <body>
 <div class="container">
-<h2>Galaxy Computer Admin</h2>
+<h2>Galaxy Computer</h2>
+<h3>Admin Panel</h3>
 
 <div id="loginBox">
 <h3>Admin Login</h3>
 <input id="email" type="email" placeholder="Admin Email">
 <input id="password" type="password" placeholder="Password">
-<button onclick="login()">Login</button>
+<button id="loginBtn">Login</button>
 </div>
 
 <div id="panel" class="hidden">
 <h3>পণ্য যোগ করুন</h3>
 <input id="pname" placeholder="Product Name">
-<textarea id="pdesc" placeholder="Description"></textarea>
+<textarea id="pdesc" placeholder="Product Description"></textarea>
 <input id="price" type="number" placeholder="Price">
 <input id="category" placeholder="Category">
 <input id="pimage" placeholder="Image URL (optional)">
-<button onclick="addProduct()">Add Product</button>
+<button id="productBtn">Add Product</button>
 
 <hr>
 <h3>সার্ভিস যোগ করুন</h3>
 <input id="sname" placeholder="Service Name">
-<textarea id="sdesc" placeholder="Description"></textarea>
+<textarea id="sdesc" placeholder="Service Description"></textarea>
 <input id="simage" placeholder="Image URL (optional)">
-<button onclick="addService()">Add Service</button>
+<button id="serviceBtn">Add Service</button>
 
-<button onclick="logout()">Logout</button>
+<button id="logoutBtn">Logout</button>
 </div>
 <p id="message"></p>
 </div>
@@ -53,14 +57,14 @@ const SUPABASE_URL = 'https://wfuvzfiwnpbgbzzeygei.supabase.co/rest/v1/';
 const SUPABASE_KEY = 'sb_publishable_FMsWzO2LqaTzM8tem94M2w_i3HhnWHR';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
 const msg = document.getElementById('message');
 
-window.login = async function(){
+document.getElementById('loginBtn').onclick = async () => {
   msg.textContent = 'Logging in...';
+
   const {data,error} = await supabase.auth.signInWithPassword({
-    email: document.getElementById('email').value,
-    password: document.getElementById('password').value
+    email:document.getElementById('email').value,
+    password:document.getElementById('password').value
   });
 
   if(error){msg.textContent=error.message;return;}
@@ -73,7 +77,7 @@ window.login = async function(){
 
   if(adminError || !admin){
     await supabase.auth.signOut();
-    msg.textContent='আপনার Admin অনুমতি নেই।';
+    msg.textContent='Admin permission not found.';
     return;
   }
 
@@ -82,27 +86,35 @@ window.login = async function(){
   msg.textContent='Login successful!';
 };
 
-window.addProduct = async function(){
-  const {error} = await supabase.from('products').insert([{
-    name:document.getElementById('pname').value,
+document.getElementById('productBtn').onclick = async () => {
+  const name=document.getElementById('pname').value.trim();
+  if(!name){msg.textContent='Product name দিন।';return;}
+
+  const {error}=await supabase.from('products').insert([{
+    name,
     description:document.getElementById('pdesc').value,
     price:document.getElementById('price').value || null,
     category:document.getElementById('category').value,
     image_url:document.getElementById('pimage').value || null
   }]);
+
   msg.textContent=error ? error.message : 'Product added successfully!';
 };
 
-window.addService = async function(){
-  const {error} = await supabase.from('services').insert([{
-    name:document.getElementById('sname').value,
+document.getElementById('serviceBtn').onclick = async () => {
+  const name=document.getElementById('sname').value.trim();
+  if(!name){msg.textContent='Service name দিন।';return;}
+
+  const {error}=await supabase.from('services').insert([{
+    name,
     description:document.getElementById('sdesc').value,
     image_url:document.getElementById('simage').value || null
   }]);
+
   msg.textContent=error ? error.message : 'Service added successfully!';
 };
 
-window.logout = async function(){
+document.getElementById('logoutBtn').onclick = async () => {
   await supabase.auth.signOut();
   location.reload();
 };
