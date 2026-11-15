@@ -76,3 +76,72 @@ async function loadProducts() {
 }
 
 loadProducts();
+
+// Galaxy Computer Category Menu
+const categoryDrawer = document.getElementById('categoryDrawer');
+const categoryOverlay = document.getElementById('categoryOverlay');
+
+document.getElementById('openCategories')?.addEventListener('click', () => {
+  categoryDrawer.classList.add('active');
+  categoryOverlay.classList.add('active');
+});
+
+function closeCategoryMenu() {
+  categoryDrawer.classList.remove('active');
+  categoryOverlay.classList.remove('active');
+}
+
+document.getElementById('closeCategories')?.addEventListener('click', closeCategoryMenu);
+categoryOverlay?.addEventListener('click', closeCategoryMenu);
+
+// Category Search
+document.getElementById('categorySearch')?.addEventListener('input', function() {
+  const search = this.value.toLowerCase();
+
+  document.querySelectorAll('.category-item').forEach(item => {
+    item.style.display = item.textContent.toLowerCase().includes(search)
+      ? 'flex'
+      : 'none';
+  });
+});
+
+/* Category Button */
+.category-open-btn {
+  background: #ff791a;
+  color: #fff;
+  border: 0;
+  border-radius: 7px;
+  padding: 11px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.category-open-btn:hover {
+  background: #e85d00;
+}
+
+/* Subcategories */
+.category-submenu {
+  display: none;
+  background: #171717;
+  padding: 5px 12px;
+  border-left: 2px solid #ff791a;
+}
+
+.category-submenu.open {
+  display: block;
+}
+
+.category-submenu a {
+  display: block;
+  color: #ccc;
+  text-decoration: none;
+  padding: 10px 5px;
+  border-bottom: 1px solid #292929;
+  font-size: 14px;
+}
+
+.category-submenu a:hover {
+  color: #ff791a;
+}
