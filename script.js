@@ -82,6 +82,10 @@ const categoryDrawer = document.getElementById('categoryDrawer');
 const categoryOverlay = document.getElementById('categoryOverlay');
 
 document.getElementById('openCategories')?.addEventListener('click', () => {
+  if (!categoryDrawer || !categoryOverlay) {
+    alert('Category menu HTML not found!');
+    return;
+  }
   categoryDrawer.classList.add('active');
   categoryOverlay.classList.add('active');
 });
