@@ -78,47 +78,54 @@ async function loadProducts() {
 loadProducts();
 
 // Galaxy Computer Category Menu
+
+// Galaxy Computer Category Menu
 const categoryDrawer = document.getElementById('categoryDrawer');
 const categoryOverlay = document.getElementById('categoryOverlay');
-
-document.getElementById('openCategories')?.addEventListener('click', () => {
-  if (!categoryDrawer || !categoryOverlay) {
-    alert('Category menu HTML not found!');
-    return;
-  }
-  categoryDrawer.classList.add('active');
-  categoryOverlay.classList.add('active');
-});
+const openCategories = document.getElementById('openCategories');
+const closeCategories = document.getElementById('closeCategories');
+const categorySearch = document.getElementById('categorySearch');
 
 function closeCategoryMenu() {
-  categoryDrawer.classList.remove('active');
-  categoryOverlay.classList.remove('active');
+  categoryDrawer?.classList.remove('active');
+  categoryOverlay?.classList.remove('active');
 }
 
-document.getElementById('closeCategories')?.addEventListener('click', closeCategoryMenu);
-categoryOverlay?.addEventListener('click', closeCategoryMenu);
-
-// Category Search
-document.getElementById('categorySearch')?.addEventListener('input', function() {
-  const search = this.value.toLowerCase();
-
-  document.querySelectorAll('.category-item').forEach(item => {
-    item.style.display = item.textContent.toLowerCase().includes(search)
-      ? 'flex'
-      : 'none';
-  });
+openCategories?.addEventListener('click', () => {
+  categoryDrawer?.classList.add('active');
+  categoryOverlay?.classList.add('active');
 });
 
-// Category Submenu Toggle
+closeCategories?.addEventListener('click', closeCategoryMenu);
+categoryOverlay?.addEventListener('click', closeCategoryMenu);
+
+// Open and close subcategories
 document.querySelectorAll('.category-item').forEach(button => {
   button.addEventListener('click', () => {
     const submenu = button.nextElementSibling;
     const symbol = button.querySelector('span');
 
+    if (!submenu) return;
+
     submenu.classList.toggle('open');
 
-    symbol.textContent = submenu.classList.contains('open')
-      ? '−'
-      : '+';
+    if (symbol) {
+      symbol.textContent = submenu.classList.contains('open') ? '−' : '+';
+    }
   });
+});
+
+// Category search
+categorySearch?.addEventListener('input', function () {
+  const search = this.value.toLowerCase().trim();
+
+  document.querySelectorAll('.category-group').forEach(group => {
+    const text = group.textContent.toLowerCase();
+    group.style.display = text.includes(search) ? '' : 'none';
+  });
+});
+
+// Close drawer after selecting a subcategory
+document.querySelectorAll('.category-submenu a').forEach(link => {
+  link.addEventListener('click', closeCategoryMenu);
 });
