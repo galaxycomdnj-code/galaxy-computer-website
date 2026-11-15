@@ -109,7 +109,6 @@ document.getElementById('categorySearch')?.addEventListener('input', function() 
   });
 });
 
-  color: #ff791a;
 }
 
 // Category Submenu Toggle
