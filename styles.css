@@ -96,3 +96,44 @@
   color: #ff791a;
   font-size: 22px;
 }
+
+/* Category Button */
+.category-open-btn {
+  background: #ff791a;
+  color: #fff;
+  border: 0;
+  border-radius: 7px;
+  padding: 11px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.category-open-btn:hover {
+  background: #e85d00;
+}
+
+/* Subcategories */
+.category-submenu {
+  display: none;
+  background: #171717;
+  padding: 5px 12px;
+  border-left: 2px solid #ff791a;
+}
+
+.category-submenu.open {
+  display: block;
+}
+
+.category-submenu a {
+  display: block;
+  color: #ccc;
+  text-decoration: none;
+  padding: 10px 5px;
+  border-bottom: 1px solid #292929;
+  font-size: 14px;
+}
+
+.category-submenu a:hover {
+  color: #ff791a;
+}
