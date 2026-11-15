@@ -145,3 +145,17 @@ document.getElementById('categorySearch')?.addEventListener('input', function() 
 .category-submenu a:hover {
   color: #ff791a;
 }
+
+// Category Submenu Toggle
+document.querySelectorAll('.category-item').forEach(button => {
+  button.addEventListener('click', () => {
+    const submenu = button.nextElementSibling;
+    const symbol = button.querySelector('span');
+
+    submenu.classList.toggle('open');
+
+    symbol.textContent = submenu.classList.contains('open')
+      ? '−'
+      : '+';
+  });
+});
