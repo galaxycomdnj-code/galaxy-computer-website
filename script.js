@@ -109,8 +109,6 @@ document.getElementById('categorySearch')?.addEventListener('input', function() 
   });
 });
 
-}
-
 // Category Submenu Toggle
 document.querySelectorAll('.category-item').forEach(button => {
   button.addEventListener('click', () => {
