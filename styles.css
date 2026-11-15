@@ -4,3 +4,95 @@
 @media(max-width:980px){.nav{gap:12px}.nav a{font-size:13px}.brand{min-width:205px}.brand strong{font-size:20px}.nav-actions .btn{display:none}}
 @media(max-width:760px){.topbar-inner{font-size:11px}.nav-wrap{min-height:72px;flex-wrap:wrap;gap:10px}.brand{margin-right:auto}.brand img{width:46px;height:46px}.brand strong{font-size:19px}.menu-toggle{display:block}.nav{display:none;order:4;width:100%;margin:0;padding:10px 0 18px;flex-direction:column;align-items:flex-start}.nav.open{display:flex}.nav-actions{margin-left:0}.hero{padding:48px 0}.hero-grid{grid-template-columns:1fr}.hero-art{min-height:210px}.hero-art>img{min-height:210px}.hero h1{font-size:36px}.trust-grid{grid-template-columns:repeat(2,1fr);gap:15px}.trust-grid div{justify-content:flex-start;border:0}.section{padding:58px 0}.cards,.product-grid{grid-template-columns:repeat(2,1fr);gap:12px}.service-card{padding:18px}.service-card h3{font-size:15px}.product-visual{height:110px}.home-service-inner{align-items:flex-start}.service-orbit{width:115px;height:115px}.service-orbit b{font-size:38px}.about-grid,.contact-grid{grid-template-columns:1fr;gap:25px}.footer-inner{align-items:flex-start;flex-direction:column}}
 @media(max-width:420px){.cards,.product-grid{grid-template-columns:1fr}.hero-buttons .btn{width:100%}.home-service-inner{flex-direction:column}.service-orbit{display:none}.contact-box>a,.contact-box>div{flex-direction:column;gap:3px}}
+
+/* Galaxy Computer Category Drawer */
+.category-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+  z-index: 9998;
+  opacity: 0;
+  visibility: hidden;
+  transition: .3s;
+}
+
+.category-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 320px;
+  max-width: 85%;
+  height: 100vh;
+  background: #0b0b0b;
+  color: #fff;
+  z-index: 9999;
+  padding: 22px;
+  overflow-y: auto;
+  transform: translateX(-100%);
+  transition: .3s ease;
+  box-sizing: border-box;
+}
+
+.category-drawer.active {
+  transform: translateX(0);
+}
+
+.category-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.category-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #333;
+  padding-bottom: 15px;
+}
+
+.category-head h3 {
+  color: #ff791a;
+  margin: 0;
+}
+
+#closeCategories {
+  background: #ff791a;
+  color: #fff;
+  border: 0;
+  border-radius: 6px;
+  font-size: 25px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+}
+
+#categorySearch {
+  width: 100%;
+  padding: 12px;
+  margin: 18px 0;
+  background: #171717;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 7px;
+  box-sizing: border-box;
+}
+
+.category-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 5px;
+  background: transparent;
+  color: #fff;
+  border: 0;
+  border-bottom: 1px solid #292929;
+  text-align: left;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.category-item span {
+  color: #ff791a;
+  font-size: 22px;
+}
