@@ -80,11 +80,88 @@
 .category-item {
   width: 100%;
   display: flex;
+
+/* Galaxy Computer Category Drawer */
+
+.category-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+  z-index: 9998;
+  opacity: 0;
+  visibility: hidden;
+  transition: .3s;
+}
+
+.category-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.category-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 340px;
+  max-width: 88%;
+  height: 100vh;
+  background: #0b0b0b;
+  color: #fff;
+  z-index: 9999;
+  padding: 22px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  transform: translateX(-100%);
+  transition: .3s ease;
+}
+
+.category-drawer.active {
+  transform: translateX(0);
+}
+
+.category-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #333;
+  padding-bottom: 15px;
+}
+
+.category-head h3 {
+  color: #ff791a;
+  margin: 0;
+}
+
+#closeCategories {
+  background: #ff791a;
+  color: white;
+  border: 0;
+  border-radius: 6px;
+  font-size: 25px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+}
+
+#categorySearch {
+  width: 100%;
+  padding: 12px;
+  margin: 18px 0;
+  background: #171717;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 7px;
+  box-sizing: border-box;
+}
+
+.category-item {
+  width: 100%;
+  display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 15px 5px;
   background: transparent;
-  color: #fff;
+  color: white;
   border: 0;
   border-bottom: 1px solid #292929;
   text-align: left;
@@ -97,23 +174,6 @@
   font-size: 22px;
 }
 
-/* Category Button */
-.category-open-btn {
-  background: #ff791a;
-  color: #fff;
-  border: 0;
-  border-radius: 7px;
-  padding: 11px 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: .2s;
-}
-
-.category-open-btn:hover {
-  background: #e85d00;
-}
-
-/* Subcategories */
 .category-submenu {
   display: none;
   background: #171717;
@@ -137,3 +197,14 @@
 .category-submenu a:hover {
   color: #ff791a;
 }
+
+.category-open-btn {
+  background: #ff791a;
+  color: white;
+  border: 0;
+  border-radius: 7px;
+  padding: 11px 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
