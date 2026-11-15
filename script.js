@@ -60,10 +60,10 @@ async function loadProducts() {
 
       const link = document.createElement("a");
       link.href = "https://wa.me/8801621422327?text=" +
-        encodeURIComponent(product.name + " এর দাম জানতে চাই");
+        encodeURIComponent(product.name + " অর্ডার করতে চাই");
       link.target = "_blank";
       link.rel = "noopener";
-      link.textContent = "দাম জানতে →";
+      link.textContent = link.textContent = "অর্ডার করতে →";
       card.appendChild(link);
 
       grid.appendChild(card);
