@@ -88,7 +88,7 @@ document.getElementById('loginBtn').onclick = async () => {
   document.getElementById('panel').classList.remove('hidden');
   msg.textContent='Login successful!';
 };
-
+loadProducts();
 document.getElementById('productBtn').onclick = async () => {
   const name=document.getElementById('pname').value.trim();
   if(!name){msg.textContent='Product name দিন।';return;}
@@ -103,7 +103,68 @@ document.getElementById('productBtn').onclick = async () => {
 
   msg.textContent=error ? error.message : 'Product added successfully!';
 };
+async function loadProducts() {
+  const list = document.getElementById('productList');
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .order('created_at', { ascending: false });
 
+  if (error) {
+    msg.textContent = error.message;
+    return;
+  }
+
+  list.innerHTML = '';
+
+  data.forEach(product => {
+    const item = document.createElement('div');
+    item.style.padding = '12px';
+    item.style.margin = '10px 0';
+    item.style.border = '1px solid #ff6a00';
+
+    const title = document.createElement('strong');
+    title.textContent = product.name + ' — ৳' + (product.price ?? '');
+    item.appendChild(title);
+
+    const edit = document.createElement('button');
+    edit.textContent = 'Edit';
+    edit.onclick = async () => {
+      const name = prompt('Product name:', product.name);
+      if (name === null || !name.trim()) return;
+
+      const price = prompt('Price:', product.price ?? '');
+      if (price === null) return;
+
+      const description = prompt('Description:', product.description ?? '');
+      if (description === null) return;
+
+      const { error } = await supabase.from('products')
+        .update({ name: name.trim(), price: price || null, description })
+        .eq('id', product.id);
+
+      msg.textContent = error ? error.message : 'Product updated!';
+      if (!error) loadProducts();
+    };
+
+    const del = document.createElement('button');
+    del.textContent = 'Delete';
+    del.onclick = async () => {
+      if (!confirm('এই পণ্যটি Delete করতে চান?')) return;
+
+      const { error } = await supabase.from('products')
+        .delete()
+        .eq('id', product.id);
+
+      msg.textContent = error ? error.message : 'Product deleted!';
+      if (!error) loadProducts();
+    };
+
+    item.appendChild(edit);
+    item.appendChild(del);
+    list.appendChild(item);
+  });
+}
 document.getElementById('serviceBtn').onclick = async () => {
   const name=document.getElementById('sname').value.trim();
   if(!name){msg.textContent='Service name দিন।';return;}
