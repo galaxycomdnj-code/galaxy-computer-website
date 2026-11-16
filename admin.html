@@ -1,193 +1,185 @@
-
-<!DOCTYPE html>
-<html lang="bn">
+<!doctype html>
+<html lang="en">
 <head>
-<link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#ff6a00">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Galaxy Computer | Admin Panel</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#111111">
+<title>Galaxy Computer | Admin Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box}
-body{font-family:Arial,sans-serif;background:#101820;margin:0;padding:20px;color:#222}
-.container{max-width:600px;margin:30px auto;background:white;padding:24px;border-radius:12px}
-h2{color:#f07818}
-input,textarea,button{width:100%;padding:13px;margin:8px 0;border:1px solid #ddd;border-radius:6px;font-size:15px}
-button{background:#f07818;color:white;border:0;font-weight:bold;cursor:pointer}
-.hidden{display:none}
-#message{overflow-wrap:anywhere}
+:root{--orange:#ff9800;--ink:#111;--muted:#737373;--line:#e9e9e9;--bg:#f5f5f5}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Sora,'Hind Siliguri',sans-serif;font-size:13px}.top{background:#111;color:#fff;padding:15px 22px;display:flex;align-items:center;justify-content:space-between;gap:15px}.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:800;font-size:17px}.mark{width:35px;height:35px;object-fit:contain;filter:brightness(0) invert(1)}.mark-wrap{position:relative}.mark-wrap:after{content:"";position:absolute;right:0;top:0;width:8px;height:8px;background:var(--orange)}.top small{color:#bbb}.wrap{max-width:1180px;margin:28px auto;padding:0 18px}.login,.panel-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:0 5px 20px #00000006}.login{max-width:430px;margin:55px auto}.login h1,.panel-head h1{font-size:23px;margin:0 0 8px}.muted{color:var(--muted);line-height:1.6}.field{display:grid;gap:6px;margin:13px 0}.field label{font-weight:700;font-size:11px}.field input,.field textarea,.toolbar input{width:100%;border:1px solid #ddd;border-radius:8px;padding:11px 12px;font:inherit;outline-color:var(--orange);background:#fff}.field textarea{min-height:75px;resize:vertical}.btn{border:0;border-radius:8px;padding:11px 15px;background:var(--orange);color:#111;font:700 12px Sora,sans-serif;cursor:pointer}.btn:hover{filter:brightness(.96)}.btn.dark{background:#111;color:#fff}.btn.light{background:#f1f1f1;color:#222}.btn.danger{background:#fff0f0;color:#b42318}.btn:disabled{opacity:.5;cursor:not-allowed}.full{width:100%}.hidden{display:none!important}.message{margin:13px 0;padding:10px 12px;border-radius:8px;background:#fff4df;color:#774800;overflow-wrap:anywhere}.message:empty{display:none}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px}.panel-head p{margin:5px 0 0}.actions{display:flex;gap:8px;flex-wrap:wrap}.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px}.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px}.stat b{display:block;font-size:24px;margin-top:5px}.layout{display:grid;grid-template-columns:minmax(280px,.75fr) minmax(0,1.5fr);gap:16px;align-items:start}.panel-card h2{font-size:16px;margin:0 0 15px}.form-actions{display:flex;gap:8px}.form-actions .btn{flex:1}.toolbar{display:flex;gap:10px;margin-bottom:12px}.toolbar input{flex:1}.list{display:grid;gap:9px;max-height:620px;overflow:auto}.item{border:1px solid var(--line);border-radius:10px;padding:12px;display:grid;grid-template-columns:58px minmax(0,1fr);gap:12px;align-items:center}.item img{width:58px;height:58px;object-fit:contain;border-radius:7px;background:#fafafa}.item-info{min-width:0}.item-info strong{display:block;overflow-wrap:anywhere}.item-info small{display:block;color:var(--muted);margin-top:5px;overflow-wrap:anywhere}.item-actions{display:flex;gap:7px;grid-column:2;flex-wrap:wrap}.item-actions .btn{padding:7px 10px;font-size:10px}.empty{padding:25px;text-align:center;color:var(--muted);border:1px dashed #ddd;border-radius:10px}.section-gap{margin-top:18px}.note{font-size:11px;color:var(--muted);line-height:1.6}.preview{width:100%;max-height:130px;object-fit:contain;background:#fafafa;border-radius:8px;display:none}.preview.visible{display:block}@media(max-width:850px){.layout{grid-template-columns:1fr}.list{max-height:450px}}@media(max-width:560px){.top{padding:12px 15px}.top small{display:none}.wrap{margin:18px auto;padding:0 12px}.panel-head{align-items:flex-start;flex-direction:column}.stats{gap:8px}.stat{padding:12px}.item{grid-template-columns:48px minmax(0,1fr);gap:9px}.item img{width:48px;height:48px}.item-actions{grid-column:1/-1}.item-actions .btn{flex:1}.login,.panel-card{padding:17px}}
 </style>
 </head>
 <body>
-<div class="container">
-<h2>Galaxy Computer</h2>
-<h3>Admin Panel</h3>
-
-<div id="loginBox">
-<h3>Admin Login</h3>
-<input id="email" type="email" placeholder="Admin Email">
-<input id="password" type="password" placeholder="Password">
-<button id="loginBtn">Login</button>
+<header class="top"><a class="brand" href="/"><span class="mark-wrap"><img class="mark" src="/logo-mark.png" alt=""></span><span>GALAXY COMPUTER <small> / ADMIN</small></span></a><small>Product &amp; service management</small></header>
+<main class="wrap">
+<section id="loginBox" class="login">
+<h1>Admin Login</h1><p class="muted">Sign in with your authorized Galaxy Computer admin account.</p>
+<form id="loginForm">
+<div class="field"><label for="email">Admin email</label><input id="email" type="email" autocomplete="username" required></div>
+<div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required></div>
+<button class="btn full" id="loginBtn" type="submit">Sign in</button>
+</form><p id="loginMessage" class="message" role="status"></p>
+</section>
+<section id="dashboard" class="hidden">
+<div class="panel-head"><div><h1>Admin Dashboard</h1><p class="muted">Manage the products and services shown on your website.</p></div><div class="actions"><a class="btn light" href="/" style="text-decoration:none">View website ↗</a><button class="btn dark" id="logoutBtn" type="button">Logout</button></div></div>
+<div class="stats"><div class="stat"><span class="muted">Products</span><b id="productTotal">—</b></div><div class="stat"><span class="muted">Services</span><b id="serviceTotal">—</b></div></div>
+<div class="layout">
+<section class="panel-card">
+<h2 id="productFormTitle">Add a product</h2>
+<form id="productForm">
+<input id="productId" type="hidden">
+<div class="field"><label for="pname">Product name *</label><input id="pname" maxlength="160" required placeholder="e.g. Gaming Laptop"></div>
+<div class="field"><label for="pdesc">Description</label><textarea id="pdesc" maxlength="1500" placeholder="Product details and specifications"></textarea></div>
+<div class="field"><label for="price">Price (BDT)</label><input id="price" type="number" min="0" step="0.01" placeholder="e.g. 65000"></div>
+<div class="field"><label for="category">Category</label><input id="category" maxlength="80" placeholder="Laptop, Monitor, RAM..."></div>
+<div class="field"><label for="pimage">Product image URL</label><input id="pimage" type="url" maxlength="1000" placeholder="https://example.com/image.jpg"><img id="imagePreview" class="preview" alt="Product image preview"></div>
+<p class="note">Use a direct HTTPS image URL. Image upload storage is not configured in this project yet.</p>
+<div class="form-actions"><button class="btn" id="productSubmit" type="submit">Add product</button><button class="btn light hidden" id="cancelProductEdit" type="button">Cancel</button></div>
+</form>
+<p id="productMessage" class="message" role="status"></p>
+</section>
+<section class="panel-card">
+<h2>Product catalogue</h2><div class="toolbar"><input id="productSearchAdmin" type="search" placeholder="Search products by name or category..." aria-label="Search products"></div>
+<div id="productList" class="list" aria-live="polite"><div class="empty">Loading products…</div></div>
+</section>
+<section class="panel-card">
+<h2 id="serviceFormTitle">Add a service</h2>
+<form id="serviceForm">
+<input id="serviceId" type="hidden">
+<div class="field"><label for="sname">Service name *</label><input id="sname" maxlength="160" required placeholder="e.g. Laptop Repair"></div>
+<div class="field"><label for="sdesc">Description</label><textarea id="sdesc" maxlength="1500" placeholder="Describe the service"></textarea></div>
+<div class="field"><label for="simage">Service image URL</label><input id="simage" type="url" maxlength="1000" placeholder="https://example.com/service.jpg"></div>
+<div class="form-actions"><button class="btn" id="serviceSubmit" type="submit">Add service</button><button class="btn light hidden" id="cancelServiceEdit" type="button">Cancel</button></div>
+</form><p id="serviceMessage" class="message" role="status"></p>
+</section>
+<section class="panel-card">
+<h2>Service catalogue</h2><div id="serviceList" class="list" aria-live="polite"><div class="empty">Loading services…</div></div>
+</section>
 </div>
-
-<div id="panel" class="hidden">
-<h3>পণ্য যোগ করুন</h3>
-<input id="pname" placeholder="Product Name">
-<textarea id="pdesc" placeholder="Product Description"></textarea>
-<input id="price" type="number" placeholder="Price">
-<input id="category" placeholder="Category">
-<input id="pimage" placeholder="Image URL (optional)">
-<button id="productBtn">Add Product</button><div id="productList"></div>
-
-<hr>
-<h3>সার্ভিস যোগ করুন</h3>
-<input id="sname" placeholder="Service Name">
-<textarea id="sdesc" placeholder="Service Description"></textarea>
-<input id="simage" placeholder="Image URL (optional)">
-<button id="serviceBtn">Add Service</button><div id="productList"></div>
-
-<button id="logoutBtn">Logout</button>
-</div>
-<p id="message"></p>
-</div>
-
+</section>
+</main>
 <script type="module">
-import { createClient } from
-'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-const SUPABASE_URL = 'https://wfuvzfiwnpbgbzzeygei.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_FMsWzO2LqaTzM8tem94M2w_i3HhnWHR';
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-const msg = document.getElementById('message');
-
-document.getElementById('loginBtn').onclick = async () => {
-  msg.textContent = 'Logging in...';
-
-  const {data,error} = await supabase.auth.signInWithPassword({
-    email:document.getElementById('email').value,
-    password:document.getElementById('password').value
-  });
-
-  if(error){msg.textContent=error.message;return;}
-
-  const {data:admin,error:adminError} = await supabase
-    .from('admins')
-    .select('user_id')
-    .eq('user_id',data.user.id)
-    .maybeSingle();
-
-  if(adminError || !admin){
-    await supabase.auth.signOut();
-    msg.textContent='Admin permission not found.';
-    return;
-  }
-
-  document.getElementById('loginBox').classList.add('hidden');
-  document.getElementById('panel').classList.remove('hidden');
-  msg.textContent='Login successful!';
-};
-loadProducts();
-document.getElementById('productBtn').onclick = async () => {
-  const name=document.getElementById('pname').value.trim();
-  if(!name){msg.textContent='Product name দিন।';return;}
-
-  const {error}=await supabase.from('products').insert([{
-    name,
-    description:document.getElementById('pdesc').value,
-    price:document.getElementById('price').value || null,
-    category:document.getElementById('category').value,
-    image_url:document.getElementById('pimage').value || null
-  }]);
-
-  msg.textContent=error ? error.message : 'Product added successfully!';
-};
-async function loadProducts() {
-  const list = document.getElementById('productList');
-  const { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    msg.textContent = error.message;
-    return;
-  }
-
-  list.innerHTML = '';
-
-  data.forEach(product => {
-    const item = document.createElement('div');
-    item.style.padding = '12px';
-    item.style.margin = '10px 0';
-    item.style.border = '1px solid #ff6a00';
-
-    const title = document.createElement('strong');
-    title.textContent = product.name + ' — ৳' + (product.price ?? '');
-    item.appendChild(title);
-
-    const edit = document.createElement('button');
-    edit.textContent = 'Edit';
-    edit.onclick = async () => {
-      const name = prompt('Product name:', product.name);
-      if (name === null || !name.trim()) return;
-
-      const price = prompt('Price:', product.price ?? '');
-      if (price === null) return;
-
-      const description = prompt('Description:', product.description ?? '');
-      if (description === null) return;
-
-      const { error } = await supabase.from('products')
-        .update({ name: name.trim(), price: price || null, description })
-        .eq('id', product.id);
-
-      msg.textContent = error ? error.message : 'Product updated!';
-      if (!error) loadProducts();
-    };
-
-    const del = document.createElement('button');
-    del.textContent = 'Delete';
-    del.onclick = async () => {
-      if (!confirm('এই পণ্যটি Delete করতে চান?')) return;
-
-      const { error } = await supabase.from('products')
-        .delete()
-        .eq('id', product.id);
-
-      msg.textContent = error ? error.message : 'Product deleted!';
-      if (!error) loadProducts();
-    };
-
-    item.appendChild(edit);
-    item.appendChild(del);
-    list.appendChild(item);
-  });
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const SUPABASE_URL='https://wfuvzfiwnpbgbzzeygei.supabase.co';
+const SUPABASE_KEY='sb_publishable_FMsWzO2LqaTzM8tem94M2w_i3HhnWHR';
+const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=id=>document.getElementById(id);
+let products=[],services=[];
+function message(id,text){$(id).textContent=text||''}
+function safeImageUrl(value){try{const u=new URL(value);return u.protocol==='https:'?u.href:''}catch{return ''}}
+function makeButton(label,kind,handler){const b=document.createElement('button');b.type='button';b.className='btn '+kind;b.textContent=label;b.addEventListener('click',handler);return b}
+async function verifyAdmin(user){
+ const {data,error}=await supabase.from('admins').select('user_id').eq('user_id',user.id).maybeSingle();
+ if(error||!data){await supabase.auth.signOut();throw new Error(error?'Could not verify admin permission: '+error.message:'This account does not have admin permission.')}
 }
-document.getElementById('serviceBtn').onclick = async () => {
-  const name=document.getElementById('sname').value.trim();
-  if(!name){msg.textContent='Service name দিন।';return;}
-
-  const {error}=await supabase.from('services').insert([{
-    name,
-    description:document.getElementById('sdesc').value,
-    image_url:document.getElementById('simage').value || null
-  }]);
-
-  msg.textContent=error ? error.message : 'Service added successfully!';
-};
-
-document.getElementById('logoutBtn').onclick = async () => {
-  await supabase.auth.signOut();
-  location.reload();
-};
-</script><script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js");
-  });
+async function enterDashboard(user){
+ await verifyAdmin(user);
+ $('loginBox').classList.add('hidden');$('dashboard').classList.remove('hidden');
+ await Promise.all([loadProducts(),loadServices()]);
 }
+async function loadProducts(){
+ const list=$('productList');list.replaceChildren();
+ const {data,error}=await supabase.from('products').select('*').order('created_at',{ascending:false});
+ if(error){list.textContent='Could not load products: '+error.message;return}
+ products=data||[];$('productTotal').textContent=String(products.length);
+ renderProducts();
+}
+function renderProducts(){
+ const list=$('productList');list.replaceChildren();
+ const term=$('productSearchAdmin').value.trim().toLowerCase();
+ const filtered=products.filter(p=>(p.name||'').toLowerCase().includes(term)||(p.category||'').toLowerCase().includes(term));
+ if(!filtered.length){const e=document.createElement('div');e.className='empty';e.textContent=term?'No matching products.':'No products added yet.';list.append(e);return}
+ filtered.forEach(p=>{
+  const item=document.createElement('article');item.className='item';
+  const img=document.createElement('img');img.alt='';img.loading='lazy';img.src=safeImageUrl(p.image_url||'')||'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22%3E%3Crect width=%22100%25%22 height=%22100%25%22 fill=%22%23f4f4f4%22/%3E%3C/svg%3E';
+  const info=document.createElement('div');info.className='item-info';
+  const title=document.createElement('strong');title.textContent=p.name||'Unnamed product';
+  const meta=document.createElement('small');meta.textContent=(p.category||'Uncategorised')+' · '+(p.price===null||p.price===''?'Price on request':'৳ '+Number(p.price).toLocaleString('en-BD'));
+  info.append(title,meta);const actions=document.createElement('div');actions.className='item-actions';
+  actions.append(makeButton('Edit','light',()=>editProduct(p)),makeButton('Delete','danger',()=>deleteProduct(p)));
+  item.append(img,info,actions);list.append(item);
+ });
+}
+function resetProductForm(){
+ $('productForm').reset();$('productId').value='';$('productFormTitle').textContent='Add a product';$('productSubmit').textContent='Add product';$('cancelProductEdit').classList.add('hidden');$('imagePreview').classList.remove('visible');$('imagePreview').removeAttribute('src');
+}
+function editProduct(p){
+ $('productId').value=p.id;$('pname').value=p.name||'';$('pdesc').value=p.description||'';$('price').value=p.price??'';$('category').value=p.category||'';$('pimage').value=p.image_url||'';
+ $('productFormTitle').textContent='Edit product';$('productSubmit').textContent='Save changes';$('cancelProductEdit').classList.remove('hidden');previewImage();
+ $('productForm').scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function deleteProduct(p){
+ if(!confirm('Delete “'+p.name+'”? This cannot be undone.'))return;
+ const {error}=await supabase.from('products').delete().eq('id',p.id);
+ if(error){message('productMessage','Delete failed: '+error.message);return}
+ message('productMessage','Product deleted.');await loadProducts();
+}
+$('productForm').addEventListener('submit',async e=>{
+ e.preventDefault();const id=$('productId').value;
+ const name=$('pname').value.trim();const priceText=$('price').value.trim();const imageText=$('pimage').value.trim();
+ if(!name){message('productMessage','Please enter a product name.');return}
+ if(priceText!==''&&(!Number.isFinite(Number(priceText))||Number(priceText)<0)){message('productMessage','Enter a valid non-negative price.');return}
+ if(imageText&&!safeImageUrl(imageText)){message('productMessage','Image URL must be a valid HTTPS URL.');return}
+ const payload={name,description:$('pdesc').value.trim(),price:priceText===''?null:Number(priceText),category:$('category').value.trim(),image_url:imageText||null};
+ $('productSubmit').disabled=true;
+ const result=id?await supabase.from('products').update(payload).eq('id',id):await supabase.from('products').insert([payload]);
+ $('productSubmit').disabled=false;
+ if(result.error){message('productMessage',(id?'Update':'Add')+' failed: '+result.error.message);return}
+ message('productMessage',id?'Product updated successfully.':'Product added successfully.');
+ resetProductForm();await loadProducts();
+});
+$('cancelProductEdit').addEventListener('click',resetProductForm);
+$('productSearchAdmin').addEventListener('input',renderProducts);
+function previewImage(){const url=safeImageUrl($('pimage').value.trim());if(url){$('imagePreview').src=url;$('imagePreview').classList.add('visible')}else{$('imagePreview').classList.remove('visible')}}
+$('pimage').addEventListener('input',previewImage);
+async function loadServices(){
+ const list=$('serviceList');list.replaceChildren();
+ const {data,error}=await supabase.from('services').select('*').order('created_at',{ascending:false});
+ if(error){list.textContent='Could not load services: '+error.message;return}
+ services=data||[];$('serviceTotal').textContent=String(services.length);renderServices();
+}
+function renderServices(){
+ const list=$('serviceList');list.replaceChildren();
+ if(!services.length){const e=document.createElement('div');e.className='empty';e.textContent='No services added yet.';list.append(e);return}
+ services.forEach(s=>{
+  const item=document.createElement('article');item.className='item';
+  const img=document.createElement('img');img.alt='';img.loading='lazy';img.src=safeImageUrl(s.image_url||'')||'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22%3E%3Crect width=%22100%25%22 height=%22100%25%22 fill=%22%23f4f4f4%22/%3E%3C/svg%3E';
+  const info=document.createElement('div');info.className='item-info';const title=document.createElement('strong');title.textContent=s.name||'Unnamed service';const desc=document.createElement('small');desc.textContent=s.description||'No description';info.append(title,desc);
+  const actions=document.createElement('div');actions.className='item-actions';actions.append(makeButton('Edit','light',()=>editService(s)),makeButton('Delete','danger',()=>deleteService(s)));
+  item.append(img,info,actions);list.append(item);
+ });
+}
+function resetServiceForm(){$('serviceForm').reset();$('serviceId').value='';$('serviceFormTitle').textContent='Add a service';$('serviceSubmit').textContent='Add service';$('cancelServiceEdit').classList.add('hidden')}
+function editService(s){$('serviceId').value=s.id;$('sname').value=s.name||'';$('sdesc').value=s.description||'';$('simage').value=s.image_url||'';$('serviceFormTitle').textContent='Edit service';$('serviceSubmit').textContent='Save changes';$('cancelServiceEdit').classList.remove('hidden');$('serviceForm').scrollIntoView({behavior:'smooth',block:'start'})}
+async function deleteService(s){if(!confirm('Delete “'+s.name+'”? This cannot be undone.'))return;const {error}=await supabase.from('services').delete().eq('id',s.id);if(error){message('serviceMessage','Delete failed: '+error.message);return}message('serviceMessage','Service deleted.');await loadServices()}
+$('serviceForm').addEventListener('submit',async e=>{
+ e.preventDefault();const id=$('serviceId').value;const name=$('sname').value.trim();const imageText=$('simage').value.trim();
+ if(!name){message('serviceMessage','Please enter a service name.');return}
+ if(imageText&&!safeImageUrl(imageText)){message('serviceMessage','Image URL must be a valid HTTPS URL.');return}
+ const payload={name,description:$('sdesc').value.trim(),image_url:imageText||null};$('serviceSubmit').disabled=true;
+ const result=id?await supabase.from('services').update(payload).eq('id',id):await supabase.from('services').insert([payload]);$('serviceSubmit').disabled=false;
+ if(result.error){message('serviceMessage',(id?'Update':'Add')+' failed: '+result.error.message);return}
+ message('serviceMessage',id?'Service updated successfully.':'Service added successfully.');resetServiceForm();await loadServices();
+});
+$('cancelServiceEdit').addEventListener('click',resetServiceForm);
+$('loginForm').addEventListener('submit',async e=>{
+ e.preventDefault();message('loginMessage','Signing in…');$('loginBtn').disabled=true;
+ const {data,error}=await supabase.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+ $('loginBtn').disabled=false;
+ if(error){message('loginMessage',error.message);return}
+ try{await enterDashboard(data.user)}catch(err){message('loginMessage',err.message)}
+});
+$('logoutBtn').addEventListener('click',async()=>{await supabase.auth.signOut();location.reload()});
+(async()=>{
+ const {data,error}=await supabase.auth.getSession();
+ if(error){message('loginMessage','Session check failed: '+error.message);return}
+ if(data.session){try{await enterDashboard(data.session.user)}catch(err){message('loginMessage',err.message)}}
+})();
 </script>
+<script>if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'))}</script>
 </body>
 </html>
