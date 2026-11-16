@@ -724,3 +724,125 @@ a{text-decoration:none;color:inherit}
   font-weight:700;
   cursor:pointer;
 }
+
+/* GALAXY COMPUTER - PROFESSIONAL DESKTOP LAYOUT */
+
+/* Keep the main homepage clean and white */
+:root {
+  --paper: #ffffff;
+}
+
+body {
+  background: #ffffff;
+}
+
+.products-section,
+.contact-section {
+  background: #ffffff;
+}
+
+/* White home service section */
+.home-service {
+  background: #ffffff;
+  color: var(--ink);
+  border-top: 1px solid #eeeeee;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.home-service p {
+  color: var(--muted);
+}
+
+.service-orbit {
+  background: #fff7e9;
+}
+
+.service-orbit b {
+  color: var(--ink);
+}
+
+.btn-light {
+  background: #ff791a;
+  color: #111111;
+}
+
+/* Desktop improvements only */
+@media (min-width: 761px) {
+
+  .container {
+    width: min(1280px, 92%);
+  }
+
+  .nav-wrap {
+    display: grid;
+    grid-template-columns: 230px 1fr auto;
+    grid-template-areas:
+      "brand blank actions"
+      "category nav nav";
+    gap: 14px 24px;
+    padding: 14px 0;
+    min-height: auto;
+  }
+
+  .brand {
+    grid-area: brand;
+    min-width: 0;
+  }
+
+  .brand-mark {
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: #111111;
+    color: #ff791a;
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .nav-actions {
+    grid-area: actions;
+    justify-self: end;
+  }
+
+  .nav {
+    grid-area: nav;
+    justify-content: flex-end;
+    gap: 20px;
+    margin: 0;
+    flex-wrap: wrap;
+  }
+
+  .category-open-btn {
+    grid-area: category;
+    justify-self: start;
+    min-width: 180px;
+    text-align: left;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .product-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .product-visual {
+    height: 170px;
+  }
+
+  .section {
+    padding: 70px 0;
+  }
+}
+
+/* Wide desktop screens */
+@media (min-width: 1440px) {
+  .product-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
