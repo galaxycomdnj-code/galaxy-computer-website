@@ -234,3 +234,35 @@ button{cursor:pointer}
   padding:4px;
   object-fit:contain;
 }
+
+
+/* Product details and mobile product-card usability */
+.product-details-btn{
+  width:100%;margin:0 0 7px;padding:8px 6px;border:1px solid #e7a13c;
+  border-radius:7px;background:#fff;color:#111;font:700 10px var(--font-brand),var(--font-bn),sans-serif;
+}
+.product-details-btn:hover{background:#fff3df;border-color:var(--orange)}
+.product-dialog{width:min(720px,calc(100% - 28px));max-width:720px;border:0;border-radius:16px;padding:0;box-shadow:0 22px 80px #0005}
+.product-dialog::backdrop{background:#0009;backdrop-filter:blur(3px)}
+.product-dialog-panel{position:relative;padding:26px;background:#fff;border-radius:16px}
+.product-dialog-close{position:absolute;right:12px;top:10px;width:34px;height:34px;border:0;border-radius:50%;background:#f1f1f1;font-size:24px;line-height:1}
+.product-dialog-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:25px;align-items:center;padding-top:12px}
+.product-dialog-image{width:100%;height:270px;object-fit:contain;background:#fafafa;border-radius:12px}
+.product-dialog-details h2{font:800 21px/1.35 var(--font-brand),var(--font-bn),sans-serif;margin:0 35px 12px 0}
+.product-dialog-category{display:inline-block;padding:5px 9px;background:#fff0d8;border-radius:20px;color:#8c4b00;font-size:11px}
+.product-dialog-details p{font-size:13px;line-height:1.7;color:#626262;white-space:pre-line}
+.product-dialog-price{display:block;color:#d97900;font:800 19px var(--font-brand);margin:14px 0}
+.product-dialog-ask{margin-top:6px}
+@media(max-width:600px){
+ .product-dialog-panel{padding:18px}
+ .product-dialog-layout{grid-template-columns:1fr;gap:14px}
+ .product-dialog-image{height:180px}
+ .product-dialog-details h2{font-size:17px}
+ .product-dialog-details p{font-size:12px}
+ .product-card{padding:8px}
+ .product-image-wrap{height:125px}
+ .product-card h3{font-size:11px;line-height:1.45;min-height:34px}
+ .product-card p{font-size:10px}
+ .product-price{font-size:12px}
+ .product-card a,.product-details-btn{font-size:10px;padding:9px 5px}
+}
