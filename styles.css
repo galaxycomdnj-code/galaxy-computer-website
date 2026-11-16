@@ -228,11 +228,24 @@ button{cursor:pointer}
 @media(prefers-reduced-motion:reduce){.category-tile,.product-card,.service-card,.btn{transition:none}}
 
 /* Footer logo contrast: preserve the original black-and-orange mark on dark footer */
+.brand-footer{position:relative}
 .brand-footer .brand-mark{
-  background:#fff;
-  border-radius:6px;
-  padding:4px;
+  background:transparent;
+  border-radius:0;
+  padding:0;
   object-fit:contain;
+  filter:brightness(0) invert(1);
+}
+.brand-footer::after{
+  content:"";
+  position:absolute;
+  width:11px;
+  height:11px;
+  left:36px;
+  top:1px;
+  border-radius:1px;
+  background:#ff9800;
+  pointer-events:none;
 }
 
 
