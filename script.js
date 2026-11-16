@@ -28,6 +28,113 @@ $('languageBtn')?.addEventListener('click', () => {
 });
 if ($('year')) $('year').textContent = new Date().getFullYear();
 
+// Cart: stores only the shopper's cart locally; checkout is handed off to WhatsApp.
+const CART_STORAGE_KEY = 'galaxy-computer-cart-v1';
+let cartItems = [];
+try {
+  const savedCart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
+  cartItems = Array.isArray(savedCart) ? savedCart.filter(item => item && item.id && item.name && Number.isInteger(item.quantity) && item.quantity > 0) : [];
+} catch { cartItems = []; }
+
+function saveCart() {
+  try { localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems)); }
+  catch (error) { console.warn('Cart could not be saved on this device.', error); }
+  renderCart();
+}
+function formatBDT(value) {
+  return '৳ ' + Number(value || 0).toLocaleString('en-BD');
+}
+function addToCart(product) {
+  const id = String(product.id || product.name);
+  const existing = cartItems.find(item => String(item.id) === id);
+  if (existing) existing.quantity += 1;
+  else cartItems.push({
+    id, name: product.name || 'Product', price: Number.isFinite(Number(product.price)) && product.price !== null && product.price !== '' ? Number(product.price) : null,
+    image_url: product.image_url || '', quantity: 1
+  });
+  saveCart();
+  const dialog = $('cartDialog');
+  if (dialog && !dialog.open) dialog.showModal();
+}
+function changeCartQuantity(id, change) {
+  const item = cartItems.find(entry => String(entry.id) === String(id));
+  if (!item) return;
+  item.quantity += change;
+  if (item.quantity <= 0) cartItems = cartItems.filter(entry => String(entry.id) !== String(id));
+  saveCart();
+}
+function removeCartItem(id) {
+  cartItems = cartItems.filter(entry => String(entry.id) !== String(id));
+  saveCart();
+}
+function renderCart() {
+  const count = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  if ($('cartCount')) $('cartCount').textContent = String(count);
+  const list = $('cartItems');
+  if (!list) return;
+  list.replaceChildren();
+  if (!cartItems.length) {
+    const empty = document.createElement('p');
+    empty.className = 'cart-empty';
+    empty.textContent = english ? 'Your cart is empty.' : 'আপনার কার্ট এখনো খালি।';
+    list.append(empty);
+  }
+  cartItems.forEach(item => {
+    const row = document.createElement('article');
+    row.className = 'cart-item';
+    const name = document.createElement('strong');
+    name.textContent = item.name;
+    const price = document.createElement('span');
+    price.className = 'cart-item-price';
+    price.textContent = item.price === null ? (english ? 'Price on request' : 'দাম জানতে যোগাযোগ করুন') : formatBDT(item.price * item.quantity);
+    const controls = document.createElement('div');
+    controls.className = 'cart-quantity';
+    const minus = document.createElement('button');
+    minus.type = 'button'; minus.textContent = '−'; minus.setAttribute('aria-label', 'Decrease quantity');
+    minus.addEventListener('click', () => changeCartQuantity(item.id, -1));
+    const qty = document.createElement('span'); qty.textContent = String(item.quantity);
+    const plus = document.createElement('button');
+    plus.type = 'button'; plus.textContent = '+'; plus.setAttribute('aria-label', 'Increase quantity');
+    plus.addEventListener('click', () => changeCartQuantity(item.id, 1));
+    const remove = document.createElement('button');
+    remove.type = 'button'; remove.className = 'cart-remove'; remove.textContent = english ? 'Remove' : 'বাদ দিন';
+    remove.addEventListener('click', () => removeCartItem(item.id));
+    controls.append(minus, qty, plus, remove);
+    row.append(name, price, controls);
+    list.append(row);
+  });
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.price === null ? 0 : item.price * item.quantity), 0);
+  if ($('cartSubtotal')) $('cartSubtotal').textContent = formatBDT(subtotal);
+  const checkout = $('checkoutForm');
+  if (checkout) {
+    const disabled = cartItems.length === 0;
+    checkout.querySelectorAll('input,textarea,button').forEach(control => control.disabled = disabled);
+  }
+}
+$('openCart')?.addEventListener('click', () => { renderCart(); $('cartDialog')?.showModal(); });
+$('closeCart')?.addEventListener('click', () => $('cartDialog')?.close());
+$('checkoutForm')?.addEventListener('submit', event => {
+  event.preventDefault();
+  if (!cartItems.length) return;
+  const name = $('customerName').value.trim();
+  const phone = $('customerPhone').value.trim();
+  const address = $('customerAddress').value.trim();
+  const note = $('customerNote').value.trim();
+  if (!name || !phone || !address) return;
+  const lines = cartItems.map(item => `• ${item.name} × ${item.quantity} — ${item.price === null ? 'Price to confirm' : formatBDT(item.price * item.quantity)}`);
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.price === null ? 0 : item.price * item.quantity), 0);
+  const message = [
+    'Assalamu Alaikum, Galaxy Computer. I want to place an order:',
+    ...lines,
+    `Subtotal (priced items): ${formatBDT(subtotal)}`,
+    `Name: ${name}`, `Phone: ${phone}`, `Delivery address: ${address}`,
+    note ? `Note: ${note}` : '',
+    'Please confirm availability, delivery charge and final total.'
+  ].filter(Boolean).join('\n');
+  window.open(`https://wa.me/8801621422327?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+});
+renderCart();
+
 // Supabase public read access; write access remains in the protected Admin Panel.
 const SUPABASE_URL = 'https://wfuvzfiwnpbgbzzeygei.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_FMsWzO2LqaTzM8tem94M2w_i3HhnWHR';
@@ -94,6 +201,12 @@ function renderProducts(products) {
       card.append(price);
     }
 
+    const cartButton = document.createElement('button');
+    cartButton.type = 'button';
+    cartButton.className = 'cart-add-btn';
+    cartButton.textContent = english ? 'Add to Cart' : 'কার্টে যোগ করুন';
+    cartButton.addEventListener('click', () => addToCart(product));
+
     const detailsButton = document.createElement('button');
     detailsButton.type = 'button';
     detailsButton.className = 'product-details-btn';
@@ -105,7 +218,7 @@ function renderProducts(products) {
     orderLink.target = '_blank';
     orderLink.rel = 'noopener';
     orderLink.textContent = english ? 'Ask on WhatsApp ↗' : 'দাম ও বিস্তারিত জানুন ↗';
-    card.append(detailsButton, orderLink);
+    card.append(cartButton, detailsButton, orderLink);
     productGrid.append(card);
   });
 }
