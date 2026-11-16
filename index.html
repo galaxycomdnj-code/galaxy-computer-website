@@ -35,6 +35,9 @@
         <button type="submit" aria-label="Search">⌕</button>
       </form>
       <div class="header-actions">
+        <button class="cart-trigger" id="openCart" type="button" aria-haspopup="dialog" aria-controls="cartDialog">
+          <span aria-hidden="true">🛒</span><span data-bn="কার্ট" data-en="Cart">কার্ট</span><b id="cartCount">0</b>
+        </button>
         <a class="header-contact" href="tel:01621422327"><span class="action-icon">☎</span><span><small>Call us</small><b>01621422327</b></span></a>
         <a class="header-whatsapp" href="https://wa.me/8801621422327?text=আসসালামু%20আলাইকুম,%20Galaxy%20Computer" target="_blank" rel="noopener"><span>WhatsApp</span><b>Order / Support</b></a>
       </div>
@@ -154,6 +157,23 @@
   </main>
 
 
+
+  <dialog class="cart-dialog" id="cartDialog" aria-labelledby="cartTitle">
+    <div class="cart-panel">
+      <div class="cart-heading"><div><span class="eyebrow">GALAXY COMPUTER</span><h2 id="cartTitle">Shopping Cart</h2></div><button id="closeCart" class="cart-close" type="button" aria-label="Close cart">×</button></div>
+      <div id="cartItems" class="cart-items" aria-live="polite"><p class="cart-empty">Your cart is empty.</p></div>
+      <div class="cart-summary"><span>Subtotal</span><strong id="cartSubtotal">৳ 0</strong></div>
+      <p class="cart-note">Delivery charges, availability and final price will be confirmed by Galaxy Computer.</p>
+      <form id="checkoutForm" class="checkout-form">
+        <h3>Checkout details</h3>
+        <label for="customerName">Full name</label><input id="customerName" name="name" autocomplete="name" required maxlength="80" placeholder="Your name">
+        <label for="customerPhone">Phone number</label><input id="customerPhone" name="phone" type="tel" autocomplete="tel" required minlength="10" maxlength="16" placeholder="01XXXXXXXXX">
+        <label for="customerAddress">Delivery address</label><textarea id="customerAddress" name="address" autocomplete="street-address" required maxlength="400" rows="2" placeholder="House, road, area, city"></textarea>
+        <label for="customerNote">Order note (optional)</label><textarea id="customerNote" name="note" maxlength="300" rows="2" placeholder="Any additional information"></textarea>
+        <button class="btn btn-primary checkout-submit" type="submit">Continue to WhatsApp Checkout ↗</button>
+      </form>
+    </div>
+  </dialog>
     <dialog class="product-dialog" id="productDialog" aria-labelledby="productDialogTitle">
       <div class="product-dialog-panel">
         <button class="product-dialog-close" id="closeProductDialog" type="button" aria-label="Close product details">×</button>
