@@ -226,3 +226,11 @@ button{cursor:pointer}
   .brand-copy b{font-size:14px}
 }
 @media(prefers-reduced-motion:reduce){.category-tile,.product-card,.service-card,.btn{transition:none}}
+
+/* Footer logo contrast: preserve the original black-and-orange mark on dark footer */
+.brand-footer .brand-mark{
+  background:#fff;
+  border-radius:6px;
+  padding:4px;
+  object-fit:contain;
+}
