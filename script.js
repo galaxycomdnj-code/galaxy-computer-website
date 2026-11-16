@@ -219,11 +219,10 @@ document.querySelectorAll('.category-tile').forEach(tile => {
       software: ['software', 'operating system']
     };
     const terms = aliases[category] || [category];
-    const matches = productsCache.filter(product =>
-      [product.name, product.description, product.category].filter(Boolean).join(' ').toLowerCase().includes(terms.find(term =>
-        [product.name, product.description, product.category].filter(Boolean).join(' ').toLowerCase().includes(term)
-      ) || '\\u0000')
-    );
+    const matches = productsCache.filter(product => {
+      const searchable = [product.name, product.description, product.category].filter(Boolean).join(' ').toLowerCase();
+      return terms.some(term => searchable.includes(term));
+    });
     renderProducts(matches);
     $('clearProductSearch').hidden = false;
   });
@@ -310,7 +309,12 @@ $('categorySearch')?.addEventListener('input', event => {
     group.style.display = group.textContent.toLowerCase().includes(query) ? '' : 'none';
   });
 });
-document.querySelectorAll('.category-submenu a').forEach(link => link.addEventListener('click', closeCategoryMenu));
+document.querySelectorAll('.category-submenu a').forEach(link => link.addEventListener('click', () => {
+  const term = link.textContent.trim();
+  if ($('productSearch')) $('productSearch').value = term;
+  filterProducts(term);
+  closeCategoryMenu();
+}));
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(error => console.warn('Service worker registration failed:', error)));
