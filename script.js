@@ -24,6 +24,7 @@ $('languageBtn')?.addEventListener('click', () => {
   $('languageBtn').textContent = english ? 'বাংলা' : 'EN';
   const search = $('productSearch');
   if (search) search.placeholder = english ? 'Search products...' : 'পণ্য খুঁজুন...';
+  if (typeof productsCache !== 'undefined') filterProducts(search?.value || '');
 });
 if ($('year')) $('year').textContent = new Date().getFullYear();
 
@@ -93,15 +94,77 @@ function renderProducts(products) {
       card.append(price);
     }
 
+    const detailsButton = document.createElement('button');
+    detailsButton.type = 'button';
+    detailsButton.className = 'product-details-btn';
+    detailsButton.textContent = english ? 'View Details' : 'বিস্তারিত দেখুন';
+    detailsButton.addEventListener('click', () => openProductDetails(product));
+
     const orderLink = document.createElement('a');
     orderLink.href = `https://wa.me/8801621422327?text=${encodeURIComponent(`${product.name} সম্পর্কে জানতে চাই`)}`;
     orderLink.target = '_blank';
     orderLink.rel = 'noopener';
     orderLink.textContent = english ? 'Ask on WhatsApp ↗' : 'দাম ও বিস্তারিত জানুন ↗';
-    card.append(orderLink);
+    card.append(detailsButton, orderLink);
     productGrid.append(card);
   });
 }
+
+function openProductDetails(product) {
+  const dialog = $('productDialog');
+  const content = $('productDialogContent');
+  if (!dialog || !content) return;
+  content.replaceChildren();
+
+  const layout = document.createElement('div');
+  layout.className = 'product-dialog-layout';
+  const image = document.createElement('img');
+  image.className = 'product-dialog-image';
+  image.alt = product.name || 'Galaxy Computer product';
+  image.src = product.image_url || 'logo-mark.png';
+  image.onerror = () => { image.src = 'logo-mark.png'; };
+  const details = document.createElement('div');
+  details.className = 'product-dialog-details';
+  const title = document.createElement('h2');
+  title.id = 'productDialogTitle';
+  title.textContent = product.name || (english ? 'Product details' : 'পণ্যের বিবরণ');
+  details.append(title);
+
+  if (product.category) {
+    const category = document.createElement('span');
+    category.className = 'product-dialog-category';
+    category.textContent = product.category;
+    details.append(category);
+  }
+  if (product.description) {
+    const description = document.createElement('p');
+    description.textContent = product.description;
+    details.append(description);
+  }
+  if (product.price !== null && product.price !== undefined && String(product.price).trim() !== '') {
+    const price = document.createElement('strong');
+    price.className = 'product-dialog-price';
+    const numericPrice = Number(product.price);
+    price.textContent = Number.isFinite(numericPrice) && String(product.price).trim() !== ''
+      ? `৳ ${numericPrice.toLocaleString('en-BD')}`
+      : String(product.price);
+    details.append(price);
+  }
+  const ask = document.createElement('a');
+  ask.className = 'btn btn-primary product-dialog-ask';
+  ask.href = `https://wa.me/8801621422327?text=${encodeURIComponent(`${product.name || 'Product'} সম্পর্কে জানতে চাই`)}`;
+  ask.target = '_blank';
+  ask.rel = 'noopener';
+  ask.textContent = english ? 'Ask on WhatsApp ↗' : 'WhatsApp-এ বিস্তারিত জানুন ↗';
+  details.append(ask);
+  layout.append(image, details);
+  content.append(layout);
+  if (!dialog.open) dialog.showModal();
+}
+$('closeProductDialog')?.addEventListener('click', () => $('productDialog')?.close());
+$('productDialog')?.addEventListener('click', event => {
+  if (event.target === $('productDialog')) $('productDialog').close();
+});
 
 function filterProducts(term) {
   const query = (term || '').trim().toLowerCase();
@@ -144,7 +207,25 @@ document.querySelectorAll('.category-tile').forEach(tile => {
   tile.addEventListener('click', () => {
     const category = tile.dataset.category || '';
     $('productSearch').value = category;
-    filterProducts(category);
+    const aliases = {
+      laptop: ['laptop', 'notebook'],
+      desktop: ['desktop', 'pc'],
+      monitor: ['monitor', 'display'],
+      processor: ['processor', 'cpu'],
+      ram: ['ram', 'memory'],
+      ssd: ['ssd', 'solid state'],
+      graphics: ['graphics', 'gpu', 'vga'],
+      accessories: ['accessory', 'accessories', 'keyboard', 'mouse', 'headphone'],
+      software: ['software', 'operating system']
+    };
+    const terms = aliases[category] || [category];
+    const matches = productsCache.filter(product =>
+      [product.name, product.description, product.category].filter(Boolean).join(' ').toLowerCase().includes(terms.find(term =>
+        [product.name, product.description, product.category].filter(Boolean).join(' ').toLowerCase().includes(term)
+      ) || '\\u0000')
+    );
+    renderProducts(matches);
+    $('clearProductSearch').hidden = false;
   });
 });
 loadProducts();
