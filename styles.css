@@ -177,3 +177,52 @@ button{cursor:pointer}
 @media(max-width:420px){.topbar-inner>span:first-child{font-size:9px}.topbar-inner>span:nth-child(3){font-size:9px}.hero{background-position:60% center}.hero-copy{width:83%}.hero h1{font-size:25px}.hero-points{max-width:250px}.category-grid{grid-template-columns:repeat(3,1fr)}.benefit-grid{grid-template-columns:1fr 1fr}.service-grid{grid-template-columns:1fr 1fr}.home-service-inner{flex-direction:column}.service-orbit{display:none}.footer-main{gap:20px 12px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
 .managed-service-image{width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:8px}
+
+
+/* Galaxy Computer homepage refinement — black, white & signature orange */
+:root{--orange:#ff9800;--orange-dark:#e98200;--ink:#101010;--line:#e8e8e8}
+::selection{background:#ff9800;color:#111}
+.brand{gap:11px}
+.brand-mark{width:49px;height:52px}
+.brand-copy{letter-spacing:-.9px}
+.brand-copy strong{font-family:'Sora',sans-serif;font-weight:800;letter-spacing:-1.15px}
+.brand-copy b{font-family:'Sora',sans-serif;font-weight:700;letter-spacing:-.55px}
+.search-form{border-color:#d9d9d9;border-radius:8px}
+.search-form button{background:var(--orange);color:#111;font-weight:800}
+.category-open-btn{background:var(--orange);color:#111;font-family:'Sora',sans-serif}
+.nav-links a{transition:color .18s ease}
+.hero{background-color:#f4f4f4;background-position:center;background-size:cover}
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(255,255,255,.97) 0%,rgba(255,255,255,.91) 36%,rgba(255,255,255,.25) 64%,rgba(255,255,255,0) 100%)}
+.hero-content{position:relative;z-index:1}
+.hero-copy{width:min(53%,640px)}
+.hero h1{max-width:610px;text-wrap:balance}
+.hero h1 span{color:var(--orange-dark)}
+.hero .btn-primary{background:var(--orange);color:#111}
+.category-tile{border-color:#ededed;box-shadow:0 4px 14px #1111110b}
+.category-icon{color:#111;text-shadow:2px 2px 0 #ffad2e}
+.benefit-grid>div{border-color:#e6e6e6}
+.benefit-icon{background:#fff0d8;color:#111}
+.products-section{background:#f7f7f7}
+.product-card{border-color:#e8e8e8;box-shadow:0 3px 13px #1111110a}
+.product-card:hover{border-color:#ffc36c;box-shadow:0 10px 24px #11111112}
+.product-card a{background:var(--orange);color:#111}
+.product-price{color:#df7800}
+.service-promo{background:linear-gradient(105deg,#ff9800 0%,#ffad24 58%,#ffc04f 100%)}
+.service-promo .btn{background:#111;color:#fff}
+.service-card{box-shadow:0 3px 14px #11111106}
+.service-card:hover{border-color:#ffbd59}
+.home-service{background:#101010}
+.home-service .eyebrow{color:#ffad24}
+.about-section{background:#f7f7f7}
+.about-card{border-color:#e9e9e9}
+.footer{background:#101010}
+.footer-bottom{border-color:#343434}
+.floating-wa{box-shadow:0 7px 22px #0003}
+@media(max-width:760px){
+  .hero::before{background:linear-gradient(90deg,rgba(255,255,255,.97) 0%,rgba(255,255,255,.89) 55%,rgba(255,255,255,.48) 100%)}
+  .hero-copy{width:84%}
+  .brand-mark{width:41px;height:44px}
+  .brand-copy strong{font-size:18px}
+  .brand-copy b{font-size:14px}
+}
+@media(prefers-reduced-motion:reduce){.category-tile,.product-card,.service-card,.btn{transition:none}}
