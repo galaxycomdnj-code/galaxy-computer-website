@@ -24,7 +24,7 @@ $('languageBtn')?.addEventListener('click', () => {
   $('languageBtn').textContent = english ? 'বাংলা' : 'EN';
   const search = $('productSearch');
   if (search) search.placeholder = english ? 'Search products...' : 'পণ্য খুঁজুন...';
-  if (typeof productsCache !== 'undefined') filterProducts(search?.value || '');
+  if (typeof productsCache !== 'undefined') { populateCategoryFilter(); filterProducts(search?.value || ''); }
 });
 if ($('year')) $('year').textContent = new Date().getFullYear();
 
@@ -279,13 +279,34 @@ $('productDialog')?.addEventListener('click', event => {
   if (event.target === $('productDialog')) $('productDialog').close();
 });
 
+let activeCategoryTerms = [];
+function populateCategoryFilter() {
+  const select = $('productCategoryFilter');
+  if (!select) return;
+  const current = select.value;
+  const categories = [...new Set(productsCache.map(product => String(product.category || '').trim()).filter(Boolean))].sort((a,b) => a.localeCompare(b));
+  select.replaceChildren();
+  const all = document.createElement('option'); all.value = ''; all.textContent = english ? 'All categories' : 'সব ক্যাটাগরি'; select.append(all);
+  categories.forEach(category => { const option = document.createElement('option'); option.value = category; option.textContent = category; select.append(option); });
+  select.value = categories.includes(current) ? current : '';
+}
 function filterProducts(term) {
   const query = (term || '').trim().toLowerCase();
-  const filtered = !query ? productsCache : productsCache.filter(product =>
-    [product.name, product.description, product.category].filter(Boolean).join(' ').toLowerCase().includes(query)
-  );
+  const selectedCategory = ($('productCategoryFilter')?.value || '').trim().toLowerCase();
+  let filtered = productsCache.filter(product => {
+    const searchable = [product.name, product.description, product.category].filter(Boolean).join(' ').toLowerCase();
+    const matchesQuery = !query || searchable.includes(query);
+    const matchesCategory = !selectedCategory || String(product.category || '').toLowerCase() === selectedCategory;
+    const matchesShortcut = !activeCategoryTerms.length || activeCategoryTerms.some(word => searchable.includes(word));
+    return matchesQuery && matchesCategory && matchesShortcut;
+  });
+  const sort = $('productSort')?.value || 'newest';
+  if (sort === 'price-asc') filtered.sort((a,b) => (Number(a.price) || Number.POSITIVE_INFINITY) - (Number(b.price) || Number.POSITIVE_INFINITY));
+  else if (sort === 'price-desc') filtered.sort((a,b) => (Number(b.price) || 0) - (Number(a.price) || 0));
+  else if (sort === 'name-asc') filtered.sort((a,b) => String(a.name || '').localeCompare(String(b.name || '')));
+  else filtered.sort((a,b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
   renderProducts(filtered);
-  $('clearProductSearch').hidden = !query;
+  $('clearProductSearch').hidden = !(query || selectedCategory || activeCategoryTerms.length);
 }
 
 async function loadProducts() {
@@ -298,7 +319,8 @@ async function loadProducts() {
     if (!response.ok) throw new Error(`Product request failed (${response.status})`);
     const products = await response.json();
     productsCache = Array.isArray(products) ? products : [];
-    renderProducts(productsCache);
+    populateCategoryFilter();
+    filterProducts($('productSearch')?.value || '');
   } catch (error) {
     console.error('Could not load products:', error);
     showProductMessage(english ? 'Products could not be loaded right now. Please contact us on WhatsApp.' : 'এই মুহূর্তে পণ্য লোড করা যায়নি। WhatsApp-এ যোগাযোগ করুন।');
@@ -311,15 +333,18 @@ $('productSearchForm')?.addEventListener('submit', event => {
   filterProducts($('productSearch').value);
   $('products').scrollIntoView({ behavior: 'smooth' });
 });
-$('productSearch')?.addEventListener('input', event => filterProducts(event.target.value));
+$('productSearch')?.addEventListener('input', event => { activeCategoryTerms = []; filterProducts(event.target.value); });
+$('productCategoryFilter')?.addEventListener('change', () => { activeCategoryTerms = []; filterProducts($('productSearch')?.value || ''); });
+$('productSort')?.addEventListener('change', () => filterProducts($('productSearch')?.value || ''));
 $('clearProductSearch')?.addEventListener('click', () => {
   $('productSearch').value = '';
+  $('productCategoryFilter').value = '';
+  activeCategoryTerms = [];
   filterProducts('');
 });
 document.querySelectorAll('.category-tile').forEach(tile => {
   tile.addEventListener('click', () => {
     const category = tile.dataset.category || '';
-    $('productSearch').value = category;
     const aliases = {
       laptop: ['laptop', 'notebook'],
       desktop: ['desktop', 'pc'],
@@ -331,13 +356,10 @@ document.querySelectorAll('.category-tile').forEach(tile => {
       accessories: ['accessory', 'accessories', 'keyboard', 'mouse', 'headphone'],
       software: ['software', 'operating system']
     };
-    const terms = aliases[category] || [category];
-    const matches = productsCache.filter(product => {
-      const searchable = [product.name, product.description, product.category].filter(Boolean).join(' ').toLowerCase();
-      return terms.some(term => searchable.includes(term));
-    });
-    renderProducts(matches);
-    $('clearProductSearch').hidden = false;
+    activeCategoryTerms = aliases[category] || [category];
+    $('productSearch').value = '';
+    $('productCategoryFilter').value = '';
+    filterProducts('');
   });
 });
 loadProducts();
