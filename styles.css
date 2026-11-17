@@ -885,3 +885,10 @@ button{cursor:pointer}
 .product-breadcrumb a:hover{color:var(--orange)}
 .product-breadcrumb-separator{color:#bbb}
 @media(max-width:760px){.product-breadcrumb{gap:6px;margin-bottom:12px;font-size:10px}}
+
+
+/* Main navigation: tighter spacing and stronger category labels */
+@media(min-width:761px){
+  .nav-links{gap:clamp(2px,.35vw,6px)}
+  .nav-links a{font-weight:800;font-size:clamp(10px,.82vw,12px);letter-spacing:-.2px;padding-inline:1px}
+}
