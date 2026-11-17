@@ -799,3 +799,15 @@ button{cursor:pointer}
   .benefit-grid{grid-template-columns:repeat(4,minmax(0,1fr));}
   .benefit-grid>div{min-width:0}
 }
+
+
+/* Desktop navigation category hover dropdowns */
+@media(min-width:761px){
+  .nav-links{align-items:stretch}
+  .nav-category{position:relative;display:flex;align-items:stretch}
+  .nav-category>a{display:flex;align-items:center}
+  .nav-category-dropdown{display:none;position:absolute;top:100%;left:0;z-index:80;min-width:205px;max-width:280px;padding:9px;background:#fff;border:1px solid #e8e8e8;border-top:3px solid var(--orange);border-radius:0 0 10px 10px;box-shadow:0 12px 28px #0002;gap:5px;flex-wrap:wrap}
+  .nav-category:hover .nav-category-dropdown,.nav-category:focus-within .nav-category-dropdown{display:flex}
+  .nav-category-dropdown a{display:block!important;width:100%;padding:8px 10px!important;border-radius:6px;color:#333!important;font:500 11px var(--font-brand),var(--font-bn),sans-serif!important;white-space:normal!important}
+  .nav-category-dropdown a:hover,.nav-category-dropdown a:focus{background:#fff1dc;color:#111!important}
+}
