@@ -914,3 +914,15 @@ button{cursor:pointer}
     letter-spacing:-.15px;
   }
 }
+
+
+/* Mobile homepage product titles: keep natural word wrapping */
+@media(max-width:760px){
+  .product-card h3{
+    word-break:normal;
+    overflow-wrap:break-word;
+    hyphens:manual;
+    line-height:1.45;
+    min-height:3em;
+  }
+}
