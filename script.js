@@ -408,17 +408,23 @@ loadManagedServices();
 const categoryDrawer = $('categoryDrawer');
 const categoryOverlay = $('categoryOverlay');
 function openCategoryMenu() {
-  categoryDrawer?.classList.add('active');
+  if (!categoryDrawer) return;
+  categoryDrawer.inert = false;
+  categoryDrawer.classList.add('active');
   categoryOverlay?.classList.add('active');
-  categoryDrawer?.setAttribute('aria-hidden', 'false');
+  categoryDrawer.setAttribute('aria-hidden', 'false');
   $('openCategories')?.setAttribute('aria-expanded', 'true');
   $('categorySearch')?.focus();
 }
 function closeCategoryMenu() {
-  categoryDrawer?.classList.remove('active');
+  if (!categoryDrawer) return;
+  const wasOpen = categoryDrawer.classList.contains('active');
+  categoryDrawer.classList.remove('active');
   categoryOverlay?.classList.remove('active');
-  categoryDrawer?.setAttribute('aria-hidden', 'true');
+  categoryDrawer.setAttribute('aria-hidden', 'true');
+  categoryDrawer.inert = true;
   $('openCategories')?.setAttribute('aria-expanded', 'false');
+  if (wasOpen) $('openCategories')?.focus();
 }
 $('openCategories')?.addEventListener('click', openCategoryMenu);
 $('closeCategories')?.addEventListener('click', closeCategoryMenu);
@@ -427,15 +433,38 @@ document.addEventListener('keydown', event => {
   if (event.key === 'Escape') {
     closeMainMenu();
     closeCategoryMenu();
+    return;
+  }
+  if (event.key === 'Tab' && categoryDrawer?.classList.contains('active')) {
+    const focusable = [...categoryDrawer.querySelectorAll('button:not([disabled]), input:not([disabled]), a[href]')]
+      .filter(element => element.getClientRects().length > 0);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   }
 });
-document.querySelectorAll('.category-item').forEach(button => {
+document.querySelectorAll('.category-item').forEach((button, index) => {
+  const submenu = button.nextElementSibling;
+  if (submenu) {
+    const submenuId = `category-submenu-${index + 1}`;
+    submenu.id = submenuId;
+    button.setAttribute('aria-controls', submenuId);
+    button.setAttribute('aria-expanded', 'false');
+  }
   button.addEventListener('click', () => {
-    const submenu = button.nextElementSibling;
+    const target = button.nextElementSibling;
     const symbol = button.querySelector('span');
-    if (!submenu) return;
-    submenu.classList.toggle('open');
-    if (symbol) symbol.textContent = submenu.classList.contains('open') ? '−' : '+';
+    if (!target) return;
+    const isOpen = target.classList.toggle('open');
+    button.setAttribute('aria-expanded', String(isOpen));
+    if (symbol) symbol.textContent = isOpen ? '−' : '+';
   });
 });
 $('categorySearch')?.addEventListener('input', event => {
