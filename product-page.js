@@ -65,10 +65,6 @@
       title.className = 'product-page-title';
       title.textContent = product.name || 'Product Details';
       summary.append(title);
-      const code = document.createElement('p');
-      code.className = 'product-detail-meta';
-      code.textContent = 'Product ID: ' + String(product.id);
-      summary.append(code);
       const price = document.createElement('strong');
       price.className = 'product-page-price';
       price.textContent = product.price !== null && product.price !== undefined && String(product.price).trim() !== '' ? money(product.price) : 'Contact for Price';
