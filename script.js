@@ -490,3 +490,11 @@ document.querySelectorAll('.category-submenu a').forEach(link => link.addEventLi
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(error => console.warn('Service worker registration failed:', error)));
 }
+
+
+// Open the cart automatically when a shopper chooses Buy Now from a product page.
+if (new URLSearchParams(window.location.search).get('buyNow') === '1') {
+  renderCart();
+  const cartDialog = $('cartDialog');
+  if (cartDialog && !cartDialog.open) cartDialog.showModal();
+}
