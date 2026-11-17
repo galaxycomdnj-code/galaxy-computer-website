@@ -5,7 +5,13 @@
 <text x="5" y="66" font-size="59" letter-spacing="-3.5">GALAXY</text>
 <text x="54" y="101" font-size="25" letter-spacing="2.2">COMPUTER</text>
 </g>
-<path d="M112 60 C126 17 185 -5 267 15" fill="none" stroke="#ff9800" stroke-width="4.5" stroke-linecap="round"/>
-<path d="M260 7 L271 15 L260 22" fill="none" stroke="#ff9800" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M205 20 L218 5" fill="none" stroke="#ff9800" stroke-width="6" stroke-linecap="square"/>
+<!-- Thick, smooth orange sweep starts at the L/A junction, crosses the A's upper-left edge, and arches over X/Y -->
+<path d="M111 66 C119 43 133 20 155 9 C185 -6 225 -5 264 7 C278 11 286 17 291 22
+L288 27 C278 18 267 14 253 11 C218 4 184 6 160 18 C140 28 126 47 119 68 Z" fill="#ff8500"/>
+<!-- Small orange overlay on the A edge so the sweep visibly touches the letter -->
+<path d="M119 66 L132 66 L137 55 L126 55 Z" fill="#ff8500"/>
+<!-- Arrow tip beyond Y -->
+<path d="M282 11 L299 20 L286 32 Z" fill="#ff8500"/>
+<!-- Orange diagonal cut within X -->
+<path d="M202 20 L216 5 L228 5 L213 24 Z" fill="#ff8500"/>
 </svg>
