@@ -877,3 +877,11 @@ button{cursor:pointer}
  .product-description-copy{min-height:90px;padding:17px 16px}
  .product-description-copy p{font-size:13px;line-height:1.9}
 }
+
+
+/* Product details breadcrumb: Home / Product / Category / Subcategory */
+.product-breadcrumb{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 16px;color:#777;font:600 11px var(--font-brand),var(--font-bn),sans-serif}
+.product-breadcrumb a{color:#777;text-decoration:none}
+.product-breadcrumb a:hover{color:var(--orange)}
+.product-breadcrumb-separator{color:#bbb}
+@media(max-width:760px){.product-breadcrumb{gap:6px;margin-bottom:12px;font-size:10px}}
