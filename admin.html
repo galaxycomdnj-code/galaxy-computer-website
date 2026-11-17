@@ -36,8 +36,8 @@
 <div class="field"><label for="pdesc">Description</label><textarea id="pdesc" maxlength="1500" placeholder="Product details and specifications"></textarea></div>
 <div class="field"><label for="price">Price (BDT)</label><input id="price" type="number" min="0" step="0.01" placeholder="e.g. 65000"></div>
 <div class="field"><label for="category">Category</label><input id="category" maxlength="80" placeholder="Laptop, Monitor, RAM..."></div>
-<div class="field"><label for="pimage">Product image URL</label><input id="pimage" type="url" maxlength="1000" placeholder="https://example.com/image.jpg"><img id="imagePreview" class="preview" alt="Product image preview"></div>
-<p class="note">Use a direct HTTPS image URL. Image upload storage is not configured in this project yet.</p>
+<div class="field"><label for="pimageFile">Upload product image</label><input id="pimageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><span class="note">JPG, PNG, WEBP or GIF · Maximum 5 MB. Uploaded images will be stored securely.</span></div>
+<div class="field"><label for="pimage">Or use an image URL</label><input id="pimage" type="url" maxlength="1000" placeholder="https://example.com/image.jpg"><img id="imagePreview" class="preview" alt="Product image preview"></div>
 <div class="form-actions"><button class="btn" id="productSubmit" type="submit">Add product</button><button class="btn light hidden" id="cancelProductEdit" type="button">Cancel</button></div>
 </form>
 <p id="productMessage" class="message" role="status"></p>
@@ -121,15 +121,24 @@ async function deleteProduct(p){
 }
 $('productForm').addEventListener('submit',async e=>{
  e.preventDefault();const id=$('productId').value;
- const name=$('pname').value.trim();const priceText=$('price').value.trim();const imageText=$('pimage').value.trim();
+ const name=$('pname').value.trim();const priceText=$('price').value.trim();const imageText=$('pimage').value.trim();const imageFile=$('pimageFile').files[0];
  if(!name){message('productMessage','Please enter a product name.');return}
  if(priceText!==''&&(!Number.isFinite(Number(priceText))||Number(priceText)<0)){message('productMessage','Enter a valid non-negative price.');return}
  if(imageText&&!safeImageUrl(imageText)){message('productMessage','Image URL must be a valid HTTPS URL.');return}
- const payload={name,description:$('pdesc').value.trim(),price:priceText===''?null:Number(priceText),category:$('category').value.trim(),image_url:imageText||null};
- $('productSubmit').disabled=true;
+ if(imageFile&&(!['image/jpeg','image/png','image/webp','image/gif'].includes(imageFile.type)||imageFile.size>5*1024*1024)){message('productMessage','Choose a JPG, PNG, WEBP or GIF image under 5 MB.');return}
+ $('productSubmit').disabled=true;message('productMessage',imageFile?'Uploading image…':'Saving product…');
+ let finalImageUrl=imageText||null;let uploadedPath=null;
+ if(imageFile){
+  const cleanName=imageFile.name.toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'')||'product-image';
+  uploadedPath='products/'+crypto.randomUUID()+'-'+cleanName;
+  const {error:uploadError}=await supabase.storage.from('product-images').upload(uploadedPath,imageFile,{cacheControl:'31536000',contentType:imageFile.type,upsert:false});
+  if(uploadError){$('productSubmit').disabled=false;message('productMessage','Image upload failed: '+uploadError.message);return}
+  finalImageUrl=supabase.storage.from('product-images').getPublicUrl(uploadedPath).data.publicUrl;
+ }
+ const payload={name,description:$('pdesc').value.trim(),price:priceText===''?null:Number(priceText),category:$('category').value.trim(),image_url:finalImageUrl};
  const result=id?await supabase.from('products').update(payload).eq('id',id):await supabase.from('products').insert([payload]);
  $('productSubmit').disabled=false;
- if(result.error){message('productMessage',(id?'Update':'Add')+' failed: '+result.error.message);return}
+ if(result.error){if(uploadedPath)await supabase.storage.from('product-images').remove([uploadedPath]);message('productMessage',(id?'Update':'Add')+' failed: '+result.error.message);return}
  message('productMessage',id?'Product updated successfully.':'Product added successfully.');
  resetProductForm();await loadProducts();
 });
@@ -137,6 +146,12 @@ $('cancelProductEdit').addEventListener('click',resetProductForm);
 $('productSearchAdmin').addEventListener('input',renderProducts);
 function previewImage(){const url=safeImageUrl($('pimage').value.trim());if(url){$('imagePreview').src=url;$('imagePreview').classList.add('visible')}else{$('imagePreview').classList.remove('visible')}}
 $('pimage').addEventListener('input',previewImage);
+$('pimageFile').addEventListener('change',()=>{
+ const file=$('pimageFile').files[0];
+ if(!file){previewImage();return}
+ if(!['image/jpeg','image/png','image/webp','image/gif'].includes(file.type)||file.size>5*1024*1024){$('pimageFile').value='';message('productMessage','Choose a JPG, PNG, WEBP or GIF image under 5 MB.');previewImage();return}
+ $('imagePreview').src=URL.createObjectURL(file);$('imagePreview').classList.add('visible');message('productMessage','Image selected. It will upload when you save the product.');
+});
 async function loadServices(){
  const list=$('serviceList');list.replaceChildren();
  const {data,error}=await supabase.from('services').select('*').order('created_at',{ascending:false});
