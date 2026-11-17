@@ -193,7 +193,15 @@
       lower.className = 'product-detail-lower';
       const specs = document.createElement('div');
       specs.className = 'product-spec-table';
-      const excluded = new Set(['id','name','description','price','image_url','category','subcategory','created_at','updated_at','slug','gallery_images','image_gallery','images']);
+      const enteredSpecs = String(product.specifications || '').trim();
+      if (enteredSpecs) enteredSpecs.split(/\\r?\\n/).map(line => line.trim()).filter(Boolean).forEach(line => {
+        const row = document.createElement('div'); row.className = 'product-spec-row';
+        const separator = line.indexOf(':');
+        const key = document.createElement('strong'); key.textContent = separator > 0 ? line.slice(0, separator).trim() : 'Specification';
+        const value = document.createElement('span'); value.textContent = separator > 0 ? line.slice(separator + 1).trim() : line;
+        row.append(key, value); specs.append(row);
+      });
+      const excluded = new Set(['id','name','description','specifications','price','image_url','category','subcategory','created_at','updated_at','slug','gallery_images','image_gallery','images']);
       const entries = Object.entries(product).filter(([key,value]) => !excluded.has(key) && value !== null && value !== undefined && value !== '');
       if (product.subcategory) entries.unshift(['subcategory',product.subcategory]);
       if (product.category) entries.unshift(['category',product.category]);
