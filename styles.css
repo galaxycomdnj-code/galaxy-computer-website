@@ -328,16 +328,17 @@ button{cursor:pointer}
 @media(max-width:600px){.product-toolbar{align-items:flex-start;gap:9px;flex-direction:column}.product-toolbar-controls{width:100%}.product-toolbar-controls select{flex:1;min-width:0;max-width:none}.product-toolbar-controls .clear-filter{white-space:nowrap}}
 
 
-/* Refined GALAXY COMPUTER wordmark: wider lettering and a sweeping orange arc */
-.brand-copy{display:flex;flex-direction:column;align-items:stretch;gap:2px;line-height:1}
-.brand-copy strong{position:relative;display:flex;align-items:flex-start;white-space:nowrap;font-family:'Sora',sans-serif;font-size:28px;font-weight:800;letter-spacing:-1.65px;line-height:.96;color:#080808;padding-top:2px}
-.brand-copy strong>span{display:inline-block}
-.brand-copy .brand-x{position:relative;margin-inline:0}
-.brand-copy strong::after{content:"";position:absolute;z-index:1;pointer-events:none;right:-1px;top:-5px;width:48px;height:17px;border-top:3px solid #ff9800;border-radius:58% 52% 0 0;transform:rotate(-13deg);transform-origin:center}
-.brand-copy b{display:block;align-self:center;font-family:'Sora',sans-serif;font-size:15px;font-weight:700;letter-spacing:1.35px;line-height:1.08;color:inherit}
-.brand-footer .brand-copy strong,.brand-footer .brand-copy b{color:#fff}
+/* Custom wordmark proportions and sweeping accent matched to the supplied logo reference */
+.brand-copy{display:flex;flex-direction:column;align-items:flex-start;gap:2px;line-height:1}
+.brand-copy .galaxy-word{position:relative;display:block;width:max-content;white-space:nowrap;font-family:'Sora',Arial,sans-serif;font-size:28px;font-weight:800;letter-spacing:-1.25px;line-height:.98;color:#080808;transform:scaleX(1.1);transform-origin:left center;padding:2px 0 0}
+.brand-copy .galaxy-swoosh{position:absolute;left:0;top:-7px;width:100%;height:37px;overflow:visible;pointer-events:none}
+.brand-copy .galaxy-swoosh path{fill:none;stroke:#ff9800;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.brand-copy .galaxy-swoosh path+path{stroke-width:2.5}
+.brand-copy b{display:block;align-self:center;font-family:'Sora',Arial,sans-serif;font-size:12.5px;font-weight:700;letter-spacing:1.45px;line-height:1.1;color:inherit;margin-top:1px}
+.brand-footer .brand-copy .galaxy-word,.brand-footer .brand-copy b{color:#fff}
 @media(max-width:760px){
- .brand-copy strong{font-size:23px;letter-spacing:-1.35px}
- .brand-copy strong::after{width:40px;height:14px;top:-4px;border-top-width:2.5px}
- .brand-copy b{font-size:12.5px;letter-spacing:1.05px}
+ .brand-copy .galaxy-word{font-size:23px;letter-spacing:-1.05px}
+ .brand-copy .galaxy-swoosh{top:-6px;height:31px}
+ .brand-copy .galaxy-swoosh path{stroke-width:2.7}
+ .brand-copy b{font-size:11.5px;letter-spacing:1.2px}
 }
