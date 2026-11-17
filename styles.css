@@ -892,3 +892,25 @@ button{cursor:pointer}
   .nav-links{gap:clamp(2px,.35vw,6px)}
   .nav-links a{font-weight:800;font-size:clamp(10px,.82vw,12px);letter-spacing:-.2px;padding-inline:1px}
 }
+
+
+/* Main navigation alignment: compact, left-flowing category row */
+@media(min-width:761px){
+  .main-nav .nav-inner{justify-content:flex-start}
+  .main-nav .nav-links{
+    justify-content:flex-start;
+    align-items:center;
+    flex:0 1 auto;
+    gap:clamp(12px,1.35vw,20px);
+    width:100%;
+  }
+  .main-nav .nav-links>a{
+    flex:0 0 auto;
+    padding:13px 0;
+    font-family:'Sora',var(--font-bn),sans-serif;
+    font-size:12px;
+    line-height:1.2;
+    font-weight:800;
+    letter-spacing:-.15px;
+  }
+}
