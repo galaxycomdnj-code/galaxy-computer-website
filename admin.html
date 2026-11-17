@@ -35,8 +35,8 @@
 <div class="field"><label for="pname">Product name *</label><input id="pname" maxlength="160" required placeholder="e.g. Gaming Laptop"></div>
 <div class="field"><label for="pdesc">Description</label><textarea id="pdesc" maxlength="1500" placeholder="Product details and specifications"></textarea></div>
 <div class="field"><label for="price">Price (BDT)</label><input id="price" type="number" min="0" step="0.01" placeholder="e.g. 65000"></div>
-<div class="field"><label for="category">Category</label><input id="category" maxlength="80" placeholder="Laptop, Monitor, RAM..."></div>
-<div class="field"><label for="subcategory">Subcategory</label><input id="subcategory" maxlength="80" placeholder="Gaming Laptop, DDR4 RAM, SSD..."></div>
+<div class="field"><label for="category">Category</label><input id="category" list="categorySuggestions" maxlength="80" placeholder="Select or type a category..."><datalist id="categorySuggestions"><option value="Laptop"></option><option value="Desktop"></option><option value="Components"></option><option value="RAM"></option><option value="Storage"></option><option value="Monitor"></option><option value="Accessories"></option><option value="Networking"></option><option value="Printer & Office"></option><option value="Power & UPS"></option></datalist></div>
+<div class="field"><label for="subcategory">Subcategory</label><input id="subcategory" list="subcategorySuggestions" maxlength="80" placeholder="Choose a category first..."><datalist id="subcategorySuggestions"></datalist><span class="note">Choose a category to get matching subcategory suggestions. You can also type a new subcategory.</span></div>
 <div class="field"><label for="pimageFile">Upload product image</label><input id="pimageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><span class="note">JPG, PNG, WEBP or GIF · Maximum 5 MB. Uploaded images will be stored securely.</span></div>
 <div class="field"><label for="pimage">Or use an image URL</label><input id="pimage" type="url" maxlength="1000" placeholder="https://example.com/image.jpg"><img id="imagePreview" class="preview" alt="Product image preview"></div>
 <div class="form-actions"><button class="btn" id="productSubmit" type="submit">Add product</button><button class="btn light hidden" id="cancelProductEdit" type="button">Cancel</button></div>
@@ -71,6 +71,28 @@ const SUPABASE_KEY='sb_publishable_FMsWzO2LqaTzM8tem94M2w_i3HhnWHR';
 const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=id=>document.getElementById(id);
 let products=[],services=[];
+const subcategoryMap={
+ 'laptop':['New Laptop','Used Laptop','Gaming Laptop'],
+ 'desktop':['Branded Desktop','Custom PC','Gaming PC'],
+ 'components':['Processor','Motherboard','Graphics Card','Power Supply'],
+ 'ram':['DDR3 RAM','DDR4 RAM','DDR5 RAM','Laptop RAM'],
+ 'storage':['SSD','NVMe SSD','Hard Disk'],
+ 'monitor':['Samsung','LG','Dell','HP','ASUS','Acer','MSI','AOC','ViewSonic','BenQ','Philips','Gigabyte'],
+ 'accessories':['Keyboard','Mouse','Keyboard & Mouse Combo','Mouse Pad','Laptop Charger','Laptop Battery','Laptop Bag','Cooling Pad'],
+ 'networking':['Router','WiFi Adapter','LAN Cable'],
+ 'printer & office':['Printer','Scanner','Projector'],
+ 'power & ups':['UPS','IPS','Power Bank']
+};
+function syncSubcategorySuggestions(){
+ const category=$('category').value.trim().toLowerCase();
+ const options=new Set(subcategoryMap[category]||[]);
+ products.filter(p=>(p.category||'').trim().toLowerCase()===category&&p.subcategory).forEach(p=>options.add(p.subcategory.trim()));
+ const datalist=$('subcategorySuggestions');datalist.replaceChildren();
+ [...options].sort((a,b)=>a.localeCompare(b)).forEach(value=>{const option=document.createElement('option');option.value=value;datalist.append(option)});
+ $('subcategory').placeholder=category?'Choose or type a subcategory...':'Choose a category first...';
+}
+$('category').addEventListener('input',syncSubcategorySuggestions);
+
 function message(id,text){$(id).textContent=text||''}
 function safeImageUrl(value){try{const u=new URL(value);return u.protocol==='https:'?u.href:''}catch{return ''}}
 function makeButton(label,kind,handler){const b=document.createElement('button');b.type='button';b.className='btn '+kind;b.textContent=label;b.addEventListener('click',handler);return b}
@@ -87,7 +109,7 @@ async function loadProducts(){
  const list=$('productList');list.replaceChildren();
  const {data,error}=await supabase.from('products').select('*').order('created_at',{ascending:false});
  if(error){list.textContent='Could not load products: '+error.message;return}
- products=data||[];$('productTotal').textContent=String(products.length);
+ products=data||[];$('productTotal').textContent=String(products.length);syncSubcategorySuggestions();
  renderProducts();
 }
 function renderProducts(){
@@ -107,10 +129,10 @@ function renderProducts(){
  });
 }
 function resetProductForm(){
- $('productForm').reset();$('productId').value='';$('productFormTitle').textContent='Add a product';$('productSubmit').textContent='Add product';$('cancelProductEdit').classList.add('hidden');$('imagePreview').classList.remove('visible');$('imagePreview').removeAttribute('src');
+ $('productForm').reset();syncSubcategorySuggestions();$('productId').value='';$('productFormTitle').textContent='Add a product';$('productSubmit').textContent='Add product';$('cancelProductEdit').classList.add('hidden');$('imagePreview').classList.remove('visible');$('imagePreview').removeAttribute('src');
 }
 function editProduct(p){
- $('productId').value=p.id;$('pname').value=p.name||'';$('pdesc').value=p.description||'';$('price').value=p.price??'';$('category').value=p.category||'';$('subcategory').value=p.subcategory||'';$('pimage').value=p.image_url||'';
+ $('productId').value=p.id;$('pname').value=p.name||'';$('pdesc').value=p.description||'';$('price').value=p.price??'';$('category').value=p.category||'';syncSubcategorySuggestions();$('subcategory').value=p.subcategory||'';$('pimage').value=p.image_url||'';
  $('productFormTitle').textContent='Edit product';$('productSubmit').textContent='Save changes';$('cancelProductEdit').classList.remove('hidden');previewImage();
  $('productForm').scrollIntoView({behavior:'smooth',block:'start'});
 }
