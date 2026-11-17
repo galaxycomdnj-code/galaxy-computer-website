@@ -367,6 +367,45 @@ async function loadManagedServices() {
 }
 loadManagedServices();
 
+
+/* Build desktop hover menus from the same category list used by the mobile drawer. */
+(function setupDesktopCategoryDropdowns(){
+  const nav=document.querySelector('.nav-links');
+  const list=document.querySelector('#categoryList');
+  if(!nav||!list) return;
+  const sourceNames={
+    laptop:'Laptop',desktop:'Desktop',components:'Components',ram:'RAM',
+    storage:'Storage',monitor:'Monitor',accessories:'Accessories',
+    networking:'Networking',printer:'Printer & Office',power:'Power & UPS'
+  };
+  nav.querySelectorAll('a[data-nav-category]').forEach(link=>{
+    const key=link.dataset.navCategory;
+    const source=[...list.querySelectorAll('.category-group')].find(group=>
+      group.querySelector('.category-item')?.textContent.replace(/[+]/g,'').trim().toLowerCase()
+      ===sourceNames[key]?.toLowerCase()
+    );
+    const submenu=source?.querySelector('.category-submenu');
+    if(!submenu||!submenu.querySelector('a')) return;
+    const wrapper=document.createElement('div');
+    wrapper.className='nav-category';
+    link.parentNode.insertBefore(wrapper,link);
+    wrapper.append(link);
+    const dropdown=document.createElement('div');
+    dropdown.className='nav-category-dropdown';
+    dropdown.setAttribute('aria-label',sourceNames[key]+' subcategories');
+    [...submenu.querySelectorAll('a')].forEach(item=>{
+      const option=item.cloneNode(true);
+      option.addEventListener('click',()=>{ 
+        const term=option.textContent.trim();
+        const search=document.querySelector('#productSearch');
+        if(search){search.value=term;search.dispatchEvent(new Event('input',{bubbles:true}));}
+      });
+      dropdown.append(option);
+    });
+    wrapper.append(dropdown);
+  });
+})();
+
 // Category drawer
 const categoryDrawer = $('categoryDrawer');
 const categoryOverlay = $('categoryOverlay');
