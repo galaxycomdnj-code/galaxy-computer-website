@@ -26,7 +26,7 @@
 </section>
 <section id="dashboard" class="hidden">
 <div class="panel-head"><div><h1>Admin Dashboard</h1><p class="muted">Manage the products and services shown on your website.</p></div><div class="actions"><a class="btn light" href="/" style="text-decoration:none">View website ↗</a><button class="btn dark" id="logoutBtn" type="button">Logout</button></div></div>
-<div class="stats"><div class="stat"><span class="muted">Products</span><b id="productTotal">—</b></div><div class="stat"><span class="muted">Services</span><b id="serviceTotal">—</b></div></div>
+<div class="stats"><div class="stat"><span class="muted">Products</span><b id="productTotal">—</b></div><div class="stat"><span class="muted">Services</span><b id="serviceTotal">—</b></div><div class="stat"><span class="muted">Orders</span><b id="orderTotal">—</b></div></div>
 <div class="layout">
 <section class="panel-card">
 <h2 id="productFormTitle">Add a product</h2>
@@ -60,6 +60,7 @@
 <h2>Service catalogue</h2><div id="serviceList" class="list" aria-live="polite"><div class="empty">Loading services…</div></div>
 </section>
 </div>
+<section class="panel-card section-gap"><div class="panel-head"><div><h2>Customer Orders</h2><p class="muted">Orders submitted through website checkout.</p></div><button class="btn light" id="refreshOrders" type="button">Refresh orders</button></div><p id="ordersMessage" class="message" role="status"></p><div id="ordersList" class="list"><div class="empty">Loading orders…</div></div></section>
 </section>
 </main>
 <script type="module">
@@ -79,7 +80,7 @@ async function verifyAdmin(user){
 async function enterDashboard(user){
  await verifyAdmin(user);
  $('loginBox').classList.add('hidden');$('dashboard').classList.remove('hidden');
- await Promise.all([loadProducts(),loadServices()]);
+ await Promise.all([loadProducts(),loadServices(),loadOrders()]);
 }
 async function loadProducts(){
  const list=$('productList');list.replaceChildren();
@@ -166,6 +167,41 @@ $('serviceForm').addEventListener('submit',async e=>{
  message('serviceMessage',id?'Service updated successfully.':'Service added successfully.');resetServiceForm();await loadServices();
 });
 $('cancelServiceEdit').addEventListener('click',resetServiceForm);
+
+async function loadOrders(){
+ const list=$('ordersList');list.replaceChildren();
+ const {data,error}=await supabase.from('orders').select('id,customer_name,customer_phone,delivery_address,customer_note,items,subtotal,status,created_at').order('created_at',{ascending:false}).limit(100);
+ if(error){$('orderTotal').textContent='—';message('ordersMessage','Could not load orders: '+error.message+' (Check the Orders RLS policies.)');list.innerHTML='<div class="empty">Orders are not available until admin read access is configured.</div>';return}
+ const orders=data||[];$('orderTotal').textContent=String(orders.length);
+ if(!orders.length){list.innerHTML='<div class="empty">No customer orders yet.</div>';return}
+ list.replaceChildren();
+ orders.forEach(order=>{
+  const card=document.createElement('article');card.className='panel-card';card.style.boxShadow='none';card.style.padding='14px';
+  const head=document.createElement('div');head.className='panel-head';head.style.marginBottom='10px';
+  const customer=document.createElement('div');const title=document.createElement('strong');title.textContent='#'+order.id+' · '+(order.customer_name||'Customer');
+  const meta=document.createElement('small');meta.className='muted';meta.textContent=new Date(order.created_at).toLocaleString('en-BD')+' · '+(order.customer_phone||'');
+  customer.append(title,meta);head.append(customer);
+  const address=document.createElement('p');address.className='muted';address.textContent='Delivery: '+(order.delivery_address||'');
+  const items=document.createElement('div');items.className='note';
+  const rows=Array.isArray(order.items)?order.items:[];
+  items.textContent=rows.map(item=>(item.name||'Product')+' × '+(item.quantity||1)+' — '+(item.price==null?'Price to confirm':'৳ '+Number(item.price).toLocaleString('en-BD'))).join(' | ');
+  const total=document.createElement('p');total.innerHTML='<b>Subtotal: </b>';const amount=document.createElement('span');amount.textContent='৳ '+Number(order.subtotal||0).toLocaleString('en-BD');total.append(amount);
+  card.append(head,address,items,total);
+  if(order.customer_note){const note=document.createElement('p');note.className='note';note.textContent='Note: '+order.customer_note;card.append(note)}
+  const controls=document.createElement('div');controls.className='actions';
+  const select=document.createElement('select');select.className='field';select.style.margin='0';select.style.maxWidth='190px';select.setAttribute('aria-label','Order status');
+  ['Pending','Confirmed','Processing','Delivered','Cancelled'].forEach(status=>{const option=document.createElement('option');option.value=status;option.textContent=status;select.append(option)});
+  select.value=order.status||'Pending';
+  const save=makeButton('Update status','dark',async()=>{
+   save.disabled=true;const {error:updateError}=await supabase.from('orders').update({status:select.value}).eq('id',order.id);
+   save.disabled=false;if(updateError){message('ordersMessage','Status update failed: '+updateError.message);return}
+   message('ordersMessage','Order #'+order.id+' status updated.');await loadOrders();
+  });
+  controls.append(select,save);card.append(controls);list.append(card);
+ });
+}
+$('refreshOrders').addEventListener('click',loadOrders);
+
 $('loginForm').addEventListener('submit',async e=>{
  e.preventDefault();message('loginMessage','Signing in…');$('loginBtn').disabled=true;
  const {data,error}=await supabase.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
