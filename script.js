@@ -201,14 +201,14 @@ function renderProducts(products) {
     const description = document.createElement('p');
     description.textContent = product.description || product.category || (english ? 'Contact us for details.' : 'বিস্তারিত জানতে যোগাযোগ করুন।');
     productLink.append(imageWrap, title, description);
-    card.append(productLink);
 
     if (product.price !== null && product.price !== undefined && product.price !== '') {
       const price = document.createElement('div');
       price.className = 'product-price';
       price.textContent = `৳ ${Number(product.price).toLocaleString('en-BD')}`;
-      card.append(price);
+      productLink.append(price);
     }
+    card.append(productLink);
 
     const cartButton = document.createElement('button');
     cartButton.type = 'button';
