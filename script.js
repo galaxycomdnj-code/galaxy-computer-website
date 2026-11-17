@@ -29,7 +29,7 @@ $('languageBtn')?.addEventListener('click', () => {
 });
 if ($('year')) $('year').textContent = new Date().getFullYear();
 
-// Cart: stores only the shopper's cart locally; checkout is handed off to WhatsApp.
+// Cart: stores the shopper's cart locally; website checkout submits orders to Supabase.
 const CART_STORAGE_KEY = 'galaxy-computer-cart-v1';
 let cartItems = [];
 try {
@@ -114,25 +114,66 @@ function renderCart() {
 }
 $('openCart')?.addEventListener('click', () => { renderCart(); $('cartDialog')?.showModal(); });
 $('closeCart')?.addEventListener('click', () => $('cartDialog')?.close());
-$('checkoutForm')?.addEventListener('submit', event => {
+$('checkoutForm')?.addEventListener('submit', async event => {
   event.preventDefault();
   if (!cartItems.length) return;
+  const form = $('checkoutForm');
+  const submit = form.querySelector('button[type="submit"]');
   const name = $('customerName').value.trim();
   const phone = $('customerPhone').value.trim();
   const address = $('customerAddress').value.trim();
   const note = $('customerNote').value.trim();
   if (!name || !phone || !address) return;
-  const lines = cartItems.map(item => `• ${item.name} × ${item.quantity} — ${item.price === null ? 'Price to confirm' : formatBDT(item.price * item.quantity)}`);
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price === null ? 0 : item.price * item.quantity), 0);
-  const message = [
-    'Assalamu Alaikum, Galaxy Computer. I want to place an order:',
-    ...lines,
-    `Subtotal (priced items): ${formatBDT(subtotal)}`,
-    `Name: ${name}`, `Phone: ${phone}`, `Delivery address: ${address}`,
-    note ? `Note: ${note}` : '',
-    'Please confirm availability, delivery charge and final total.'
-  ].filter(Boolean).join('\n');
-  window.open(`https://wa.me/8801621422327?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+  const payload = {
+    customer_name: name,
+    customer_phone: phone,
+    delivery_address: address,
+    customer_note: note || null,
+    items: cartItems.map(item => ({id:String(item.id),name:String(item.name),price:item.price===null?null:Number(item.price),quantity:Number(item.quantity)})),
+    subtotal: Number(subtotal.toFixed(2)),
+    status: 'Pending'
+  };
+  submit.disabled = true;
+  submit.textContent = english ? 'Submitting order…' : 'অর্ডার জমা হচ্ছে…';
+  let feedback = $('checkoutMessage');
+  if (!feedback) {
+    feedback = document.createElement('p');
+    feedback.id = 'checkoutMessage';
+    feedback.className = 'cart-note';
+    feedback.setAttribute('role','status');
+    form.append(feedback);
+  }
+  feedback.textContent = '';
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      let detail = '';
+      try { const result = await response.json(); detail = result.message || result.details || result.hint || ''; } catch {}
+      throw new Error(detail || `Order submission failed (${response.status})`);
+    }
+    cartItems = [];
+    saveCart();
+    form.reset();
+    feedback.textContent = english ? 'Your order has been submitted successfully. Galaxy Computer will contact you shortly.' : 'আপনার অর্ডার সফলভাবে জমা হয়েছে। Galaxy Computer থেকে শিগগিরই যোগাযোগ করা হবে।';
+    feedback.style.color = '#187044';
+  } catch (error) {
+    feedback.textContent = (english ? 'Order could not be submitted: ' : 'অর্ডার জমা হয়নি: ') + error.message;
+    feedback.style.color = '#b42318';
+  } finally {
+    submit.disabled = cartItems.length === 0;
+    submit.textContent = english ? 'Place Order' : 'অর্ডার জমা দিন';
+    renderCart();
+  }
 });
 renderCart();
 
