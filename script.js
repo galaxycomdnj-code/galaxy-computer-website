@@ -436,45 +436,37 @@ async function loadManagedServices() {
 loadManagedServices();
 
 
-/* Keep desktop hover menus in sync with the mobile category drawer. */
+/* Build category menus from the catalogue so new Admin categories appear automatically. */
 function refreshDesktopCategoryDropdowns(){
   const nav=document.querySelector('.nav-links');
-  const list=document.querySelector('#categoryList');
+  const list=$('categoryList');
   if(!nav||!list) return;
-  const sourceNames={
-    laptop:'Laptop',desktop:'Desktop',components:'Components',ram:'RAM',
-    storage:'Storage',monitor:'Monitor',accessories:'Accessories',
-    networking:'Networking',printer:'Printer & Office',power:'Power & UPS'
-  };
-  nav.querySelectorAll('a[data-nav-category]').forEach(link=>{
-    const key=link.dataset.navCategory;
-    const source=[...list.querySelectorAll('.category-group')].find(group=>
-      normalizeCategoryText(group.querySelector('.category-item')?.textContent.replace(/[+]/g,''))
-      ===normalizeCategoryText(sourceNames[key])
-    );
-    const submenu=source?.querySelector('.category-submenu');
-    if(!submenu) return;
-    let wrapper=link.closest('.nav-category');
-    if(!wrapper){
-      wrapper=document.createElement('div');
+  [...list.querySelectorAll('.category-group')].forEach(group=>{
+    const label=group.querySelector('.category-item')?.textContent.replace(/[+−]/g,'').trim()||'';
+    const submenu=group.querySelector('.category-submenu');
+    if(!label||!submenu) return;
+    let link=[...nav.querySelectorAll('a[data-nav-category]')].find(a=>normalizeCategoryText(a.dataset.navCategory)===normalizeCategoryText(label)||normalizeCategoryText(a.textContent)===normalizeCategoryText(label));
+    if(!link){
+      const wrapper=document.createElement('div');
       wrapper.className='nav-category';
-      link.parentNode.insertBefore(wrapper,link);
+      link=document.createElement('a');
+      link.href='#products';
+      link.dataset.navCategory=label;
+      link.textContent=label;
       wrapper.append(link);
+      nav.append(wrapper);
+    }else{
+      let wrapper=link.closest('.nav-category');
+      if(!wrapper){wrapper=document.createElement('div');wrapper.className='nav-category';link.parentNode.insertBefore(wrapper,link);wrapper.append(link);}
     }
+    const wrapper=link.closest('.nav-category');
     let dropdown=wrapper.querySelector('.nav-category-dropdown');
-    if(!dropdown){
-      dropdown=document.createElement('div');
-      dropdown.className='nav-category-dropdown';
-      wrapper.append(dropdown);
-    }
+    if(!dropdown){dropdown=document.createElement('div');dropdown.className='nav-category-dropdown';wrapper.append(dropdown);}
     dropdown.replaceChildren();
-    dropdown.setAttribute('aria-label',sourceNames[key]+' subcategories');
+    dropdown.setAttribute('aria-label',label+' subcategories');
     [...submenu.querySelectorAll('a')].forEach(item=>{
       const option=item.cloneNode(true);
-      option.addEventListener('click',event=>{
-        event.preventDefault();
-        selectSubcategory(option.textContent.trim());
-      });
+      option.addEventListener('click',event=>{event.preventDefault();selectSubcategory(option.textContent.trim());});
       dropdown.append(option);
     });
   });
@@ -483,31 +475,41 @@ function populateDynamicCategorySubmenus(){
   const list=$('categoryList');
   if(!list) return;
   const groups=[...list.querySelectorAll('.category-group')];
-  groups.forEach(group=>{
-    const label=group.querySelector('.category-item')?.textContent.replace(/[+]/g,'').trim()||'';
-    const key=normalizeCategoryText(label);
+  const groupByKey=new Map(groups.map(group=>{
+    const label=group.querySelector('.category-item')?.textContent.replace(/[+−]/g,'').trim()||'';
+    return [normalizeCategoryText(label),group];
+  }));
+  /* Any category newly entered in Admin is added to both desktop and mobile menus. */
+  [...new Set(productsCache.map(product=>String(product.category||'').trim()).filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b)).forEach(label=>{
+      const key=normalizeCategoryText(label);
+      if(groupByKey.has(key)) return;
+      const group=document.createElement('div');group.className='category-group';
+      const button=document.createElement('button');button.type='button';button.className='category-item';button.textContent=label;
+      const symbol=document.createElement('span');symbol.textContent='+';button.append(symbol);
+      const submenu=document.createElement('div');submenu.className='category-submenu';
+      button.addEventListener('click',()=>{
+        const opened=submenu.classList.toggle('open');
+        button.setAttribute('aria-expanded',String(opened));symbol.textContent=opened?'−':'+';
+      });
+      group.append(button,submenu);list.append(group);groupByKey.set(key,group);
+    });
+  groupByKey.forEach((group,key)=>{
     const submenu=group.querySelector('.category-submenu');
     if(!submenu) return;
     const values=new Map();
     submenu.querySelectorAll('a').forEach(anchor=>{
-      const value=anchor.textContent.trim();
-      if(value) values.set(normalizeCategoryText(value),value);
+      const value=anchor.textContent.trim();if(value)values.set(normalizeCategoryText(value),value);
     });
     productsCache.forEach(product=>{
-      if(normalizeCategoryText(product.category)!==key) return;
+      if(normalizeCategoryText(product.category)!==key)return;
       const value=String(product.subcategory||'').trim();
-      if(value&&!values.has(normalizeCategoryText(value))) values.set(normalizeCategoryText(value),value);
+      if(value&&!values.has(normalizeCategoryText(value)))values.set(normalizeCategoryText(value),value);
     });
     submenu.replaceChildren();
     [...values.values()].sort((a,b)=>a.localeCompare(b)).forEach(value=>{
-      const anchor=document.createElement('a');
-      anchor.href='#products';
-      anchor.textContent=value;
-      anchor.addEventListener('click',event=>{
-        event.preventDefault();
-        selectSubcategory(value);
-        closeCategoryMenu();
-      });
+      const anchor=document.createElement('a');anchor.href='#products';anchor.textContent=value;
+      anchor.addEventListener('click',event=>{event.preventDefault();selectSubcategory(value);closeCategoryMenu();});
       submenu.append(anchor);
     });
   });
