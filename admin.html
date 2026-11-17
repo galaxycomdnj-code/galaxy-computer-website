@@ -35,8 +35,8 @@
 <div class="field"><label for="pname">Product name *</label><input id="pname" maxlength="160" required placeholder="e.g. Gaming Laptop"></div>
 <div class="field"><label for="pdesc">Description</label><textarea id="pdesc" maxlength="1500" placeholder="Product details and specifications"></textarea></div>
 <div class="field"><label for="price">Price (BDT)</label><input id="price" type="number" min="0" step="0.01" placeholder="e.g. 65000"></div>
-<div class="field"><label for="category">Category</label><input id="category" list="categorySuggestions" maxlength="80" placeholder="Select or type a category..."><datalist id="categorySuggestions"><option value="Laptop"></option><option value="Desktop"></option><option value="Components"></option><option value="RAM"></option><option value="Storage"></option><option value="Monitor"></option><option value="Accessories"></option><option value="Networking"></option><option value="Printer & Office"></option><option value="Power & UPS"></option></datalist></div>
-<div class="field"><label for="subcategory">Subcategory</label><input id="subcategory" list="subcategorySuggestions" maxlength="80" placeholder="Choose a category first..."><datalist id="subcategorySuggestions"></datalist><span class="note">Choose a category to get matching subcategory suggestions. You can also type a new subcategory.</span></div>
+<div class="field"><label for="category">Category *</label><input id="category" list="categorySuggestions" maxlength="80" required placeholder="Select or type a category..."><datalist id="categorySuggestions"><option value="Laptop"></option><option value="Desktop"></option><option value="Components"></option><option value="RAM"></option><option value="Storage"></option><option value="Monitor"></option><option value="Accessories"></option><option value="Networking"></option><option value="Printer & Office"></option><option value="Power & UPS"></option></datalist></div>
+<div class="field"><label for="subcategory">Subcategory *</label><input id="subcategory" list="subcategorySuggestions" maxlength="80" required placeholder="Choose a category first..."><datalist id="subcategorySuggestions"></datalist><span class="note">Choose a category to get matching subcategory suggestions. You can also type a new subcategory.</span></div>
 <div class="field"><label for="pimageFile">Upload product image</label><input id="pimageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><span class="note">JPG, PNG, WEBP or GIF · Maximum 5 MB. Uploaded images will be stored securely.</span></div>
 <div class="field"><label for="pimage">Or use an image URL</label><input id="pimage" type="url" maxlength="1000" placeholder="https://example.com/image.jpg"><img id="imagePreview" class="preview" alt="Product image preview"></div>
 <div class="form-actions"><button class="btn" id="productSubmit" type="submit">Add product</button><button class="btn light hidden" id="cancelProductEdit" type="button">Cancel</button></div>
@@ -72,16 +72,16 @@ const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=id=>document.getElementById(id);
 let products=[],services=[];
 const subcategoryMap={
- 'laptop':['New Laptop','Used Laptop','Gaming Laptop'],
- 'desktop':['Branded Desktop','Custom PC','Gaming PC'],
- 'components':['Processor','Motherboard','Graphics Card','Power Supply'],
- 'ram':['DDR3 RAM','DDR4 RAM','DDR5 RAM','Laptop RAM'],
- 'storage':['SSD','NVMe SSD','Hard Disk'],
- 'monitor':['Samsung','LG','Dell','HP','ASUS','Acer','MSI','AOC','ViewSonic','BenQ','Philips','Gigabyte'],
- 'accessories':['Keyboard','Mouse','Keyboard & Mouse Combo','Mouse Pad','Laptop Charger','Laptop Battery','Laptop Bag','Cooling Pad'],
- 'networking':['Router','WiFi Adapter','LAN Cable'],
- 'printer & office':['Printer','Scanner','Projector'],
- 'power & ups':['UPS','IPS','Power Bank']
+ 'laptop':['New Laptop','Used Laptop','Gaming Laptop','Business Laptop','Ultrabook','2-in-1 Laptop','MacBook','ThinkPad','Dell Latitude','HP EliteBook','HP ProBook','ASUS ZenBook','ASUS VivoBook','Acer Aspire','MSI Gaming','Lenovo','HP','Dell','ASUS','Acer','MSI','Apple','Microsoft Surface','Huawei','Samsung','Gigabyte','Razer'],
+ 'desktop':['Branded Desktop','Custom PC','Gaming PC','All-in-One PC','Mini PC','Workstation','Dell','HP','Lenovo','ASUS','Acer','Apple iMac','Intel NUC','MSI'],
+ 'components':['Processor','CPU','Motherboard','Graphics Card','GPU','Power Supply','Casing','CPU Cooler','Liquid Cooler','Case Fan','Intel','AMD','ASUS','Gigabyte','MSI','ASRock','Zotac','Sapphire','Colorful','Galax','Corsair','Cooler Master','DeepCool','Antec','Thermaltake'],
+ 'ram':['Desktop RAM','Laptop RAM','DDR3 RAM','DDR4 RAM','DDR5 RAM','SO-DIMM RAM','Kingston','Corsair','ADATA','Adata XPG','TeamGroup','G.Skill','Transcend','Lexar','Samsung','Crucial','Apacer','TwinMOS'],
+ 'storage':['SSD','SATA SSD','NVMe SSD','M.2 SSD','External SSD','Hard Disk','External HDD','Portable HDD','Memory Card','USB Flash Drive','Samsung','Western Digital','WD','Seagate','Kingston','Crucial','ADATA','Transcend','Lexar','Hikvision','Toshiba','TeamGroup'],
+ 'monitor':['Gaming Monitor','IPS Monitor','Curved Monitor','4K Monitor','Portable Monitor','Samsung','LG','Dell','HP','ASUS','Acer','MSI','AOC','ViewSonic','BenQ','Philips','Gigabyte','Lenovo','Xiaomi'],
+ 'accessories':['Keyboard','Mechanical Keyboard','Wireless Keyboard','Mouse','Gaming Mouse','Wireless Mouse','Keyboard & Mouse Combo','Mouse Pad','Gaming Mouse Pad','Laptop Charger','Laptop Adapter','Laptop Battery','Laptop Bag','Cooling Pad','Headphone','Headset','Speaker','Webcam','Microphone','USB Hub','Docking Station','Cable','HDMI Cable','VGA Cable','DisplayPort Cable','USB Cable','Type-C Cable','LAN Cable','Converter','Adapter','Card Reader','Bluetooth Adapter','Logitech','A4Tech','Rapoo','Fantech','Havit','Redragon','Aula','Dareu','Razer','SteelSeries','HyperX','Baseus','UGREEN','Anker','Orico','Vention','Xtreme'],
+ 'networking':['Router','WiFi Router','Dual Band Router','Mesh Router','Switch','Network Switch','WiFi Adapter','USB WiFi Adapter','LAN Card','LAN Cable','Fiber Optic','Access Point','Repeater','TP-Link','Tenda','D-Link','Netis','Mercusys','MikroTik','Ubiquiti','Cudy'],
+ 'printer & office':['Printer','Ink Tank Printer','Laser Printer','Dot Matrix Printer','Multifunction Printer','Scanner','Projector','Toner','Ink Cartridge','Drum Unit','HP','Canon','Epson','Brother','Pantum','Xerox'],
+ 'power & ups':['UPS','Offline UPS','Online UPS','IPS','Voltage Stabilizer','AVR','Power Bank','Power Supply','APC','Prolink','MaxGreen','Power Guard','KSTAR','Santak','Luminous','Vertiv']
 };
 function syncSubcategorySuggestions(){
  const category=$('category').value.trim().toLowerCase();
@@ -146,6 +146,7 @@ $('productForm').addEventListener('submit',async e=>{
  e.preventDefault();const id=$('productId').value;
  const name=$('pname').value.trim();const priceText=$('price').value.trim();const imageText=$('pimage').value.trim();const imageFile=$('pimageFile').files[0];
  if(!name){message('productMessage','Please enter a product name.');return}
+ if(!$('category').value.trim()||!$('subcategory').value.trim()){message('productMessage','Please select or enter both category and subcategory.');return}
  if(priceText!==''&&(!Number.isFinite(Number(priceText))||Number(priceText)<0)){message('productMessage','Enter a valid non-negative price.');return}
  if(imageText&&!safeImageUrl(imageText)){message('productMessage','Image URL must be a valid HTTPS URL.');return}
  if(imageFile&&(!['image/jpeg','image/png','image/webp','image/gif'].includes(imageFile.type)||imageFile.size>5*1024*1024)){message('productMessage','Choose a JPG, PNG, WEBP or GIF image under 5 MB.');return}
