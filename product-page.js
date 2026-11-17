@@ -135,11 +135,37 @@
       contact.target = '_blank'; contact.rel = 'noopener';
       contact.textContent = 'Order on WhatsApp ↗';
       contact.id = 'buy';
+      const buyNow = document.createElement('button');
+      buyNow.type = 'button';
+      buyNow.className = 'product-page-buy-now';
+      buyNow.textContent = 'Buy Now';
+      buyNow.addEventListener('click', () => {
+        try {
+          const key = 'galaxy-computer-cart-v1';
+          const saved = JSON.parse(localStorage.getItem(key) || '[]');
+          const cart = Array.isArray(saved) ? saved : [];
+          const id = String(product.id || product.name);
+          const existing = cart.find(item => String(item.id) === id);
+          if (existing) existing.quantity = (Number(existing.quantity) || 0) + 1;
+          else cart.push({
+            id,
+            name: product.name || 'Product',
+            price: product.price !== null && product.price !== undefined && String(product.price).trim() !== '' && Number.isFinite(Number(product.price)) ? Number(product.price) : null,
+            image_url: product.image_url || '',
+            quantity: 1
+          });
+          localStorage.setItem(key, JSON.stringify(cart));
+          window.location.href = 'index.html?buyNow=1#products';
+        } catch (error) {
+          console.error('Could not start direct purchase:', error);
+          alert('Buy Now চালু করা যাচ্ছে না। অনুগ্রহ করে WhatsApp-এ Order করুন।');
+        }
+      });
       const call = document.createElement('a');
       call.className = 'product-page-call';
       call.href = 'tel:01621422327';
       call.textContent = 'Call: 01621422327';
-      actions.append(contact,call);
+      actions.append(contact,buyNow,call);
       summary.append(actions);
       top.append(gallery,summary);
       root.append(top);
