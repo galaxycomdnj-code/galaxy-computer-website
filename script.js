@@ -255,9 +255,8 @@ function renderProducts(products) {
 
     const title = document.createElement('h3');
     title.textContent = product.name || 'Product';
-    const description = document.createElement('p');
-    description.textContent = product.description || product.category || (english ? 'Contact us for details.' : 'বিস্তারিত জানতে যোগাযোগ করুন।');
-    productLink.append(imageWrap, title, description);
+    // Keep home-page product cards compact; the full description stays on product.html.
+    productLink.append(imageWrap, title);
 
     if (product.price !== null && product.price !== undefined && product.price !== '') {
       const price = document.createElement('div');
