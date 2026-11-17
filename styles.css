@@ -774,3 +774,20 @@ button{cursor:pointer}
   .product-page .main-nav{background:#fff;border-top:1px solid #eee}
 }
 @media(min-width:761px){.product-mobile-categories{display:none!important}}
+
+
+/* Desktop hero: show the complete banner image and keep trust points below it */
+@media(min-width:761px){
+  .hero{
+    min-height:390px;
+    background-size:auto 100%;
+    background-position:right center;
+    background-repeat:no-repeat;
+    background-color:#f8f8f8;
+  }
+  .hero-content{min-height:390px}
+  .hero::before{
+    background:linear-gradient(90deg,rgba(255,255,255,.99) 0%,rgba(255,255,255,.95) 34%,rgba(255,255,255,.52) 52%,rgba(255,255,255,0) 72%);
+  }
+  .hero-points{display:none}
+}
