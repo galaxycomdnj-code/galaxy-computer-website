@@ -32,6 +32,7 @@ if ($('year')) $('year').textContent = new Date().getFullYear();
 // Cart: stores the shopper's cart locally; website checkout submits orders to Supabase.
 const CART_STORAGE_KEY = 'galaxy-computer-cart-v1';
 let cartItems = [];
+let orderSubmitted = false;
 try {
   const savedCart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
   cartItems = Array.isArray(savedCart) ? savedCart.filter(item => item && item.id && item.name && Number.isInteger(item.quantity) && item.quantity > 0) : [];
@@ -92,13 +93,16 @@ function renderCart() {
     controls.className = 'cart-quantity';
     const minus = document.createElement('button');
     minus.type = 'button'; minus.textContent = '−'; minus.setAttribute('aria-label', 'Decrease quantity');
+    minus.disabled = orderSubmitted;
     minus.addEventListener('click', () => changeCartQuantity(item.id, -1));
     const qty = document.createElement('span'); qty.textContent = String(item.quantity);
     const plus = document.createElement('button');
     plus.type = 'button'; plus.textContent = '+'; plus.setAttribute('aria-label', 'Increase quantity');
+    plus.disabled = orderSubmitted;
     plus.addEventListener('click', () => changeCartQuantity(item.id, 1));
     const remove = document.createElement('button');
     remove.type = 'button'; remove.className = 'cart-remove'; remove.textContent = english ? 'Remove' : 'বাদ দিন';
+    remove.disabled = orderSubmitted;
     remove.addEventListener('click', () => removeCartItem(item.id));
     controls.append(minus, qty, plus, remove);
     row.append(name, price, controls);
@@ -108,12 +112,20 @@ function renderCart() {
   if ($('cartSubtotal')) $('cartSubtotal').textContent = formatBDT(subtotal);
   const checkout = $('checkoutForm');
   if (checkout) {
-    const disabled = cartItems.length === 0;
+    const disabled = cartItems.length === 0 || orderSubmitted;
     checkout.querySelectorAll('input,textarea,button').forEach(control => control.disabled = disabled);
   }
 }
 $('openCart')?.addEventListener('click', () => { renderCart(); $('cartDialog')?.showModal(); });
 $('closeCart')?.addEventListener('click', () => $('cartDialog')?.close());
+$('cartDialog')?.addEventListener('close', () => {
+  if (!orderSubmitted) return;
+  orderSubmitted = false;
+  cartItems = [];
+  saveCart();
+  const feedback = $('checkoutMessage');
+  if (feedback) feedback.textContent = '';
+});
 $('checkoutForm')?.addEventListener('submit', async event => {
   event.preventDefault();
   if (!cartItems.length) return;
@@ -161,8 +173,7 @@ $('checkoutForm')?.addEventListener('submit', async event => {
       try { const result = await response.json(); detail = result.message || result.details || result.hint || ''; } catch {}
       throw new Error(detail || `Order submission failed (${response.status})`);
     }
-    cartItems = [];
-    saveCart();
+    orderSubmitted = true;
     form.reset();
     const hasUnpricedItems = cartItems.some(item => item.price === null);
     const orderTotalText = formatBDT(subtotal);
@@ -174,7 +185,7 @@ $('checkoutForm')?.addEventListener('submit', async event => {
     feedback.textContent = (english ? 'Order could not be submitted: ' : 'অর্ডার জমা হয়নি: ') + error.message;
     feedback.style.color = '#b42318';
   } finally {
-    submit.disabled = cartItems.length === 0;
+    submit.disabled = cartItems.length === 0 || orderSubmitted;
     submit.textContent = english ? 'Place Order' : 'অর্ডার জমা দিন';
     renderCart();
   }
