@@ -91,11 +91,22 @@
       eyebrow.className = 'product-detail-eyebrow';
       eyebrow.textContent = 'GALAXY COMPUTER • PRODUCT DETAILS';
       summary.append(eyebrow);
-      if (product.category) {
-        const category = document.createElement('span');
-        category.className = 'product-page-category';
-        category.textContent = product.category;
-        summary.append(category);
+      if (product.category || product.subcategory) {
+        const categoryWrap = document.createElement('div');
+        categoryWrap.className = 'product-page-category-wrap';
+        if (product.category) {
+          const category = document.createElement('span');
+          category.className = 'product-page-category';
+          category.textContent = product.category;
+          categoryWrap.append(category);
+        }
+        if (product.subcategory) {
+          const subcategory = document.createElement('span');
+          subcategory.className = 'product-page-subcategory';
+          subcategory.textContent = product.subcategory;
+          categoryWrap.append(subcategory);
+        }
+        summary.append(categoryWrap);
       }
       const title = document.createElement('h1');
       title.className = 'product-page-title';
@@ -173,24 +184,18 @@
       const nav = document.createElement('nav');
       nav.className = 'product-detail-tabs';
       nav.setAttribute('aria-label','Product information');
-      [['overview','Overview'],['specifications','Specifications'],['description','Description']].forEach(([id,name]) => {
+      [['description','Description'],['specifications','Specifications']].forEach(([id,name]) => {
         const a = document.createElement('a'); a.href = '#' + id; a.textContent = name; nav.append(a);
       });
       root.append(nav);
 
       const lower = document.createElement('div');
       lower.className = 'product-detail-lower';
-      const overview = document.createElement('div');
-      overview.className = 'product-overview-copy';
-      const overviewText = document.createElement('p');
-      overviewText.textContent = product.description || 'For product details, availability and assistance, please contact Galaxy Computer.';
-      overview.append(overviewText);
-      lower.append(makeSection('overview','Product Overview',overview));
-
       const specs = document.createElement('div');
       specs.className = 'product-spec-table';
-      const excluded = new Set(['id','name','description','price','image_url','category','created_at','updated_at','slug','gallery_images','image_gallery','images']);
+      const excluded = new Set(['id','name','description','price','image_url','category','subcategory','created_at','updated_at','slug','gallery_images','image_gallery','images']);
       const entries = Object.entries(product).filter(([key,value]) => !excluded.has(key) && value !== null && value !== undefined && value !== '');
+      if (product.subcategory) entries.unshift(['subcategory',product.subcategory]);
       if (product.category) entries.unshift(['category',product.category]);
       if (entries.length) entries.forEach(([key,value]) => {
         const row = document.createElement('div'); row.className = 'product-spec-row';
@@ -206,7 +211,7 @@
       lower.append(makeSection('specifications','Specifications',specs));
 
       const description = document.createElement('div');
-      description.className = 'product-overview-copy';
+      description.className = 'product-overview-copy product-description-copy';
       const descriptionText = document.createElement('p');
       descriptionText.textContent = product.description || 'No additional description is available for this product yet.';
       description.append(descriptionText);
