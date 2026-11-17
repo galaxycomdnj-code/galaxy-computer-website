@@ -286,6 +286,15 @@ function renderProducts(products) {
 
 
 let activeCategoryTerms = [];
+let activeSubcategory = '';
+const normalizeCategoryText = value => String(value || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ').trim();
+function selectSubcategory(term) {
+  activeSubcategory = String(term || '').trim();
+  if ($('productSearch')) $('productSearch').value = '';
+  if ($('productCategoryFilter')) $('productCategoryFilter').value = '';
+  filterProducts('');
+  $('products')?.scrollIntoView({ behavior: 'smooth' });
+}
 function populateCategoryFilter() {
   const select = $('productCategoryFilter');
   if (!select) return;
@@ -304,7 +313,8 @@ function filterProducts(term) {
     const matchesQuery = !query || searchable.includes(query);
     const matchesCategory = !selectedCategory || String(product.category || '').toLowerCase() === selectedCategory;
     const matchesShortcut = !activeCategoryTerms.length || activeCategoryTerms.some(word => searchable.includes(word));
-    return matchesQuery && matchesCategory && matchesShortcut;
+    const matchesSubcategory = !activeSubcategory || normalizeCategoryText(product.subcategory) === normalizeCategoryText(activeSubcategory) || (!product.subcategory && normalizeCategoryText(searchable).includes(normalizeCategoryText(activeSubcategory)));
+    return matchesQuery && matchesCategory && matchesShortcut && matchesSubcategory;
   });
   const sort = $('productSort')?.value || 'newest';
   const getPrice = product => {
@@ -325,14 +335,14 @@ function filterProducts(term) {
   else if (sort === 'name-asc') filtered.sort((a,b) => String(a.name || '').localeCompare(String(b.name || ''), undefined, { sensitivity: 'base' }));
   else filtered.sort((a,b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
   renderProducts(filtered);
-  $('clearProductSearch').hidden = !(query || selectedCategory || activeCategoryTerms.length);
+  $('clearProductSearch').hidden = !(query || selectedCategory || activeCategoryTerms.length || activeSubcategory);
 }
 
 async function loadProducts() {
   if (!productGrid) return;
   try {
     const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/products?select=id,name,description,price,image_url,category,created_at&order=created_at.desc`,
+      `${SUPABASE_URL}/rest/v1/products?select=id,name,description,price,image_url,category,subcategory,created_at&order=created_at.desc`,
       { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
     );
     if (!response.ok) throw new Error(`Product request failed (${response.status})`);
@@ -352,13 +362,14 @@ $('productSearchForm')?.addEventListener('submit', event => {
   filterProducts($('productSearch').value);
   $('products').scrollIntoView({ behavior: 'smooth' });
 });
-$('productSearch')?.addEventListener('input', event => { activeCategoryTerms = []; filterProducts(event.target.value); });
-$('productCategoryFilter')?.addEventListener('change', () => { activeCategoryTerms = []; filterProducts($('productSearch')?.value || ''); });
+$('productSearch')?.addEventListener('input', event => { activeCategoryTerms = []; activeSubcategory = ''; filterProducts(event.target.value); });
+$('productCategoryFilter')?.addEventListener('change', () => { activeCategoryTerms = []; activeSubcategory = ''; filterProducts($('productSearch')?.value || ''); });
 $('productSort')?.addEventListener('change', () => filterProducts($('productSearch')?.value || ''));
 $('clearProductSearch')?.addEventListener('click', () => {
   $('productSearch').value = '';
   $('productCategoryFilter').value = '';
   activeCategoryTerms = [];
+  activeSubcategory = '';
   filterProducts('');
 });
 document.querySelectorAll('.category-tile').forEach(tile => {
@@ -375,6 +386,7 @@ document.querySelectorAll('.category-tile').forEach(tile => {
       accessories: ['accessory', 'accessories', 'keyboard', 'mouse', 'headphone'],
       software: ['software', 'operating system']
     };
+    activeSubcategory = '';
     activeCategoryTerms = aliases[category] || [category];
     $('productSearch').value = '';
     $('productCategoryFilter').value = '';
@@ -451,10 +463,9 @@ loadManagedServices();
     dropdown.setAttribute('aria-label',sourceNames[key]+' subcategories');
     [...submenu.querySelectorAll('a')].forEach(item=>{
       const option=item.cloneNode(true);
-      option.addEventListener('click',()=>{ 
-        const term=option.textContent.trim();
-        const search=document.querySelector('#productSearch');
-        if(search){search.value=term;search.dispatchEvent(new Event('input',{bubbles:true}));}
+      option.addEventListener('click',event=>{ 
+        event.preventDefault();
+        selectSubcategory(option.textContent.trim());
       });
       dropdown.append(option);
     });
@@ -536,10 +547,9 @@ $('categorySearch')?.addEventListener('input', event => {
     group.style.display = group.textContent.toLowerCase().includes(query) ? '' : 'none';
   });
 });
-document.querySelectorAll('.category-submenu a').forEach(link => link.addEventListener('click', () => {
-  const term = link.textContent.trim();
-  if ($('productSearch')) $('productSearch').value = term;
-  filterProducts(term);
+document.querySelectorAll('.category-submenu a').forEach(link => link.addEventListener('click', event => {
+  event.preventDefault();
+  selectSubcategory(link.textContent.trim());
   closeCategoryMenu();
 }));
 
