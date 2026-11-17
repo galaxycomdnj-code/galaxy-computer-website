@@ -33,7 +33,8 @@
 <form id="productForm">
 <input id="productId" type="hidden">
 <div class="field"><label for="pname">Product name *</label><input id="pname" maxlength="160" required placeholder="e.g. Gaming Laptop"></div>
-<div class="field"><label for="pdesc">Description</label><textarea id="pdesc" maxlength="1500" placeholder="Product details and specifications"></textarea></div>
+<div class="field"><label for="pspec">Product Specifications</label><textarea id="pspec" maxlength="5000" placeholder="Brand: Golden Field&#10;Model: GF-KM605W&#10;Connection: 2.4GHz Wireless&#10;Warranty: 1 Year"></textarea><span class="note">প্রতিটি Specification আলাদা লাইনে লিখুন। যেমন: Processor, RAM, Storage, Display, Warranty।</span></div>
+<div class="field"><label for="pdesc">Product Description</label><textarea id="pdesc" maxlength="3000" placeholder="Write a separate detailed description of this product..."></textarea></div>
 <div class="field"><label for="price">Price (BDT)</label><input id="price" type="number" min="0" step="0.01" placeholder="e.g. 65000"></div>
 <div class="field"><label for="category">Category *</label><input id="category" list="categorySuggestions" maxlength="80" required placeholder="Select or type a category..."><datalist id="categorySuggestions"><option value="Laptop"></option><option value="Desktop"></option><option value="Components"></option><option value="RAM"></option><option value="Storage"></option><option value="Monitor"></option><option value="Accessories"></option><option value="Networking"></option><option value="Printer & Office"></option><option value="Power & UPS"></option></datalist></div>
 <div class="field"><label for="subcategory">Subcategory *</label><input id="subcategory" list="subcategorySuggestions" maxlength="80" required placeholder="Choose a category first..."><datalist id="subcategorySuggestions"></datalist><span class="note">Choose a category to get matching subcategory suggestions. You can also type a new subcategory.</span></div>
@@ -132,7 +133,7 @@ function resetProductForm(){
  $('productForm').reset();syncSubcategorySuggestions();$('productId').value='';$('productFormTitle').textContent='Add a product';$('productSubmit').textContent='Add product';$('cancelProductEdit').classList.add('hidden');$('imagePreview').classList.remove('visible');$('imagePreview').removeAttribute('src');
 }
 function editProduct(p){
- $('productId').value=p.id;$('pname').value=p.name||'';$('pdesc').value=p.description||'';$('price').value=p.price??'';$('category').value=p.category||'';syncSubcategorySuggestions();$('subcategory').value=p.subcategory||'';$('pimage').value=p.image_url||'';
+ $('productId').value=p.id;$('pname').value=p.name||'';$('pspec').value=p.specifications||'';$('pdesc').value=p.description||'';$('price').value=p.price??'';$('category').value=p.category||'';syncSubcategorySuggestions();$('subcategory').value=p.subcategory||'';$('pimage').value=p.image_url||'';
  $('productFormTitle').textContent='Edit product';$('productSubmit').textContent='Save changes';$('cancelProductEdit').classList.remove('hidden');previewImage();
  $('productForm').scrollIntoView({behavior:'smooth',block:'start'});
 }
@@ -159,7 +160,7 @@ $('productForm').addEventListener('submit',async e=>{
   if(uploadError){$('productSubmit').disabled=false;message('productMessage','Image upload failed: '+uploadError.message);return}
   finalImageUrl=supabase.storage.from('product-images').getPublicUrl(uploadedPath).data.publicUrl;
  }
- const payload={name,description:$('pdesc').value.trim(),price:priceText===''?null:Number(priceText),category:$('category').value.trim(),subcategory:$('subcategory').value.trim(),image_url:finalImageUrl};
+ const payload={name,specifications:$('pspec').value.trim(),description:$('pdesc').value.trim(),price:priceText===''?null:Number(priceText),category:$('category').value.trim(),subcategory:$('subcategory').value.trim(),image_url:finalImageUrl};
  const result=id?await supabase.from('products').update(payload).eq('id',id):await supabase.from('products').insert([payload]);
  $('productSubmit').disabled=false;
  if(result.error){if(uploadedPath)await supabase.storage.from('product-images').remove([uploadedPath]);message('productMessage',(id?'Update':'Add')+' failed: '+result.error.message);return}
