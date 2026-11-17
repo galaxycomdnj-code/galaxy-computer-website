@@ -407,6 +407,7 @@ loadManagedServices();
 // Category drawer
 const categoryDrawer = $('categoryDrawer');
 const categoryOverlay = $('categoryOverlay');
+if (categoryDrawer) categoryDrawer.inert = true;
 function openCategoryMenu() {
   if (!categoryDrawer) return;
   categoryDrawer.inert = false;
