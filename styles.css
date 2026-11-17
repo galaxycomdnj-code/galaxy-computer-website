@@ -856,3 +856,9 @@ button{cursor:pointer}
  .product-info-section>div{padding:14px 15px}
  .product-spec-row{grid-template-columns:minmax(95px,.38fr) minmax(0,1fr);gap:10px;padding:11px 14px;font-size:11px}
 }
+
+
+/* Direct Buy Now action beside WhatsApp order */
+.product-page-buy-now{display:inline-flex;align-items:center;justify-content:center;min-width:170px;min-height:48px;padding:12px 18px;border:1px solid #171717;border-radius:8px;background:#171717;color:#fff;cursor:pointer;font:700 12px var(--font-brand),var(--font-bn),sans-serif;transition:background .18s,border-color .18s,transform .18s}
+.product-page-buy-now:hover{background:#333;border-color:#333;transform:translateY(-1px)}
+@media(max-width:760px){.product-page-buy-now{min-width:0;min-height:46px;padding:10px 6px;font-size:10px}}
