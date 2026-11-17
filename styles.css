@@ -792,3 +792,11 @@ button{cursor:pointer}
   .hero-points{display:none}
   .benefit-strip{position:relative;display:block;clear:both}
 }
+
+
+/* Keep all four trust benefits together in a full row directly under the cover */
+@media(min-width:761px){
+  .benefit-strip{position:relative;display:block;clear:both;width:100%}
+  .benefit-grid{grid-template-columns:repeat(4,minmax(0,1fr));}
+  .benefit-grid>div{min-width:0}
+}
