@@ -546,3 +546,7 @@ button{cursor:pointer}
  .product-page-actions{display:grid;grid-template-columns:1fr 1fr}
  .product-page-actions a{padding:11px 9px}
 }
+
+/* Keep the clickable product image/title area visually neutral */
+.product-card .product-main-link{background:transparent;color:inherit;text-align:left;padding:0;font:inherit;border-radius:9px}
+.product-card .product-main-link:hover{background:transparent}
