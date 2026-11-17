@@ -222,7 +222,7 @@ function renderProducts(products) {
   products.forEach(product => {
     const card = document.createElement('article');
     card.className = 'product-card';
-    card.dataset.search = [product.name, product.description, product.category].filter(Boolean).join(' ').toLowerCase();
+    card.dataset.search = [product.name, product.description, product.category, product.subcategory].filter(Boolean).join(' ').toLowerCase();
 
     const productUrl = `product.html?id=${encodeURIComponent(product.id)}`;
     const productLink = document.createElement('a');
@@ -309,7 +309,7 @@ function filterProducts(term) {
   const query = (term || '').trim().toLowerCase();
   const selectedCategory = ($('productCategoryFilter')?.value || '').trim().toLowerCase();
   let filtered = productsCache.filter(product => {
-    const searchable = [product.name, product.description, product.category].filter(Boolean).join(' ').toLowerCase();
+    const searchable = [product.name, product.description, product.category, product.subcategory].filter(Boolean).join(' ').toLowerCase();
     const matchesQuery = !query || searchable.includes(query);
     const matchesCategory = !selectedCategory || String(product.category || '').toLowerCase() === selectedCategory;
     const matchesShortcut = !activeCategoryTerms.length || activeCategoryTerms.some(word => searchable.includes(word));
