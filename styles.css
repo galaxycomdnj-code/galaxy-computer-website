@@ -894,17 +894,17 @@ button{cursor:pointer}
 }
 
 
-/* Main navigation alignment: compact, left-flowing category row */
+/* Main navigation alignment: extra-compact, left-flowing category row */
 @media(min-width:761px){
   .main-nav .nav-inner{justify-content:flex-start}
   .main-nav .nav-links{
     justify-content:flex-start;
     align-items:center;
     flex:0 1 auto;
-    gap:clamp(12px,1.35vw,20px);
+    gap:clamp(5px,.65vw,9px);
     width:100%;
   }
-  .main-nav .nav-links>a{
+  .main-nav .nav-links a{
     flex:0 0 auto;
     padding:13px 0;
     font-family:'Sora',var(--font-bn),sans-serif;
