@@ -776,7 +776,7 @@ button{cursor:pointer}
 @media(min-width:761px){.product-mobile-categories{display:none!important}}
 
 
-/* Desktop hero: preserve the mobile banner artwork without cropping; keep benefits below */
+/* Desktop hero: preserve the mobile banner artwork without cropping */
 @media(min-width:761px){
   .hero{
     min-height:420px;
@@ -790,11 +790,10 @@ button{cursor:pointer}
     background:linear-gradient(90deg,rgba(255,255,255,.99) 0%,rgba(255,255,255,.95) 34%,rgba(255,255,255,.52) 52%,rgba(255,255,255,0) 72%);
   }
   .hero-points{display:none}
-  .benefit-strip{position:relative;display:block;clear:both}
 }
 
 
-/* Keep all four trust benefits together in a full row directly under the cover */
+/* Keep all four trust benefits together in one row above the footer */
 @media(min-width:761px){
   .benefit-strip{position:relative;display:block;clear:both;width:100%}
   .benefit-grid{grid-template-columns:repeat(4,minmax(0,1fr));}
