@@ -81,11 +81,9 @@
       contact.target = '_blank';
       contact.rel = 'noopener';
       contact.textContent = 'Order / Ask on WhatsApp ↗';
-      const back = document.createElement('a');
-      back.className = 'product-page-back-link';
-      back.href = 'index.html#products';
-      back.textContent = '← Back to Products';
-      actions.append(contact, back);
+      contact.textContent = 'Buy Now ↗';
+      contact.id = 'buy';
+      actions.append(contact);
       summary.append(actions);
       top.append(gallery, summary);
       root.append(top);
