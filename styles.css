@@ -337,3 +337,60 @@ button{cursor:pointer}
  .brand-wordmark{width:120px}
  .brand-footer .brand-wordmark{width:135px}
 }
+
+
+/* Hero section — refined Galaxy Computer brand experience */
+.hero{
+  min-height:420px;
+  background-color:#f3f3f3;
+  background-position:center right;
+  border-bottom:1px solid #e8e8e8;
+}
+.hero-content{min-height:420px}
+.hero::before{
+  background:
+    radial-gradient(ellipse at 4% 50%,rgba(255,255,255,.55) 0%,rgba(255,255,255,0) 62%),
+    linear-gradient(90deg,rgba(255,255,255,.99) 0%,rgba(255,255,255,.96) 34%,rgba(255,255,255,.68) 57%,rgba(255,255,255,.06) 100%);
+}
+.hero-copy{width:min(56%,680px);padding:48px 0 58px}
+.hero-kicker{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 13px;border:1px solid #f0d4ad;border-radius:999px;
+  background:rgba(255,255,255,.82);color:#242424;
+  font:800 10px var(--font-brand);letter-spacing:1.55px;
+  box-shadow:0 4px 16px #11100008;
+}
+.hero-kicker i{width:7px;height:7px;border-radius:50%;margin:0;background:var(--orange-dark);box-shadow:0 0 0 4px #ff980022}
+.hero h1{font-size:clamp(34px,4.1vw,54px);line-height:1.14;letter-spacing:-1.7px;margin:19px 0 14px}
+.hero-copy p{font-size:16px;line-height:1.8;max-width:510px;color:#454545}
+.hero-points{gap:17px;margin:22px 0 25px;font-size:11px}
+.hero-points span{display:inline-flex;align-items:center;gap:5px}
+.hero-points span::first-letter{color:var(--orange-dark)}
+.hero-actions{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.hero .btn-primary{min-height:48px;padding:0 24px;border-radius:8px;font:800 12px var(--font-brand);box-shadow:0 8px 22px #e9820033;transition:transform .2s,box-shadow .2s,background .2s}
+.hero .btn-primary:hover{transform:translateY(-3px);box-shadow:0 12px 26px #e9820040;background:#ffad24}
+.hero-secondary-link{display:inline-flex;align-items:center;gap:9px;font:700 12px var(--font-brand),var(--font-bn),sans-serif;color:#191919;transition:color .2s}
+.hero-secondary-link:hover{color:var(--orange-dark)}
+.hero-chat-icon{display:grid;place-items:center;width:34px;height:34px;border:1px solid #e5e5e5;border-radius:50%;background:#fff;font-size:16px;box-shadow:0 3px 10px #1110000d}
+.hero-dots{bottom:17px}
+.hero-dots span{background:#b8b8b8}
+.hero-dots .selected{background:var(--orange-dark)}
+@media(max-width:760px){
+  .hero,.hero-content{min-height:400px}
+  .hero{background-position:60% center}
+  .hero::before{background:linear-gradient(90deg,rgba(255,255,255,.98) 0%,rgba(255,255,255,.94) 58%,rgba(255,255,255,.73) 100%)}
+  .hero-copy{width:88%;padding:42px 0 58px}
+  .hero-kicker{font-size:9px;padding:7px 11px}
+  .hero h1{font-size:clamp(29px,7.2vw,39px);letter-spacing:-1.1px;margin:16px 0 12px}
+  .hero-copy p{font-size:13px;line-height:1.7;max-width:390px}
+  .hero-points{gap:9px 13px;margin:17px 0 22px;font-size:9px}
+  .hero-actions{gap:14px}
+  .hero .btn-primary{min-height:44px;padding:0 17px;font-size:11px}
+  .hero-secondary-link{font-size:10px}
+}
+@media(max-width:420px){
+  .hero,.hero-content{min-height:390px}
+  .hero-copy{width:92%;padding-top:36px}
+  .hero h1{font-size:28px}
+  .hero-points{max-width:100%}
+}
