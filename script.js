@@ -164,7 +164,11 @@ $('checkoutForm')?.addEventListener('submit', async event => {
     cartItems = [];
     saveCart();
     form.reset();
-    feedback.textContent = english ? 'Your order has been submitted successfully. Galaxy Computer will contact you shortly.' : 'আপনার অর্ডার সফলভাবে জমা হয়েছে। Galaxy Computer থেকে শিগগিরই যোগাযোগ করা হবে।';
+    const hasUnpricedItems = cartItems.some(item => item.price === null);
+    const orderTotalText = formatBDT(subtotal);
+    feedback.textContent = english
+      ? `Your order has been submitted successfully. Subtotal: ${orderTotalText}${hasUnpricedItems ? ' (some item prices will be confirmed by Galaxy Computer).' : ''} Galaxy Computer will contact you shortly. Delivery charge, if applicable, will be confirmed separately.`
+      : `আপনার অর্ডার সফলভাবে জমা হয়েছে। Subtotal: ${orderTotalText}${hasUnpricedItems ? ' (কিছু পণ্যের দাম Galaxy Computer থেকে নিশ্চিত করা হবে)।' : ''} ডেলিভারি চার্জ প্রযোজ্য হলে আলাদাভাবে নিশ্চিত করা হবে। Galaxy Computer থেকে শিগগিরই যোগাযোগ করা হবে।`;
     feedback.style.color = '#187044';
   } catch (error) {
     feedback.textContent = (english ? 'Order could not be submitted: ' : 'অর্ডার জমা হয়নি: ') + error.message;
