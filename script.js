@@ -8,9 +8,10 @@ function closeMainMenu() {
   menuButton?.setAttribute('aria-label', 'Open menu');
 }
 menuButton?.addEventListener('click', () => {
-  const isOpen = navLinks?.classList.toggle('open') ?? false;
-  menuButton.setAttribute('aria-expanded', String(isOpen));
-  menuButton.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+  if (typeof openCategoryMenu === 'function') {
+    if (categoryDrawer?.classList.contains('active')) closeCategoryMenu();
+    else openCategoryMenu();
+  }
 });
 document.querySelectorAll('.nav-links a').forEach(link => link.addEventListener('click', closeMainMenu));
 
@@ -377,6 +378,8 @@ function openCategoryMenu() {
   categoryOverlay?.classList.add('active');
   categoryDrawer.setAttribute('aria-hidden', 'false');
   $('openCategories')?.setAttribute('aria-expanded', 'true');
+  menuButton?.setAttribute('aria-expanded', 'true');
+  menuButton?.setAttribute('aria-label', 'Close categories');
   $('categorySearch')?.focus();
 }
 function closeCategoryMenu() {
@@ -387,6 +390,8 @@ function closeCategoryMenu() {
   categoryDrawer.setAttribute('aria-hidden', 'true');
   categoryDrawer.inert = true;
   $('openCategories')?.setAttribute('aria-expanded', 'false');
+  menuButton?.setAttribute('aria-expanded', 'false');
+  menuButton?.setAttribute('aria-label', 'Open categories');
   if (wasOpen) $('openCategories')?.focus();
 }
 $('openCategories')?.addEventListener('click', openCategoryMenu);
