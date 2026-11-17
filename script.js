@@ -144,6 +144,7 @@ let productsCache = [];
 function showProductMessage(message, className = 'product-empty') {
   if (!productGrid) return;
   productGrid.replaceChildren();
+  productGrid.setAttribute('aria-busy', 'false');
   const messageBox = document.createElement('div');
   messageBox.className = className;
   messageBox.textContent = message;
@@ -153,6 +154,7 @@ function showProductMessage(message, className = 'product-empty') {
 function renderProducts(products) {
   if (!productGrid) return;
   productGrid.replaceChildren();
+  productGrid.setAttribute('aria-busy', 'false');
   if (!products.length) {
     showProductMessage(english ? 'No matching products found. Contact us and we will help you find it.' : 'কোনো পণ্য পাওয়া যায়নি। পণ্য খুঁজে পেতে আমাদের সঙ্গে যোগাযোগ করুন।');
     $('productCount').textContent = english ? '0 products' : '০টি পণ্য';
@@ -301,9 +303,22 @@ function filterProducts(term) {
     return matchesQuery && matchesCategory && matchesShortcut;
   });
   const sort = $('productSort')?.value || 'newest';
-  if (sort === 'price-asc') filtered.sort((a,b) => (Number(a.price) || Number.POSITIVE_INFINITY) - (Number(b.price) || Number.POSITIVE_INFINITY));
-  else if (sort === 'price-desc') filtered.sort((a,b) => (Number(b.price) || 0) - (Number(a.price) || 0));
-  else if (sort === 'name-asc') filtered.sort((a,b) => String(a.name || '').localeCompare(String(b.name || '')));
+  const getPrice = product => {
+    if (product.price === null || product.price === undefined || String(product.price).trim() === '') return null;
+    const price = Number(product.price);
+    return Number.isFinite(price) ? price : null;
+  };
+  const comparePrice = (a, b, direction) => {
+    const priceA = getPrice(a);
+    const priceB = getPrice(b);
+    if (priceA === null && priceB === null) return 0;
+    if (priceA === null) return 1;
+    if (priceB === null) return -1;
+    return (priceA - priceB) * direction;
+  };
+  if (sort === 'price-asc') filtered.sort((a, b) => comparePrice(a, b, 1));
+  else if (sort === 'price-desc') filtered.sort((a, b) => comparePrice(a, b, -1));
+  else if (sort === 'name-asc') filtered.sort((a,b) => String(a.name || '').localeCompare(String(b.name || ''), undefined, { sensitivity: 'base' }));
   else filtered.sort((a,b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
   renderProducts(filtered);
   $('clearProductSearch').hidden = !(query || selectedCategory || activeCategoryTerms.length);
@@ -313,7 +328,7 @@ async function loadProducts() {
   if (!productGrid) return;
   try {
     const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/products?select=id,name,description,price,image_url,category&order=created_at.desc`,
+      `${SUPABASE_URL}/rest/v1/products?select=id,name,description,price,image_url,category,created_at&order=created_at.desc`,
       { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
     );
     if (!response.ok) throw new Error(`Product request failed (${response.status})`);
