@@ -348,6 +348,7 @@ async function loadProducts() {
     if (!response.ok) throw new Error(`Product request failed (${response.status})`);
     const products = await response.json();
     productsCache = Array.isArray(products) ? products : [];
+    populateDynamicCategorySubmenus();
     populateCategoryFilter();
     filterProducts($('productSearch')?.value || '');
   } catch (error) {
@@ -436,8 +437,8 @@ async function loadManagedServices() {
 loadManagedServices();
 
 
-/* Build desktop hover menus from the same category list used by the mobile drawer. */
-(function setupDesktopCategoryDropdowns(){
+/* Keep desktop hover menus in sync with the mobile category drawer. */
+function refreshDesktopCategoryDropdowns(){
   const nav=document.querySelector('.nav-links');
   const list=document.querySelector('#categoryList');
   if(!nav||!list) return;
@@ -449,29 +450,71 @@ loadManagedServices();
   nav.querySelectorAll('a[data-nav-category]').forEach(link=>{
     const key=link.dataset.navCategory;
     const source=[...list.querySelectorAll('.category-group')].find(group=>
-      group.querySelector('.category-item')?.textContent.replace(/[+]/g,'').trim().toLowerCase()
-      ===sourceNames[key]?.toLowerCase()
+      normalizeCategoryText(group.querySelector('.category-item')?.textContent.replace(/[+]/g,''))
+      ===normalizeCategoryText(sourceNames[key])
     );
     const submenu=source?.querySelector('.category-submenu');
-    if(!submenu||!submenu.querySelector('a')) return;
-    const wrapper=document.createElement('div');
-    wrapper.className='nav-category';
-    link.parentNode.insertBefore(wrapper,link);
-    wrapper.append(link);
-    const dropdown=document.createElement('div');
-    dropdown.className='nav-category-dropdown';
+    if(!submenu) return;
+    let wrapper=link.closest('.nav-category');
+    if(!wrapper){
+      wrapper=document.createElement('div');
+      wrapper.className='nav-category';
+      link.parentNode.insertBefore(wrapper,link);
+      wrapper.append(link);
+    }
+    let dropdown=wrapper.querySelector('.nav-category-dropdown');
+    if(!dropdown){
+      dropdown=document.createElement('div');
+      dropdown.className='nav-category-dropdown';
+      wrapper.append(dropdown);
+    }
+    dropdown.replaceChildren();
     dropdown.setAttribute('aria-label',sourceNames[key]+' subcategories');
     [...submenu.querySelectorAll('a')].forEach(item=>{
       const option=item.cloneNode(true);
-      option.addEventListener('click',event=>{ 
+      option.addEventListener('click',event=>{
         event.preventDefault();
         selectSubcategory(option.textContent.trim());
       });
       dropdown.append(option);
     });
-    wrapper.append(dropdown);
   });
-})();
+}
+function populateDynamicCategorySubmenus(){
+  const list=$('categoryList');
+  if(!list) return;
+  const groups=[...list.querySelectorAll('.category-group')];
+  groups.forEach(group=>{
+    const label=group.querySelector('.category-item')?.textContent.replace(/[+]/g,'').trim()||'';
+    const key=normalizeCategoryText(label);
+    const submenu=group.querySelector('.category-submenu');
+    if(!submenu) return;
+    const values=new Map();
+    submenu.querySelectorAll('a').forEach(anchor=>{
+      const value=anchor.textContent.trim();
+      if(value) values.set(normalizeCategoryText(value),value);
+    });
+    productsCache.forEach(product=>{
+      if(normalizeCategoryText(product.category)!==key) return;
+      const value=String(product.subcategory||'').trim();
+      if(value&&!values.has(normalizeCategoryText(value))) values.set(normalizeCategoryText(value),value);
+    });
+    submenu.replaceChildren();
+    [...values.values()].sort((a,b)=>a.localeCompare(b)).forEach(value=>{
+      const anchor=document.createElement('a');
+      anchor.href='#products';
+      anchor.textContent=value;
+      anchor.addEventListener('click',event=>{
+        event.preventDefault();
+        selectSubcategory(value);
+        closeCategoryMenu();
+      });
+      submenu.append(anchor);
+    });
+  });
+  refreshDesktopCategoryDropdowns();
+}
+refreshDesktopCategoryDropdowns();
 
 // Category drawer
 const categoryDrawer = $('categoryDrawer');
