@@ -394,3 +394,24 @@ button{cursor:pointer}
   .hero h1{font-size:28px}
   .hero-points{max-width:100%}
 }
+
+
+/* Compact mobile header: keep brand, cart, WhatsApp and menu on one row */
+@media(max-width:480px){
+  .header-main{gap:8px;min-height:64px;flex-wrap:wrap}
+  .brand{gap:7px;min-width:0}
+  .brand-mark{width:34px;height:38px}
+  .brand-wordmark{width:108px}
+  .header-actions{gap:6px;flex:0 0 auto;margin-left:auto}
+  .cart-trigger{min-height:38px;padding:7px 8px}
+  .header-whatsapp{padding:7px 8px;min-height:38px;justify-content:center}
+  .header-whatsapp b{display:none}
+  .menu-toggle{width:34px;height:38px;padding:0;display:grid;place-items:center;font-size:23px;flex:0 0 34px}
+  .search-form{margin-bottom:9px}
+}
+@media(max-width:360px){
+  .brand-wordmark{width:98px}
+  .header-main{gap:6px}
+  .header-actions{gap:5px}
+  .header-whatsapp{padding-inline:7px}
+}
