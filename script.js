@@ -167,6 +167,12 @@ function renderProducts(products) {
     card.className = 'product-card';
     card.dataset.search = [product.name, product.description, product.category].filter(Boolean).join(' ').toLowerCase();
 
+    const productUrl = `product.html?id=${encodeURIComponent(product.id)}`;
+    const productLink = document.createElement('a');
+    productLink.className = 'product-main-link';
+    productLink.href = productUrl;
+    productLink.setAttribute('aria-label', `View ${product.name || 'product'} details`);
+
     const imageWrap = document.createElement('div');
     imageWrap.className = 'product-image-wrap';
     if (product.image_url) {
@@ -192,9 +198,10 @@ function renderProducts(products) {
 
     const title = document.createElement('h3');
     title.textContent = product.name || 'Product';
+    productLink.append(imageWrap, title);
     const description = document.createElement('p');
     description.textContent = product.description || product.category || (english ? 'Contact us for details.' : 'বিস্তারিত জানতে যোগাযোগ করুন।');
-    card.append(imageWrap, title, description);
+    card.append(productLink, description);
 
     if (product.price !== null && product.price !== undefined && product.price !== '') {
       const price = document.createElement('div');
@@ -213,73 +220,13 @@ function renderProducts(products) {
     detailsButton.type = 'button';
     detailsButton.className = 'product-details-btn';
     detailsButton.textContent = english ? 'View Details' : 'বিস্তারিত দেখুন';
-    detailsButton.addEventListener('click', () => openProductDetails(product));
+    detailsButton.addEventListener('click', () => { window.location.href = productUrl; });
 
-    const orderLink = document.createElement('a');
-    orderLink.href = `https://wa.me/8801621422327?text=${encodeURIComponent(`${product.name} সম্পর্কে জানতে চাই`)}`;
-    orderLink.target = '_blank';
-    orderLink.rel = 'noopener';
-    orderLink.textContent = english ? 'Ask on WhatsApp ↗' : 'দাম ও বিস্তারিত জানুন ↗';
-    card.append(cartButton, detailsButton, orderLink);
+    card.append(cartButton, detailsButton);
     productGrid.append(card);
   });
 }
 
-function openProductDetails(product) {
-  const dialog = $('productDialog');
-  const content = $('productDialogContent');
-  if (!dialog || !content) return;
-  content.replaceChildren();
-
-  const layout = document.createElement('div');
-  layout.className = 'product-dialog-layout';
-  const image = document.createElement('img');
-  image.className = 'product-dialog-image';
-  image.alt = product.name || 'Galaxy Computer product';
-  image.src = product.image_url || 'logo-mark.png';
-  image.onerror = () => { image.src = 'logo-mark.png'; };
-  const details = document.createElement('div');
-  details.className = 'product-dialog-details';
-  const title = document.createElement('h2');
-  title.id = 'productDialogTitle';
-  title.textContent = product.name || (english ? 'Product details' : 'পণ্যের বিবরণ');
-  details.append(title);
-
-  if (product.category) {
-    const category = document.createElement('span');
-    category.className = 'product-dialog-category';
-    category.textContent = product.category;
-    details.append(category);
-  }
-  if (product.description) {
-    const description = document.createElement('p');
-    description.textContent = product.description;
-    details.append(description);
-  }
-  if (product.price !== null && product.price !== undefined && String(product.price).trim() !== '') {
-    const price = document.createElement('strong');
-    price.className = 'product-dialog-price';
-    const numericPrice = Number(product.price);
-    price.textContent = Number.isFinite(numericPrice) && String(product.price).trim() !== ''
-      ? `৳ ${numericPrice.toLocaleString('en-BD')}`
-      : String(product.price);
-    details.append(price);
-  }
-  const ask = document.createElement('a');
-  ask.className = 'btn btn-primary product-dialog-ask';
-  ask.href = `https://wa.me/8801621422327?text=${encodeURIComponent(`${product.name || 'Product'} সম্পর্কে জানতে চাই`)}`;
-  ask.target = '_blank';
-  ask.rel = 'noopener';
-  ask.textContent = english ? 'Ask on WhatsApp ↗' : 'WhatsApp-এ বিস্তারিত জানুন ↗';
-  details.append(ask);
-  layout.append(image, details);
-  content.append(layout);
-  if (!dialog.open) dialog.showModal();
-}
-$('closeProductDialog')?.addEventListener('click', () => $('productDialog')?.close());
-$('productDialog')?.addEventListener('click', event => {
-  if (event.target === $('productDialog')) $('productDialog').close();
-});
 
 let activeCategoryTerms = [];
 function populateCategoryFilter() {
