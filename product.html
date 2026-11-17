@@ -10,14 +10,37 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="product-page">
-  <header class="product-page-header">
-    <div class="container product-page-header-inner">
-      <a class="brand" href="index.html" aria-label="Galaxy Computer home">
-        <img class="brand-mark" src="logo-mark.png" alt="">
-        <span class="brand-copy"><strong>GALAXY</strong><b>COMPUTER</b></span>
+  <header class="site-header">
+    <div class="container header-main">
+      <a class="brand" href="index.html#home" aria-label="Galaxy Computer home">
+        <img class="brand-mark" src="logo-mark.png" alt="Galaxy Computer E logo">
+        <img class="brand-wordmark" src="galaxy-wordmark.svg" alt="GALAXY COMPUTER">
       </a>
-      <a class="product-page-back" href="index.html#products">← Back to Products</a>
+      <form class="search-form" action="index.html#products" method="get" role="search">
+        <input type="search" name="search" placeholder="পণ্য খুঁজুন..." aria-label="Search products">
+        <button type="submit" aria-label="Search">⌕</button>
+      </form>
+      <div class="header-actions">
+        <a class="cart-trigger" href="index.html#products"><span aria-hidden="true">🛒</span><span>কার্ট</span></a>
+        <a class="header-contact" href="tel:01621422327"><span class="action-icon">☎</span><span><small>Call us</small><b>01621422327</b></span></a>
+        <a class="header-whatsapp" href="https://wa.me/8801621422327?text=আসসালামু%20আলাইকুম,%20Galaxy%20Computer" target="_blank" rel="noopener"><span>WhatsApp</span><b>Order / Support</b></a>
+      </div>
+      <button class="menu-toggle" type="button" aria-label="Open menu" aria-controls="productPrimaryNav" aria-expanded="false">☰</button>
     </div>
+    <nav class="main-nav" id="productPrimaryNav">
+      <div class="container nav-inner">
+        <a class="category-open-btn" href="index.html#products">☰ <span>সব ক্যাটাগরি</span> <b>⌄</b></a>
+        <div class="nav-links">
+          <a href="index.html#home">হোম</a>
+          <a href="index.html#products">ল্যাপটপ</a>
+          <a href="index.html#products">ডেস্কটপ</a>
+          <a href="index.html#products">কম্পোনেন্টস</a>
+          <a href="index.html#products">মনিটর</a>
+          <a href="index.html#services">সার্ভিস</a>
+          <a href="index.html#contact">যোগাযোগ</a>
+        </div>
+      </div>
+    </nav>
   </header>
   <main class="container product-page-main">
     <p class="product-page-breadcrumb"><a href="index.html">Home</a> <span>›</span> <a href="index.html#products">Products</a> <span>›</span> Product Details</p>
