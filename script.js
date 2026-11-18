@@ -395,6 +395,28 @@ document.querySelectorAll('.category-tile').forEach(tile => {
 });
 loadProducts();
 
+function addServiceReadMore(grid) {
+  if (!grid) return;
+  grid.querySelectorAll('.service-card p').forEach(description => {
+    if (description.dataset.readMoreReady) return;
+    description.dataset.readMoreReady = 'true';
+    if ((description.textContent || '').trim().length <= 90) return;
+    description.classList.add('service-description-collapsed');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'service-read-more';
+    button.textContent = 'আরও পড়ুন';
+    button.setAttribute('aria-expanded', 'false');
+    button.addEventListener('click', () => {
+      const expanded = description.classList.toggle('service-description-expanded');
+      description.classList.toggle('service-description-collapsed', !expanded);
+      button.textContent = expanded ? 'কম দেখুন' : 'আরও পড়ুন';
+      button.setAttribute('aria-expanded', String(expanded));
+    });
+    description.after(button);
+  });
+}
+
 async function loadManagedServices() {
   const grid = $('serviceGrid');
   if (!grid) return;
@@ -404,7 +426,7 @@ async function loadManagedServices() {
     });
     if (!response.ok) throw new Error(`Service request failed (${response.status})`);
     const services = await response.json();
-    if (!Array.isArray(services) || services.length === 0) return; // Keep the built-in service highlights as a fallback.
+    if (!Array.isArray(services) || services.length === 0) { addServiceReadMore(grid); return; } // Keep built-in service highlights as a fallback.
     grid.replaceChildren();
     services.forEach(service => {
       const card = document.createElement('article');
@@ -429,6 +451,7 @@ async function loadManagedServices() {
       card.append(title, description);
       grid.append(card);
     });
+    addServiceReadMore(grid);
   } catch (error) {
     console.warn('Managed services could not be loaded; showing default services.', error);
   }
