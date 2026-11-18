@@ -496,12 +496,50 @@ function refreshDesktopCategoryDropdowns(){
     if(!dropdown){dropdown=document.createElement('div');dropdown.className='nav-category-dropdown';wrapper.append(dropdown);}
     dropdown.replaceChildren();
     dropdown.setAttribute('aria-label',label+' subcategories');
-    [...submenu.querySelectorAll(':scope > a, :scope > .category-nested-group > .category-item')].forEach(item=>{
-      const option=document.createElement('a');
-      option.href='#products';
-      option.textContent=item.textContent.replace(/[+−]/g,'').trim();
-      option.addEventListener('click',event=>{event.preventDefault();selectSubcategory(option.textContent.trim());});
-      dropdown.append(option);
+    [...submenu.querySelectorAll(':scope > a, :scope > .category-nested-group')].forEach(item=>{
+      if(item.classList.contains('category-nested-group')){
+        const typeButton=item.querySelector(':scope > .category-item');
+        const brandMenu=item.querySelector(':scope > .category-submenu');
+        const type=(typeButton?.childNodes[0]?.textContent||typeButton?.textContent||'').replace(/[+−]/g,'').trim();
+        if(!type)return;
+        const nested=document.createElement('div');
+        nested.className='nav-category-nested';
+        const option=document.createElement('a');
+        option.href='#products';
+        option.className='nav-category-type-link';
+        option.textContent=type+'  ›';
+        option.addEventListener('click',event=>{event.preventDefault();activeBrandTerm='';selectSubcategory(type);});
+        nested.append(option);
+        if(brandMenu){
+          const brands=document.createElement('div');
+          brands.className='nav-category-brand-dropdown';
+          brands.setAttribute('aria-label',type+' brands');
+          [...brandMenu.querySelectorAll(':scope > a')].forEach(brandLink=>{
+            const brand=document.createElement('a');
+            brand.href='#products';
+            brand.textContent=brandLink.textContent.trim();
+            brand.addEventListener('click',event=>{
+              event.preventDefault();
+              activeSubcategory=type;
+              activeBrandTerm=(brandLink.dataset.filter||brandLink.textContent||'').trim();
+              activeCategoryTerms=[];
+              if($('productSearch'))$('productSearch').value='';
+              if($('productCategoryFilter'))$('productCategoryFilter').value='';
+              filterProducts('');
+              $('products')?.scrollIntoView({behavior:'smooth'});
+            });
+            brands.append(brand);
+          });
+          if(brands.childElementCount)nested.append(brands);
+        }
+        dropdown.append(nested);
+      }else{
+        const option=document.createElement('a');
+        option.href='#products';
+        option.textContent=item.textContent.trim();
+        option.addEventListener('click',event=>{event.preventDefault();selectSubcategory(option.textContent.trim());});
+        dropdown.append(option);
+      }
     });
   });
 }
