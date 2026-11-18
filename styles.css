@@ -228,27 +228,11 @@ button{cursor:pointer}
 @media(prefers-reduced-motion:reduce){.category-tile,.product-card,.service-card,.btn{transition:none}}
 
 /* Footer logo contrast: preserve the original black-and-orange mark on dark footer */
-.brand-footer{position:relative}
-.brand-footer .brand-mark{
-  background:transparent;
-  border-radius:0;
-  padding:0;
-  object-fit:contain;
-  filter:brightness(0) invert(1);
-}
-.brand-footer::after{
-  content:"";
-  position:absolute;
-  width:11px;
-  height:11px;
-  left:36px;
-  top:1px;
-  border-radius:1px;
-  background:#ff9800;
-  pointer-events:none;
-}
-
-
+/* Footer: show the complete white-and-orange Galaxy symbol clearly */
+.brand-footer{position:relative;display:inline-flex;align-items:center;min-height:125px}
+.brand-footer::after{content:none!important;display:none!important}
+.footer-brand .footer-full-logo{display:block!important;width:125px;height:125px;max-width:100%;object-fit:contain;filter:none}
+@media(max-width:760px){.footer-brand .footer-full-logo{width:112px;height:112px}}
 /* Product details and mobile product-card usability */
 .product-details-btn{
   width:100%;margin:0 0 7px;padding:8px 6px;border:1px solid #e7a13c;
@@ -1099,12 +1083,12 @@ button{cursor:pointer}
 /* Use the full supplied logo in the footer without duplicate wordmark text */
 .footer-brand .brand-footer{display:inline-flex;align-items:flex-start;max-width:100%;}
 .footer-brand .footer-full-logo{display:block;width:220px;max-width:100%;height:auto;object-fit:contain;}
-@media(max-width:760px){.footer-brand .footer-full-logo{width:200px;}}
+@media(max-width:760px){.footer-brand .footer-full-logo{width:112px;height:112px;}}
 
 /* Unified Galaxy symbol-only identity */
 .brand-mark{width:64px;height:64px;object-fit:contain;flex:0 0 auto}
 .brand-wordmark{display:none!important}
 .about-full-mark{display:block;width:190px;max-width:100%;height:auto;margin:0 auto;object-fit:contain}
-.footer-brand .footer-full-logo{display:block!important;width:66px;height:66px;object-fit:contain;filter:none}
+.footer-brand .footer-full-logo{display:block!important;width:125px;height:125px;object-fit:contain;filter:none}
 .brand-footer .brand-mark{filter:none}
 @media(max-width:760px){.brand-mark{width:48px;height:48px}}
