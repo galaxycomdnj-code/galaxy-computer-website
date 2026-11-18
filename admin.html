@@ -41,6 +41,7 @@
 <div class="field"><label for="subcategory">Subcategory *</label><input id="subcategory" list="subcategorySuggestions" maxlength="80" required placeholder="Choose a category first..."><datalist id="subcategorySuggestions"></datalist><span class="note">Choose a category to get matching subcategory suggestions. You can also type a new subcategory.</span></div>
 <div class="field"><label for="pimageFile">Upload product image</label><input id="pimageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><span class="note">JPG, PNG, WEBP or GIF · Maximum 5 MB. Uploaded images will be stored securely.</span></div>
 <div class="field"><label for="pimage">Or use an image URL</label><input id="pimage" type="url" maxlength="1000" placeholder="https://example.com/image.jpg"><img id="imagePreview" class="preview" alt="Product image preview"></div>
+<div class="field"><label for="pgalleryFiles">Additional Product Gallery Images</label><input id="pgalleryFiles" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple><span class="note">একসঙ্গে Front, Back, Side সহ একাধিক ছবি নির্বাচন করুন। প্রতিটি ছবি সর্বোচ্চ 5 MB।</span><div id="productGalleryPreview" class="admin-gallery-preview"></div></div>
 <div class="form-actions"><button class="btn" id="productSubmit" type="submit">Add product</button><button class="btn light hidden" id="cancelProductEdit" type="button">Cancel</button></div>
 </form>
 <p id="productMessage" class="message" role="status"></p>
@@ -74,6 +75,7 @@ const SUPABASE_KEY='sb_publishable_FMsWzO2LqaTzM8tem94M2w_i3HhnWHR';
 const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=id=>document.getElementById(id);
 let products=[],services=[];
+let editingGalleryImages=[];
 const subcategoryMap={
  'laptop':['New Laptop','Used Laptop','Gaming Laptop','Business Laptop','Ultrabook','2-in-1 Laptop','MacBook','ThinkPad','Dell Latitude','HP EliteBook','HP ProBook','ASUS ZenBook','ASUS VivoBook','Acer Aspire','MSI Gaming','Lenovo','HP','Dell','ASUS','Acer','MSI','Apple','Microsoft Surface','Huawei','Samsung','Gigabyte','Razer'],
  'desktop':['Branded Desktop','Custom PC','Gaming PC','All-in-One PC','Mini PC','Workstation','Dell','HP','Lenovo','ASUS','Acer','Apple iMac','Intel NUC','MSI'],
@@ -138,10 +140,10 @@ function renderProducts(){
  });
 }
 function resetProductForm(){
- $('productForm').reset();syncSubcategorySuggestions();$('productId').value='';$('productFormTitle').textContent='Add a product';$('productSubmit').textContent='Add product';$('cancelProductEdit').classList.add('hidden');$('imagePreview').classList.remove('visible');$('imagePreview').removeAttribute('src');
+ $('productForm').reset();syncSubcategorySuggestions();$('productId').value='';$('productFormTitle').textContent='Add a product';$('productSubmit').textContent='Add product';$('cancelProductEdit').classList.add('hidden');$('imagePreview').classList.remove('visible');$('imagePreview').removeAttribute('src');editingGalleryImages=[];$('productGalleryPreview').replaceChildren();$('pgalleryFiles').value='';
 }
 function editProduct(p){
- $('productId').value=p.id;$('pname').value=p.name||'';$('pspec').value=p.specifications||'';$('pdesc').value=p.description||'';$('price').value=p.price??'';$('category').value=p.category||'';syncSubcategorySuggestions();$('subcategory').value=p.subcategory||'';$('pimage').value=p.image_url||'';
+ $('productId').value=p.id;$('pname').value=p.name||'';$('pspec').value=p.specifications||'';$('pdesc').value=p.description||'';$('price').value=p.price??'';$('category').value=p.category||'';syncSubcategorySuggestions();$('subcategory').value=p.subcategory||'';$('pimage').value=p.image_url||'';editingGalleryImages=Array.isArray(p.gallery_images)?p.gallery_images.filter(x=>typeof x==='string'&&safeImageUrl(x)):[];renderProductGalleryPreview();
  $('productFormTitle').textContent='Edit product';$('productSubmit').textContent='Save changes';$('cancelProductEdit').classList.remove('hidden');previewImage();
  $('productForm').scrollIntoView({behavior:'smooth',block:'start'});
 }
@@ -152,31 +154,64 @@ async function deleteProduct(p){
  message('productMessage','Product deleted.');await loadProducts();
 }
 $('productForm').addEventListener('submit',async e=>{
- e.preventDefault();const id=$('productId').value;
- const name=$('pname').value.trim();const priceText=$('price').value.trim();const imageText=$('pimage').value.trim();const imageFile=$('pimageFile').files[0];
- if(!name){message('productMessage','Please enter a product name.');return}
- if(!$('category').value.trim()||!$('subcategory').value.trim()){message('productMessage','Please select or enter both category and subcategory.');return}
- if(priceText!==''&&(!Number.isFinite(Number(priceText))||Number(priceText)<0)){message('productMessage','Enter a valid non-negative price.');return}
- if(imageText&&!safeImageUrl(imageText)){message('productMessage','Image URL must be a valid HTTPS URL.');return}
- if(imageFile&&(!['image/jpeg','image/png','image/webp','image/gif'].includes(imageFile.type)||imageFile.size>5*1024*1024)){message('productMessage','Choose a JPG, PNG, WEBP or GIF image under 5 MB.');return}
- $('productSubmit').disabled=true;message('productMessage',imageFile?'Uploading image…':'Saving product…');
- let finalImageUrl=imageText||null;let uploadedPath=null;
- if(imageFile){
-  const cleanName=imageFile.name.toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'')||'product-image';
-  uploadedPath='products/'+crypto.randomUUID()+'-'+cleanName;
-  const {error:uploadError}=await supabase.storage.from('product-images').upload(uploadedPath,imageFile,{cacheControl:'31536000',contentType:imageFile.type,upsert:false});
-  if(uploadError){$('productSubmit').disabled=false;message('productMessage','Image upload failed: '+uploadError.message);return}
-  finalImageUrl=supabase.storage.from('product-images').getPublicUrl(uploadedPath).data.publicUrl;
- }
- const payload={name,specifications:$('pspec').value.trim(),description:$('pdesc').value.trim(),price:priceText===''?null:Number(priceText),category:$('category').value.trim(),subcategory:$('subcategory').value.trim(),image_url:finalImageUrl};
- const result=id?await supabase.from('products').update(payload).eq('id',id):await supabase.from('products').insert([payload]);
- $('productSubmit').disabled=false;
- if(result.error){if(uploadedPath)await supabase.storage.from('product-images').remove([uploadedPath]);message('productMessage',(id?'Update':'Add')+' failed: '+result.error.message);return}
- message('productMessage',id?'Product updated successfully.':'Product added successfully.');
- resetProductForm();await loadProducts();
-});
-$('cancelProductEdit').addEventListener('click',resetProductForm);
+  e.preventDefault();const id=$('productId').value;
+  const name=$('pname').value.trim();const priceText=$('price').value.trim();const imageText=$('pimage').value.trim();const imageFile=$('pimageFile').files[0];const galleryFiles=[...$('pgalleryFiles').files];
+  if(!name){message('productMessage','Please enter a product name.');return}
+  if(!$('category').value.trim()||!$('subcategory').value.trim()){message('productMessage','Please select or enter both category and subcategory.');return}
+  if(priceText!==''&&(!Number.isFinite(Number(priceText))||Number(priceText)<0)){message('productMessage','Enter a valid non-negative price.');return}
+  if(imageText&&!safeImageUrl(imageText)){message('productMessage','Image URL must be a valid HTTPS URL.');return}
+  const allFiles=[...(imageFile?[imageFile]:[]),...galleryFiles];
+  if(allFiles.some(file=>!['image/jpeg','image/png','image/webp','image/gif'].includes(file.type)||file.size>5*1024*1024)){message('productMessage','Every image must be JPG, PNG, WEBP or GIF and under 5 MB.');return}
+  $('productSubmit').disabled=true;message('productMessage',allFiles.length?'Uploading product images…':'Saving product…');
+  let finalImageUrl=imageText||null;let uploadedPaths=[];let galleryImages=[...editingGalleryImages];
+  async function uploadProductImage(file){
+   const cleanName=file.name.toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'')||'product-image';
+   const path='products/'+crypto.randomUUID()+'-'+cleanName;
+   const {error}=await supabase.storage.from('product-images').upload(path,file,{cacheControl:'31536000',contentType:file.type,upsert:false});
+   if(error)throw error;
+   uploadedPaths.push(path);
+   return supabase.storage.from('product-images').getPublicUrl(path).data.publicUrl;
+  }
+  try{
+   if(imageFile)finalImageUrl=await uploadProductImage(imageFile);
+   const uploadedGallery=[];
+   for(const file of galleryFiles)uploadedGallery.push(await uploadProductImage(file));
+   if(!finalImageUrl&&uploadedGallery.length)finalImageUrl=uploadedGallery.shift();
+   galleryImages=[...galleryImages,...uploadedGallery];
+   const payload={name,specifications:$('pspec').value.trim(),description:$('pdesc').value.trim(),price:priceText===''?null:Number(priceText),category:$('category').value.trim(),subcategory:$('subcategory').value.trim(),image_url:finalImageUrl,gallery_images:galleryImages};
+   const result=id?await supabase.from('products').update(payload).eq('id',id):await supabase.from('products').insert([payload]);
+   if(result.error)throw result.error;
+   message('productMessage',id?'Product updated successfully.':'Product added successfully.');
+   $('productSubmit').disabled=false;resetProductForm();await loadProducts();
+  }catch(error){
+   if(uploadedPaths.length)await supabase.storage.from('product-images').remove(uploadedPaths);
+   $('productSubmit').disabled=false;message('productMessage','Save failed: '+(error.message||'Unknown error'));
+  }
+ });
+ $('cancelProductEdit').addEventListener('click',resetProductForm);
 $('productSearchAdmin').addEventListener('input',renderProducts);
+function renderProductGalleryPreview(){
+ const box=$('productGalleryPreview');if(!box)return;box.replaceChildren();
+ editingGalleryImages.forEach((url,index)=>{
+  const item=document.createElement('div');item.className='admin-gallery-thumb';
+  const img=document.createElement('img');img.src=url;img.alt='Saved gallery image '+(index+1);
+  const remove=makeButton('Remove','danger',()=>{editingGalleryImages.splice(index,1);renderProductGalleryPreview()});
+  item.append(img,remove);box.append(item);
+ });
+ [...($('pgalleryFiles')?.files||[])].forEach((file,index)=>{
+  const item=document.createElement('div');item.className='admin-gallery-thumb';
+  const img=document.createElement('img');img.src=URL.createObjectURL(file);img.alt='New gallery image '+(index+1);
+  const name=document.createElement('small');name.textContent=file.name;
+  item.append(img,name);box.append(item);
+ });
+}
+$('pgalleryFiles').addEventListener('change',()=>{
+ const files=[...$('pgalleryFiles').files];
+ if(files.some(file=>!['image/jpeg','image/png','image/webp','image/gif'].includes(file.type)||file.size>5*1024*1024)){
+  $('pgalleryFiles').value='';message('productMessage','Every gallery image must be JPG, PNG, WEBP or GIF and under 5 MB.');
+ }
+ renderProductGalleryPreview();
+});
 function previewImage(){const url=safeImageUrl($('pimage').value.trim());if(url){$('imagePreview').src=url;$('imagePreview').classList.add('visible')}else{$('imagePreview').classList.remove('visible')}}
 $('pimage').addEventListener('input',previewImage);
 $('pimageFile').addEventListener('change',()=>{
