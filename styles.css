@@ -1120,3 +1120,10 @@ button{cursor:pointer}
 .category-submenu.category-nested-submenu.open{display:flex}
 .category-submenu.category-nested-submenu a{font-size:10px;padding:5px 8px}
 .category-nested-item span{margin-left:auto}
+
+/* Correctly nest component types and brand lists inside the category drawer */
+#categoryDrawer .category-submenu>.category-nested-group{display:block;width:100%;flex:0 0 100%;}
+#categoryDrawer .category-submenu>.category-nested-group>.category-item{display:flex;width:100%;box-sizing:border-box;padding:10px 8px;background:#fff;text-align:left;color:#333;border-bottom:1px solid #f0f0f0;font-size:12px;font-weight:600;}
+#categoryDrawer .category-submenu.category-nested-submenu{display:none;flex-direction:row;flex-wrap:wrap;padding:7px 0 10px 16px;gap:7px;}
+#categoryDrawer .category-submenu.category-nested-submenu.open{display:flex;}
+#categoryDrawer .category-submenu.category-nested-submenu a{display:inline-block;font-size:11px;padding:6px 9px;background:#f6f6f6;border-radius:6px;}
