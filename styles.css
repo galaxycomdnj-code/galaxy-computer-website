@@ -1105,6 +1105,6 @@ button{cursor:pointer}
 .brand-mark{width:64px;height:64px;object-fit:contain;flex:0 0 auto}
 .brand-wordmark{display:none!important}
 .about-full-mark{display:block;width:190px;max-width:100%;height:auto;margin:0 auto;object-fit:contain}
-.footer-brand .footer-full-logo{display:none!important}
+.footer-brand .footer-full-logo{display:block!important;width:66px;height:66px;object-fit:contain;filter:none}
 .brand-footer .brand-mark{filter:none}
 @media(max-width:760px){.brand-mark{width:48px;height:48px}}
