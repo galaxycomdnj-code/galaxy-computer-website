@@ -1041,3 +1041,17 @@ button{cursor:pointer}
     letter-spacing:-.3px;
   }
 }
+
+/* Match the cleaner reference navigation typography */
+@media(min-width:761px){
+  .main-nav .nav-links{
+    gap:clamp(7px,.7vw,12px);
+  }
+  .main-nav .nav-links a{
+    font-family:'Manrope',Arial,sans-serif;
+    font-size:12px;
+    font-weight:650;
+    letter-spacing:-.12px;
+    line-height:1.25;
+  }
+}
