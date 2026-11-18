@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#111111">
+<link rel="manifest" href="/admin-manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <title>Galaxy Computer | Admin Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,6 +70,9 @@
 <section class="panel-card section-gap"><div class="panel-head"><div><h2>Customer Orders</h2><p class="muted">Orders submitted through website checkout.</p></div><button class="btn light" id="refreshOrders" type="button">Refresh orders</button></div><p id="ordersMessage" class="message" role="status"></p><div id="ordersList" class="list"><div class="empty">Loading orders…</div></div></section>
 </section>
 </main>
+<script>
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {})); }
+</script>
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 const SUPABASE_URL='https://wfuvzfiwnpbgbzzeygei.supabase.co';
