@@ -312,7 +312,8 @@ function filterProducts(term) {
     const matchesQuery = !query || searchable.includes(query);
     const matchesCategory = !selectedCategory || String(product.category || '').toLowerCase() === selectedCategory;
     const matchesShortcut = !activeCategoryTerms.length || activeCategoryTerms.some(word => searchable.includes(word));
-    const matchesSubcategory = !activeSubcategory || normalizeCategoryText(product.subcategory) === normalizeCategoryText(activeSubcategory) || (!product.subcategory && normalizeCategoryText(searchable).includes(normalizeCategoryText(activeSubcategory)));
+    const normalizedFilter = normalizeCategoryText(activeSubcategory);
+     const matchesSubcategory = !activeSubcategory || normalizeCategoryText(product.subcategory) === normalizedFilter || normalizeCategoryText(searchable).includes(normalizedFilter);
     return matchesQuery && matchesCategory && matchesShortcut && matchesSubcategory;
   });
   const sort = $('productSort')?.value || 'newest';
@@ -497,43 +498,36 @@ function refreshDesktopCategoryDropdowns(){
 function populateDynamicCategorySubmenus(){
   const list=$('categoryList');
   if(!list) return;
-  const groups=[...list.querySelectorAll('.category-group')];
+  const groups=[...list.querySelectorAll(':scope > .category-group')];
   const groupByKey=new Map(groups.map(group=>{
-    const label=group.querySelector('.category-item')?.textContent.replace(/[+−]/g,'').trim()||'';
+    const label=group.querySelector(':scope > .category-item')?.textContent.replace(/[+−]/g,'').trim()||'';
     return [normalizeCategoryText(label),group];
   }));
-  /* Any category newly entered in Admin is added to both desktop and mobile menus. */
+  const hiddenLegacyCategories=new Set(['ram','storage']);
   [...new Set(productsCache.map(product=>String(product.category||'').trim()).filter(Boolean))]
     .sort((a,b)=>a.localeCompare(b)).forEach(label=>{
       const key=normalizeCategoryText(label);
-      if(groupByKey.has(key)) return;
+      if(groupByKey.has(key)||hiddenLegacyCategories.has(key)) return;
       const group=document.createElement('div');group.className='category-group';
       const button=document.createElement('button');button.type='button';button.className='category-item';button.textContent=label;
       const symbol=document.createElement('span');symbol.textContent='+';button.append(symbol);
       const submenu=document.createElement('div');submenu.className='category-submenu';
-      button.addEventListener('click',()=>{
-        const opened=submenu.classList.toggle('open');
-        button.setAttribute('aria-expanded',String(opened));symbol.textContent=opened?'−':'+';
-      });
       group.append(button,submenu);list.append(group);groupByKey.set(key,group);
     });
   groupByKey.forEach((group,key)=>{
-    const submenu=group.querySelector('.category-submenu');
+    const submenu=group.querySelector(':scope > .category-submenu');
     if(!submenu) return;
-    const values=new Map();
-    submenu.querySelectorAll('a').forEach(anchor=>{
-      const value=anchor.textContent.trim();if(value)values.set(normalizeCategoryText(value),value);
-    });
+    const known=new Set([...submenu.querySelectorAll('a, .category-item')].map(node=>normalizeCategoryText(node.textContent.replace(/[+−]/g,'').trim())));
     productsCache.forEach(product=>{
-      if(normalizeCategoryText(product.category)!==key)return;
+      const productCategory=normalizeCategoryText(product.category);
+      const legacyMatch=key==='components'&&['ram','storage'].includes(productCategory);
+      if(productCategory!==key&&!legacyMatch)return;
       const value=String(product.subcategory||'').trim();
-      if(value&&!values.has(normalizeCategoryText(value)))values.set(normalizeCategoryText(value),value);
-    });
-    submenu.replaceChildren();
-    [...values.values()].sort((a,b)=>a.localeCompare(b)).forEach(value=>{
+      const normalized=normalizeCategoryText(value);
+      if(!value||known.has(normalized))return;
       const anchor=document.createElement('a');anchor.href='#products';anchor.textContent=value;
       anchor.addEventListener('click',event=>{event.preventDefault();selectSubcategory(value);closeCategoryMenu();});
-      submenu.append(anchor);
+      submenu.append(anchor);known.add(normalized);
     });
   });
   refreshDesktopCategoryDropdowns();
