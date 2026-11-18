@@ -538,7 +538,7 @@ function populateDynamicCategorySubmenus(){
           normalizeCategoryText(product.category)===key &&
           normalizeCategoryText(product.subcategory)===normalizeCategoryText(type) &&
           String(product.brand||'').trim()
-        ).map(product=>String(product.brand).trim())].sort((a,b)=>a.localeCompare(b));
+        )).map(product=>String(product.brand).trim())].sort((a,b)=>a.localeCompare(b));
         brandMenu.replaceChildren();
         brands.forEach(brand=>{
           const anchor=document.createElement('a');
