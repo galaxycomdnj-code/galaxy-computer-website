@@ -534,11 +534,14 @@ function populateDynamicCategorySubmenus(){
         const type=(typeButton?.childNodes[0]?.textContent||typeButton?.textContent||'').replace(/[+−]/g,'').trim();
         const brandMenu=nested.querySelector(':scope > .category-submenu');
         if(!brandMenu||!type)return;
-        const brands=[...new Set(productsCache.filter(product=>
-          normalizeCategoryText(product.category)===key &&
-          normalizeCategoryText(product.subcategory)===normalizeCategoryText(type) &&
-          String(product.brand||'').trim()
-        )).map(product=>String(product.brand).trim())].sort((a,b)=>a.localeCompare(b));
+        const brands=[...new Set(productsCache
+          .filter(product=>
+            normalizeCategoryText(product.category)===key &&
+            normalizeCategoryText(product.subcategory)===normalizeCategoryText(type) &&
+            String(product.brand||'').trim()
+          )
+          .map(product=>String(product.brand).trim())
+        )].sort((a,b)=>a.localeCompare(b));
         brandMenu.replaceChildren();
         brands.forEach(brand=>{
           const anchor=document.createElement('a');
