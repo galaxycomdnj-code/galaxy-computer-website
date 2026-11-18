@@ -1111,3 +1111,12 @@ button{cursor:pointer}
 .header-main .brand .brand-mark{display:block!important;width:48px!important;height:50px!important;object-fit:contain!important;}
 .header-main .brand .brand-wordmark{display:block!important;width:158px!important;height:auto!important;max-width:none!important;object-fit:contain!important;}
 @media(max-width:760px){.header-main .brand{gap:6px!important}.header-main .brand .brand-mark{width:38px!important;height:40px!important}.header-main .brand .brand-wordmark{width:112px!important;max-width:calc(100vw - 190px)!important}}
+
+
+/* Nested product category menus */
+.category-nested-group{display:block;flex:0 0 100%;min-width:0}
+.category-submenu>.category-nested-group>.category-item{padding:8px 7px 8px 2px;font-size:11px;font-weight:700;color:#333;background:#fff8ee;border-radius:5px}
+.category-submenu.category-nested-submenu{padding:7px 0 9px 13px;gap:6px}
+.category-submenu.category-nested-submenu.open{display:flex}
+.category-submenu.category-nested-submenu a{font-size:10px;padding:5px 8px}
+.category-nested-item span{margin-left:auto}
