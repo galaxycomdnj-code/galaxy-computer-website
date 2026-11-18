@@ -1031,3 +1031,13 @@ button{cursor:pointer}
   cursor:pointer;
 }
 .service-card .service-read-more:hover{text-decoration:underline}
+
+/* Main category navigation: clean modern Manrope typography */
+@media(min-width:761px){
+  .main-nav .nav-links a{
+    font-family:'Manrope',Arial,sans-serif;
+    font-size:12px;
+    font-weight:750;
+    letter-spacing:-.3px;
+  }
+}
