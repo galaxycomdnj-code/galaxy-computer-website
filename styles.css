@@ -973,3 +973,22 @@ button{cursor:pointer}
   .about-card b{font-size:14px;line-height:1.12;white-space:nowrap}
   .about-card span{font-size:7px;letter-spacing:.65px;line-height:1.3;white-space:nowrap;margin-top:3px}
 }
+
+/* Refined desktop positioning for the two homepage feature sections */
+@media(min-width:761px){
+  .home-service-inner{
+    grid-template-columns:minmax(0,1fr) minmax(220px, .28fr);
+    column-gap:clamp(36px,5vw,76px);
+  }
+  .service-orbit{justify-self:end;margin-right:clamp(18px,2.5vw,42px)}
+  .about-card{
+    grid-template-columns:72px max-content;
+    column-gap:14px;
+    padding:18px 22px;
+    min-height:132px;
+  }
+  .about-card img{width:72px;height:72px}
+  .about-card strong{font-size:18px;line-height:1.12}
+  .about-card b{font-size:15px;line-height:1.12}
+  .about-card span{font-size:7px;letter-spacing:.7px;line-height:1.3;margin-top:4px}
+}
