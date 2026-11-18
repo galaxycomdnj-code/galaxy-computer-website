@@ -317,7 +317,7 @@ function filterProducts(term) {
     const productType = normalizeCategoryText(product.subcategory || '');
     const productCategory = normalizeCategoryText(product.category || '');
     const matchesSubcategory = !activeSubcategory || productType === normalizedFilter || productCategory === normalizedFilter;
-    const brandSearchable = normalizeCategoryText([product.name, product.description].filter(Boolean).join(' '));
+    const brandSearchable = normalizeCategoryText([product.brand, product.name].filter(Boolean).join(' '));
     const normalizedBrand = normalizeCategoryText(activeBrandTerm);
     const matchesBrand = !activeBrandTerm || brandSearchable.includes(normalizedBrand);
     return matchesQuery && matchesCategory && matchesShortcut && matchesSubcategory && matchesBrand;
@@ -348,7 +348,7 @@ async function loadProducts() {
   if (!productGrid) return;
   try {
     const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/products?select=id,name,description,price,image_url,category,subcategory,created_at&order=created_at.desc`,
+      `${SUPABASE_URL}/rest/v1/products?select=id,name,brand,model,description,price,image_url,category,subcategory,created_at&order=created_at.desc`,
       { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
     );
     if (!response.ok) throw new Error(`Product request failed (${response.status})`);
@@ -525,9 +525,29 @@ function populateDynamicCategorySubmenus(){
       group.append(button,submenu);list.append(group);groupByKey.set(key,group);
     });
   groupByKey.forEach((group,key)=>{
-    if(key==='components') return; // Keep the curated product-type > brand hierarchy intact.
     const submenu=group.querySelector(':scope > .category-submenu');
     if(!submenu) return;
+    const nestedGroups=[...submenu.querySelectorAll(':scope > .category-nested-group')];
+    if(nestedGroups.length){
+      nestedGroups.forEach(nested=>{
+        const typeButton=nested.querySelector(':scope > .category-item');
+        const type=(typeButton?.childNodes[0]?.textContent||typeButton?.textContent||'').replace(/[+−]/g,'').trim();
+        const brandMenu=nested.querySelector(':scope > .category-submenu');
+        if(!brandMenu||!type)return;
+        const brands=[...new Set(productsCache.filter(product=>
+          normalizeCategoryText(product.category)===key &&
+          normalizeCategoryText(product.subcategory)===normalizeCategoryText(type) &&
+          String(product.brand||'').trim()
+        ).map(product=>String(product.brand).trim())].sort((a,b)=>a.localeCompare(b));
+        brandMenu.replaceChildren();
+        brands.forEach(brand=>{
+          const anchor=document.createElement('a');
+          anchor.href='#products';anchor.dataset.filter=brand;anchor.textContent=brand;
+          brandMenu.append(anchor);
+        });
+      });
+      return;
+    }
     const values=new Map();
     submenu.querySelectorAll(':scope > a').forEach(anchor=>{const value=anchor.textContent.trim();if(value)values.set(normalizeCategoryText(value),value);});
     productsCache.forEach(product=>{
