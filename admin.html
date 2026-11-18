@@ -36,7 +36,9 @@
 <h2 id="productFormTitle">Add a product</h2>
 <form id="productForm">
 <input id="productId" type="hidden">
-<div class="field"><label for="pname">Product name *</label><input id="pname" maxlength="160" required placeholder="e.g. Gaming Laptop"></div>
+<div class="field"><label for="pname">Product name *</label><input id="pname" maxlength="160" required placeholder="e.g. MSI PRO B760M-A Motherboard"></div>
+<div class="field"><label for="pbrand">Brand *</label><input id="pbrand" maxlength="80" required placeholder="e.g. MSI"></div>
+<div class="field"><label for="pmodel">Model</label><input id="pmodel" maxlength="120" placeholder="e.g. PRO B760M-A WIFI"></div>
 <div class="field"><label for="pspec">Product Specifications</label><textarea id="pspec" maxlength="5000" placeholder="Brand: Golden Field&#10;Model: GF-KM605W&#10;Connection: 2.4GHz Wireless&#10;Warranty: 1 Year"></textarea><span class="note">প্রতিটি Specification আলাদা লাইনে লিখুন। যেমন: Processor, RAM, Storage, Display, Warranty।</span></div>
 <div class="field"><label for="pdesc">Product Description</label><textarea id="pdesc" maxlength="3000" placeholder="Write a separate detailed description of this product..."></textarea></div>
 <div class="field"><label for="price">Price (BDT)</label><input id="price" type="number" min="0" step="0.01" placeholder="e.g. 65000"></div>
@@ -140,17 +142,17 @@ function renderProducts(){
   const img=document.createElement('img');img.alt='';img.loading='lazy';img.src=safeImageUrl(p.image_url||'')||'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22%3E%3Crect width=%22100%25%22 height=%22100%25%22 fill=%22%23f4f4f4%22/%3E%3C/svg%3E';
   const info=document.createElement('div');info.className='item-info';
   const title=document.createElement('strong');title.textContent=p.name||'Unnamed product';
-  const meta=document.createElement('small');meta.textContent=[p.category,p.subcategory].filter(Boolean).join(' › ')+' · '+(p.price===null||p.price===''?'Price on request':'৳ '+Number(p.price).toLocaleString('en-BD'));
+  const meta=document.createElement('small');meta.textContent=[p.category,p.subcategory,p.brand,p.model].filter(Boolean).join(' › ')+' · '+(p.price===null||p.price===''?'Price on request':'৳ '+Number(p.price).toLocaleString('en-BD'));
   info.append(title,meta);const actions=document.createElement('div');actions.className='item-actions';
   actions.append(makeButton('Edit','light',()=>editProduct(p)),makeButton('Delete','danger',()=>deleteProduct(p)));
   item.append(img,info,actions);list.append(item);
  });
 }
 function resetProductForm(){
- $('productForm').reset();syncSubcategorySuggestions();$('productId').value='';$('productFormTitle').textContent='Add a product';$('productSubmit').textContent='Add product';$('cancelProductEdit').classList.add('hidden');$('imagePreview').classList.remove('visible');$('imagePreview').removeAttribute('src');editingGalleryImages=[];$('productGalleryPreview').replaceChildren();$('pgalleryFiles').value='';
+ $('productForm').reset();syncSubcategorySuggestions();$('productId').value='';$('pbrand').value='';$('pmodel').value='';$('productFormTitle').textContent='Add a product';$('productSubmit').textContent='Add product';$('cancelProductEdit').classList.add('hidden');$('imagePreview').classList.remove('visible');$('imagePreview').removeAttribute('src');editingGalleryImages=[];$('productGalleryPreview').replaceChildren();$('pgalleryFiles').value='';
 }
 function editProduct(p){
- $('productId').value=p.id;$('pname').value=p.name||'';$('pspec').value=p.specifications||'';$('pdesc').value=p.description||'';$('price').value=p.price??'';$('category').value=p.category||'';syncSubcategorySuggestions();$('subcategory').value=p.subcategory||'';$('pimage').value=p.image_url||'';editingGalleryImages=Array.isArray(p.gallery_images)?p.gallery_images.filter(x=>typeof x==='string'&&safeImageUrl(x)):[];renderProductGalleryPreview();
+ $('productId').value=p.id;$('pname').value=p.name||'';$('pbrand').value=p.brand||'';$('pmodel').value=p.model||'';$('pspec').value=p.specifications||'';$('pdesc').value=p.description||'';$('price').value=p.price??'';$('category').value=p.category||'';syncSubcategorySuggestions();$('subcategory').value=p.subcategory||'';$('pimage').value=p.image_url||'';editingGalleryImages=Array.isArray(p.gallery_images)?p.gallery_images.filter(x=>typeof x==='string'&&safeImageUrl(x)):[];renderProductGalleryPreview();
  $('productFormTitle').textContent='Edit product';$('productSubmit').textContent='Save changes';$('cancelProductEdit').classList.remove('hidden');previewImage();
  $('productForm').scrollIntoView({behavior:'smooth',block:'start'});
 }
@@ -185,7 +187,7 @@ $('productForm').addEventListener('submit',async e=>{
    for(const file of galleryFiles)uploadedGallery.push(await uploadProductImage(file));
    if(!finalImageUrl&&uploadedGallery.length)finalImageUrl=uploadedGallery.shift();
    galleryImages=[...galleryImages,...uploadedGallery];
-   const payload={name,specifications:$('pspec').value.trim(),description:$('pdesc').value.trim(),price:priceText===''?null:Number(priceText),category:$('category').value.trim(),subcategory:$('subcategory').value.trim(),image_url:finalImageUrl,gallery_images:galleryImages};
+   const payload={name,brand:$('pbrand').value.trim(),model:$('pmodel').value.trim(),specifications:$('pspec').value.trim(),description:$('pdesc').value.trim(),price:priceText===''?null:Number(priceText),category:$('category').value.trim(),subcategory:$('subcategory').value.trim(),image_url:finalImageUrl,gallery_images:galleryImages};
    const result=id?await supabase.from('products').update(payload).eq('id',id):await supabase.from('products').insert([payload]);
    if(result.error)throw result.error;
    message('productMessage',id?'Product updated successfully.':'Product added successfully.');
