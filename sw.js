@@ -1,4 +1,4 @@
-const CACHE_NAME = 'galaxy-computer-shell-v82';
+const CACHE_NAME = 'galaxy-computer-shell-v83';
 const APP_SHELL = [
   '/', '/index.html', '/product.html', '/styles.css', '/script.js', '/product-page.js', '/manifest.webmanifest', '/admin-manifest.webmanifest', '/admin.html',
   '/hero-banner.webp', '/logo-mark.svg', '/logo-mark-dark.svg', '/admin-full-logo.svg', '/cover.png', '/logo.jpg', '/parts.png',
@@ -19,8 +19,14 @@ self.addEventListener('fetch', event => {
     event.respondWith(fetch(request).catch(() => caches.match('/index.html')));
     return;
   }
-  event.respondWith(caches.match(request).then(cached => cached || fetch(request).then(response => {
-    if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
-    return response;
-  })));
+  event.respondWith(caches.match(request).then(cached => {
+    if (cached) return cached;
+    return fetch(request).then(response => {
+      if (!response.ok) return response;
+      const responseToCache = response.clone();
+      return caches.open(CACHE_NAME)
+        .then(cache => cache.put(request, responseToCache))
+        .then(() => response);
+    });
+  }));
 });
