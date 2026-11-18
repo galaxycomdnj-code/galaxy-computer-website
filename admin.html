@@ -55,7 +55,8 @@
 <input id="serviceId" type="hidden">
 <div class="field"><label for="sname">Service name *</label><input id="sname" maxlength="160" required placeholder="e.g. Laptop Repair"></div>
 <div class="field"><label for="sdesc">Description</label><textarea id="sdesc" maxlength="1500" placeholder="Describe the service"></textarea></div>
-<div class="field"><label for="simage">Service image URL</label><input id="simage" type="url" maxlength="1000" placeholder="https://example.com/service.jpg"></div>
+<div class="field"><label for="simageFile">Upload service image</label><input id="simageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><span class="note">JPG, PNG, WEBP or GIF · Maximum 5 MB. Image uploads to Galaxy Computer storage.</span></div>
+ <div class="field"><label for="simage">Or use an image URL</label><input id="simage" type="url" maxlength="1000" placeholder="https://example.com/service.jpg"><img id="serviceImagePreview" class="preview" alt="Service image preview"></div>
 <div class="form-actions"><button class="btn" id="serviceSubmit" type="submit">Add service</button><button class="btn light hidden" id="cancelServiceEdit" type="button">Cancel</button></div>
 </form><p id="serviceMessage" class="message" role="status"></p>
 </section>
@@ -201,16 +202,30 @@ function renderServices(){
   item.append(img,info,actions);list.append(item);
  });
 }
-function resetServiceForm(){$('serviceForm').reset();$('serviceId').value='';$('serviceFormTitle').textContent='Add a service';$('serviceSubmit').textContent='Add service';$('cancelServiceEdit').classList.add('hidden')}
-function editService(s){$('serviceId').value=s.id;$('sname').value=s.name||'';$('sdesc').value=s.description||'';$('simage').value=s.image_url||'';$('serviceFormTitle').textContent='Edit service';$('serviceSubmit').textContent='Save changes';$('cancelServiceEdit').classList.remove('hidden');$('serviceForm').scrollIntoView({behavior:'smooth',block:'start'})}
+function resetServiceForm(){$('serviceForm').reset();$('serviceId').value='';$('serviceFormTitle').textContent='Add a service';$('serviceSubmit').textContent='Add service';$('cancelServiceEdit').classList.add('hidden');$('serviceImagePreview').classList.remove('visible');$('serviceImagePreview').removeAttribute('src')}
+function editService(s){$('serviceId').value=s.id;$('sname').value=s.name||'';$('sdesc').value=s.description||'';$('simage').value=s.image_url||'';previewServiceImage();$('serviceFormTitle').textContent='Edit service';$('serviceSubmit').textContent='Save changes';$('cancelServiceEdit').classList.remove('hidden');$('serviceForm').scrollIntoView({behavior:'smooth',block:'start'})}
+function previewServiceImage(){const url=safeImageUrl($('simage').value.trim());if(url){$('serviceImagePreview').src=url;$('serviceImagePreview').classList.add('visible')}else{$('serviceImagePreview').classList.remove('visible')}}
+$('simage').addEventListener('input',previewServiceImage);
+$('simageFile').addEventListener('change',()=>{const file=$('simageFile').files[0];if(!file){previewServiceImage();return}if(!['image/jpeg','image/png','image/webp','image/gif'].includes(file.type)||file.size>5*1024*1024){$('simageFile').value='';message('serviceMessage','Choose a JPG, PNG, WEBP or GIF image under 5 MB.');previewServiceImage();return}$('serviceImagePreview').src=URL.createObjectURL(file);$('serviceImagePreview').classList.add('visible');message('serviceMessage','Image selected. It will upload when you save the service.')});
 async function deleteService(s){if(!confirm('Delete “'+s.name+'”? This cannot be undone.'))return;const {error}=await supabase.from('services').delete().eq('id',s.id);if(error){message('serviceMessage','Delete failed: '+error.message);return}message('serviceMessage','Service deleted.');await loadServices()}
 $('serviceForm').addEventListener('submit',async e=>{
- e.preventDefault();const id=$('serviceId').value;const name=$('sname').value.trim();const imageText=$('simage').value.trim();
+ e.preventDefault();const id=$('serviceId').value;const name=$('sname').value.trim();const imageText=$('simage').value.trim();const imageFile=$('simageFile').files[0];
  if(!name){message('serviceMessage','Please enter a service name.');return}
  if(imageText&&!safeImageUrl(imageText)){message('serviceMessage','Image URL must be a valid HTTPS URL.');return}
- const payload={name,description:$('sdesc').value.trim(),image_url:imageText||null};$('serviceSubmit').disabled=true;
- const result=id?await supabase.from('services').update(payload).eq('id',id):await supabase.from('services').insert([payload]);$('serviceSubmit').disabled=false;
- if(result.error){message('serviceMessage',(id?'Update':'Add')+' failed: '+result.error.message);return}
+ if(imageFile&&(!['image/jpeg','image/png','image/webp','image/gif'].includes(imageFile.type)||imageFile.size>5*1024*1024)){message('serviceMessage','Choose a JPG, PNG, WEBP or GIF image under 5 MB.');return}
+ $('serviceSubmit').disabled=true;message('serviceMessage',imageFile?'Uploading service image…':'Saving service…');
+ let finalImageUrl=imageText||null;let uploadedPath=null;
+ if(imageFile){
+  const cleanName=imageFile.name.toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'')||'service-image';
+  uploadedPath='products/services/'+crypto.randomUUID()+'-'+cleanName;
+  const {error:uploadError}=await supabase.storage.from('product-images').upload(uploadedPath,imageFile,{cacheControl:'31536000',contentType:imageFile.type,upsert:false});
+  if(uploadError){$('serviceSubmit').disabled=false;message('serviceMessage','Image upload failed: '+uploadError.message);return}
+  finalImageUrl=supabase.storage.from('product-images').getPublicUrl(uploadedPath).data.publicUrl;
+ }
+ const payload={name,description:$('sdesc').value.trim(),image_url:finalImageUrl};
+ const result=id?await supabase.from('services').update(payload).eq('id',id):await supabase.from('services').insert([payload]);
+ $('serviceSubmit').disabled=false;
+ if(result.error){if(uploadedPath)await supabase.storage.from('product-images').remove([uploadedPath]);message('serviceMessage',(id?'Update':'Add')+' failed: '+result.error.message);return}
  message('serviceMessage',id?'Service updated successfully.':'Service added successfully.');resetServiceForm();await loadServices();
 });
 $('cancelServiceEdit').addEventListener('click',resetServiceForm);
