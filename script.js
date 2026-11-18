@@ -286,6 +286,7 @@ function renderProducts(products) {
 
 let activeCategoryTerms = [];
 let activeSubcategory = '';
+let activeBrandTerm = '';
 const normalizeCategoryText = value => String(value || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ').trim();
 function selectSubcategory(term) {
   activeSubcategory = String(term || '').trim();
@@ -313,8 +314,13 @@ function filterProducts(term) {
     const matchesCategory = !selectedCategory || String(product.category || '').toLowerCase() === selectedCategory;
     const matchesShortcut = !activeCategoryTerms.length || activeCategoryTerms.some(word => searchable.includes(word));
     const normalizedFilter = normalizeCategoryText(activeSubcategory);
-     const matchesSubcategory = !activeSubcategory || normalizeCategoryText(product.subcategory) === normalizedFilter || normalizeCategoryText(searchable).includes(normalizedFilter);
-    return matchesQuery && matchesCategory && matchesShortcut && matchesSubcategory;
+    const productType = normalizeCategoryText(product.subcategory || '');
+    const productCategory = normalizeCategoryText(product.category || '');
+    const matchesSubcategory = !activeSubcategory || productType === normalizedFilter || productCategory === normalizedFilter;
+    const brandSearchable = normalizeCategoryText([product.name, product.description].filter(Boolean).join(' '));
+    const normalizedBrand = normalizeCategoryText(activeBrandTerm);
+    const matchesBrand = !activeBrandTerm || brandSearchable.includes(normalizedBrand);
+    return matchesQuery && matchesCategory && matchesShortcut && matchesSubcategory && matchesBrand;
   });
   const sort = $('productSort')?.value || 'newest';
   const getPrice = product => {
@@ -335,7 +341,7 @@ function filterProducts(term) {
   else if (sort === 'name-asc') filtered.sort((a,b) => String(a.name || '').localeCompare(String(b.name || ''), undefined, { sensitivity: 'base' }));
   else filtered.sort((a,b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
   renderProducts(filtered);
-  $('clearProductSearch').hidden = !(query || selectedCategory || activeCategoryTerms.length || activeSubcategory);
+  $('clearProductSearch').hidden = !(query || selectedCategory || activeCategoryTerms.length || activeSubcategory || activeBrandTerm);
 }
 
 async function loadProducts() {
@@ -363,14 +369,15 @@ $('productSearchForm')?.addEventListener('submit', event => {
   filterProducts($('productSearch').value);
   $('products').scrollIntoView({ behavior: 'smooth' });
 });
-$('productSearch')?.addEventListener('input', event => { activeCategoryTerms = []; activeSubcategory = ''; filterProducts(event.target.value); });
-$('productCategoryFilter')?.addEventListener('change', () => { activeCategoryTerms = []; activeSubcategory = ''; filterProducts($('productSearch')?.value || ''); });
+$('productSearch')?.addEventListener('input', event => { activeCategoryTerms = []; activeSubcategory = ''; activeBrandTerm = ''; filterProducts(event.target.value); });
+$('productCategoryFilter')?.addEventListener('change', () => { activeCategoryTerms = []; activeSubcategory = ''; activeBrandTerm = ''; filterProducts($('productSearch')?.value || ''); });
 $('productSort')?.addEventListener('change', () => filterProducts($('productSearch')?.value || ''));
 $('clearProductSearch')?.addEventListener('click', () => {
   $('productSearch').value = '';
   $('productCategoryFilter').value = '';
   activeCategoryTerms = [];
   activeSubcategory = '';
+  activeBrandTerm = '';
   filterProducts('');
 });
 document.querySelectorAll('.category-tile').forEach(tile => {
@@ -388,6 +395,7 @@ document.querySelectorAll('.category-tile').forEach(tile => {
       software: ['software', 'operating system']
     };
     activeSubcategory = '';
+    activeBrandTerm = '';
     activeCategoryTerms = aliases[category] || [category];
     $('productSearch').value = '';
     $('productCategoryFilter').value = '';
@@ -603,7 +611,20 @@ categoryDrawer?.addEventListener('click',event=>{
   const link=event.target.closest('.category-submenu a');
   if(link&&categoryDrawer.contains(link)){
     event.preventDefault();
-    selectSubcategory(link.dataset.filter||link.textContent.trim());
+    const nestedGroup = link.closest('.category-nested-group');
+    if (nestedGroup) {
+      const typeButton = nestedGroup.querySelector(':scope > .category-item');
+      activeSubcategory = (typeButton?.childNodes[0]?.textContent || typeButton?.textContent || '').replace(/[+−]/g,'').trim();
+      activeBrandTerm = (link.dataset.filter || link.textContent || '').trim();
+      activeCategoryTerms = [];
+      if ($('productSearch')) $('productSearch').value = '';
+      if ($('productCategoryFilter')) $('productCategoryFilter').value = '';
+      filterProducts('');
+      $('products')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      activeBrandTerm = '';
+      selectSubcategory(link.dataset.filter||link.textContent.trim());
+    }
     closeCategoryMenu();
   }
 });
