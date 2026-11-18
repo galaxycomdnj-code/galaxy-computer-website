@@ -1007,3 +1007,27 @@ button{cursor:pointer}
   margin-top:1px;
   line-height:1.1;
 }
+
+/* Service card descriptions: preview two lines with an accessible read-more toggle */
+.service-card .service-description-collapsed{
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  line-clamp:2;
+  overflow:hidden;
+}
+.service-card .service-description-expanded{
+  display:block;
+  overflow:visible;
+}
+.service-card .service-read-more{
+  display:inline-block;
+  margin-top:7px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#d97900;
+  font:700 11px var(--font-brand),var(--font-bn),sans-serif;
+  cursor:pointer;
+}
+.service-card .service-read-more:hover{text-decoration:underline}
