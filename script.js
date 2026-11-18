@@ -488,8 +488,10 @@ function refreshDesktopCategoryDropdowns(){
     if(!dropdown){dropdown=document.createElement('div');dropdown.className='nav-category-dropdown';wrapper.append(dropdown);}
     dropdown.replaceChildren();
     dropdown.setAttribute('aria-label',label+' subcategories');
-    [...submenu.querySelectorAll('a')].forEach(item=>{
-      const option=item.cloneNode(true);
+    [...submenu.querySelectorAll(':scope > a, :scope > .category-nested-group > .category-item')].forEach(item=>{
+      const option=document.createElement('a');
+      option.href='#products';
+      option.textContent=item.textContent.replace(/[+−]/g,'').trim();
       option.addEventListener('click',event=>{event.preventDefault();selectSubcategory(option.textContent.trim());});
       dropdown.append(option);
     });
@@ -515,19 +517,21 @@ function populateDynamicCategorySubmenus(){
       group.append(button,submenu);list.append(group);groupByKey.set(key,group);
     });
   groupByKey.forEach((group,key)=>{
+    if(key==='components') return; // Keep the curated product-type > brand hierarchy intact.
     const submenu=group.querySelector(':scope > .category-submenu');
     if(!submenu) return;
-    const known=new Set([...submenu.querySelectorAll('a, .category-item')].map(node=>normalizeCategoryText(node.textContent.replace(/[+−]/g,'').trim())));
+    const values=new Map();
+    submenu.querySelectorAll(':scope > a').forEach(anchor=>{const value=anchor.textContent.trim();if(value)values.set(normalizeCategoryText(value),value);});
     productsCache.forEach(product=>{
-      const productCategory=normalizeCategoryText(product.category);
-      const legacyMatch=key==='components'&&['ram','storage'].includes(productCategory);
-      if(productCategory!==key&&!legacyMatch)return;
+      if(normalizeCategoryText(product.category)!==key)return;
       const value=String(product.subcategory||'').trim();
-      const normalized=normalizeCategoryText(value);
-      if(!value||known.has(normalized))return;
+      if(value&&!values.has(normalizeCategoryText(value)))values.set(normalizeCategoryText(value),value);
+    });
+    submenu.replaceChildren();
+    [...values.values()].sort((a,b)=>a.localeCompare(b)).forEach(value=>{
       const anchor=document.createElement('a');anchor.href='#products';anchor.textContent=value;
       anchor.addEventListener('click',event=>{event.preventDefault();selectSubcategory(value);closeCategoryMenu();});
-      submenu.append(anchor);known.add(normalized);
+      submenu.append(anchor);
     });
   });
   refreshDesktopCategoryDropdowns();
@@ -585,34 +589,30 @@ document.addEventListener('keydown', event => {
     }
   }
 });
-document.querySelectorAll('.category-item').forEach((button, index) => {
-  const submenu = button.nextElementSibling;
-  if (submenu) {
-    const submenuId = `category-submenu-${index + 1}`;
-    submenu.id = submenuId;
-    button.setAttribute('aria-controls', submenuId);
-    button.setAttribute('aria-expanded', 'false');
+categoryDrawer?.addEventListener('click',event=>{
+  const button=event.target.closest('.category-item');
+  if(button&&categoryDrawer.contains(button)){
+    const target=button.nextElementSibling;
+    if(target?.classList.contains('category-submenu')){
+      const opened=target.classList.toggle('open');
+      button.setAttribute('aria-expanded',String(opened));
+      const symbol=button.querySelector('span');if(symbol)symbol.textContent=opened?'−':'+';
+    }
+    return;
   }
-  button.addEventListener('click', () => {
-    const target = button.nextElementSibling;
-    const symbol = button.querySelector('span');
-    if (!target) return;
-    const isOpen = target.classList.toggle('open');
-    button.setAttribute('aria-expanded', String(isOpen));
-    if (symbol) symbol.textContent = isOpen ? '−' : '+';
+  const link=event.target.closest('.category-submenu a');
+  if(link&&categoryDrawer.contains(link)){
+    event.preventDefault();
+    selectSubcategory(link.dataset.filter||link.textContent.trim());
+    closeCategoryMenu();
+  }
+});
+$('categorySearch')?.addEventListener('input',event=>{
+  const query=event.target.value.toLowerCase().trim();
+  document.querySelectorAll('.category-group').forEach(group=>{
+    group.style.display=group.textContent.toLowerCase().includes(query)?'':'none';
   });
 });
-$('categorySearch')?.addEventListener('input', event => {
-  const query = event.target.value.toLowerCase().trim();
-  document.querySelectorAll('.category-group').forEach(group => {
-    group.style.display = group.textContent.toLowerCase().includes(query) ? '' : 'none';
-  });
-});
-document.querySelectorAll('.category-submenu a').forEach(link => link.addEventListener('click', event => {
-  event.preventDefault();
-  selectSubcategory(link.textContent.trim());
-  closeCategoryMenu();
-}));
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(error => console.warn('Service worker registration failed:', error)));
