@@ -1,7 +1,7 @@
-const CACHE_NAME = 'galaxy-computer-shell-v66';
+const CACHE_NAME = 'galaxy-computer-shell-v67';
 const APP_SHELL = [
   '/', '/index.html', '/product.html', '/styles.css', '/script.js', '/product-page.js', '/manifest.webmanifest', '/admin-manifest.webmanifest', '/admin.html',
-  '/hero-banner.webp', '/logo-mark.svg', '/cover.png', '/logo.jpg', '/parts.png',
+  '/hero-banner.webp', '/logo-mark.svg', '/admin-full-logo.svg', '/cover.png', '/logo.jpg', '/parts.png',
   '/icon-192.png', '/icon-512.png'
 ];
 
