@@ -1097,3 +1097,11 @@ button{cursor:pointer}
 .footer-brand .brand-footer::before,.footer-brand .brand-footer::after{content:none!important;display:none!important;background:none!important}
 .footer-brand .footer-full-logo{width:125px!important;height:125px!important;object-fit:contain!important;filter:none!important}
 @media(max-width:760px){.footer-brand .footer-full-logo{width:112px!important;height:112px!important}}
+
+/* Footer brand lockup: symbol + GALAXY COMPUTER typography */
+.footer-brand .footer-brand-lockup{display:flex!important;align-items:center!important;gap:12px!important;min-height:0!important;width:max-content;max-width:100%;}
+.footer-brand .footer-symbol{display:block!important;width:62px!important;height:62px!important;object-fit:contain!important;flex:0 0 auto;}
+.footer-brand .footer-wordmark{display:block!important;width:190px!important;height:auto!important;max-width:min(190px,calc(100vw - 110px));object-fit:contain!important;}
+.footer-brand .brand-footer::before,.footer-brand .brand-footer::after{content:none!important;display:none!important;}
+.footer-brand p{margin-top:9px!important;}
+@media(max-width:760px){.footer-brand .footer-symbol{width:52px!important;height:52px!important}.footer-brand .footer-wordmark{width:165px!important;max-width:calc(100vw - 100px)}}
