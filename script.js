@@ -161,6 +161,9 @@ $('checkoutForm')?.addEventListener('submit', async event => {
     customer_phone: phone,
     delivery_address: address,
     customer_note: note || null,
+    payment_method: $('paymentMethod').value,
+    payment_status: 'unpaid',
+    final_price: null,
     items: cartItems.map(item => ({id:String(item.id),name:String(item.name),price:item.price===null?null:Number(item.price),quantity:Number(item.quantity)})),
     subtotal: Number(subtotal.toFixed(2)),
     status: 'Pending'
@@ -199,9 +202,10 @@ $('checkoutForm')?.addEventListener('submit', async event => {
     form.hidden = true;
     $('orderSuccess').hidden = false;
     $('customerOrderId').textContent = publicOrderId;
+    const selectedPayment = payload.payment_method === 'bkash' ? 'bKash' : payload.payment_method === 'nagad' ? 'Nagad' : 'Cash on Delivery';
     $('orderSuccessSummary').textContent = english
-      ? `Subtotal: ${orderTotalText}${hasUnpricedItems ? ' (some item prices will be confirmed by Galaxy Computer).' : ''} Delivery charge, if applicable, will be confirmed separately.`
-      : `সাবটোটাল: ${orderTotalText}${hasUnpricedItems ? ' (কিছু পণ্যের দাম Galaxy Computer থেকে নিশ্চিত করা হবে)।' : ''} ডেলিভারি চার্জ প্রযোজ্য হলে আলাদাভাবে নিশ্চিত করা হবে।`;
+      ? `Subtotal: ${orderTotalText}${hasUnpricedItems ? ' (some item prices will be confirmed by Galaxy Computer).' : ''} Preferred payment: ${selectedPayment}. We will confirm stock, final price and delivery charge before asking for payment.`
+      : `সাবটোটাল: ${orderTotalText}${hasUnpricedItems ? ' (কিছু পণ্যের দাম Galaxy Computer থেকে নিশ্চিত করা হবে)।' : ''} পেমেন্ট পদ্ধতি: ${payload.payment_method === 'cod' ? 'ক্যাশ অন ডেলিভারি' : selectedPayment}। পেমেন্টের আগে স্টক, চূড়ান্ত দাম ও ডেলিভারি চার্জ নিশ্চিত করা হবে।`;
     $('orderCopyMessage').textContent = '';
   } catch (error) {
     feedback.textContent = (english ? 'Order could not be submitted: ' : 'অর্ডার জমা হয়নি: ') + error.message;
