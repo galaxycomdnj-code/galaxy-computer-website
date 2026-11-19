@@ -1137,3 +1137,33 @@ button{cursor:pointer}
 
 /* Force the logo-mark orange on the service promo strip */
 .service-promo{background-color:#FF8004!important;background-image:none!important;}
+
+
+/* Keep service section text within a neat readable width */
+.service-promo-inner>div:first-child{
+  flex:1 1 620px;
+  max-width:620px;
+  min-width:0;
+}
+.service-promo h2,
+.service-promo p{
+  max-width:100%;
+  overflow-wrap:anywhere;
+}
+.home-service-inner>div:first-child{
+  flex:1 1 620px;
+  max-width:620px;
+  min-width:0;
+}
+.home-service h2,
+.home-service p{
+  max-width:100%;
+  overflow-wrap:anywhere;
+}
+@media(max-width:760px){
+  .service-promo-inner>div:first-child,
+  .home-service-inner>div:first-child{
+    flex-basis:100%;
+    max-width:100%;
+  }
+}
