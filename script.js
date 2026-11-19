@@ -29,7 +29,7 @@ function applySiteLanguage(refreshProducts = true) {
 applySiteLanguage(false);
 // Keep the Hero, About, and Contact sections in Bengali on the initial page load.
 // The language button still switches the entire site between Bengali and English.
-['#home', '#about', '#contact'].forEach(sectionSelector => {
+['#home', '#about', '#contact', '.service-promo'].forEach(sectionSelector => {
   document.querySelectorAll(`${sectionSelector} [data-bn][data-en]`).forEach(element => {
     element.textContent = element.dataset.bn;
   });
