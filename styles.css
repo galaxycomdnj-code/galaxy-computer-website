@@ -1176,5 +1176,5 @@ button{cursor:pointer}
 
 
 /* Fit the orange promo background tightly around its text and support button */
-.service-promo-inner{width:min(100%,1440px)!important;max-width:94%!important;margin-inline:auto!important;}
+.service-promo-inner{width:min(1440px,94%)!important;max-width:none!important;margin-inline:auto!important;box-sizing:border-box!important;}
 @media(max-width:760px){.service-promo-inner{width:100%!important;}}
