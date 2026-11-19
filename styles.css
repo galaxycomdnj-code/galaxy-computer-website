@@ -1220,3 +1220,10 @@ button{cursor:pointer}
 .order-success .btn{width:100%;margin:0 0 8px}
 .order-copy-message{min-height:18px;margin:0 0 8px!important;color:#187044!important;font-size:11px!important}
 .order-success-summary{font-weight:700}
+
+
+/* Product availability labels */
+.product-stock-status{display:inline-flex;align-items:center;width:max-content;max-width:100%;margin:7px 0;padding:5px 9px;border-radius:5px;background:#e8f6ee;color:#187044;font:700 10px 'Sora',sans-serif;}
+.product-stock-status.out_of_stock{background:#fff0f0;color:#b42318;}
+.product-stock-status.price_on_request{background:#fff5df;color:#805500;}
+.product-card .cart-add-btn:disabled,.product-page-buy-now:disabled{opacity:.58;cursor:not-allowed;filter:grayscale(.2);}
