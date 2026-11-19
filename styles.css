@@ -1173,3 +1173,8 @@ button{cursor:pointer}
 .service-promo-inner>div:first-child{flex:0 1 500px;width:100%;max-width:500px;min-width:0;}
 .service-promo h2,.service-promo p{max-width:100%;overflow-wrap:break-word;}
 @media(max-width:760px){.service-promo{padding:18px 0!important;}.service-promo-inner{padding:26px 22px!important;align-items:flex-start;flex-direction:column;gap:14px;}}
+
+
+/* Fit the orange promo background tightly around its text and support button */
+.service-promo-inner{width:fit-content!important;max-width:100%!important;margin-inline:auto!important;}
+@media(max-width:760px){.service-promo-inner{width:100%!important;}}
