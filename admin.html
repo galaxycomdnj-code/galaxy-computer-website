@@ -277,7 +277,7 @@ $('cancelServiceEdit').addEventListener('click',resetServiceForm);
 
 async function loadOrders(){
  const list=$('ordersList');list.replaceChildren();
- const {data,error}=await supabase.from('orders').select('id,customer_name,customer_phone,delivery_address,customer_note,items,subtotal,status,payment_method,payment_status,final_price,customer_order_code,created_at').order('created_at',{ascending:false}).limit(100);
+ const {data,error}=await supabase.from('orders').select('id,customer_name,customer_phone,delivery_address,customer_note,items,subtotal,status,payment_method,payment_status,final_price,product_total,additional_charges,customer_order_code,created_at').order('created_at',{ascending:false}).limit(100);
  if(error){$('orderTotal').textContent='—';message('ordersMessage','Could not load orders: '+error.message+' (Check the Orders RLS policies.)');list.innerHTML='<div class="empty">Orders are not available until admin read access is configured.</div>';return}
  const orders=data||[];$('orderTotal').textContent=String(orders.length);
  if(!orders.length){list.innerHTML='<div class="empty">No customer orders yet.</div>';return}
@@ -293,9 +293,8 @@ async function loadOrders(){
   const items=document.createElement('div');items.className='note';
   items.textContent=rows.map(item=>(item.name||'Product')+' × '+(item.quantity||1)+' — '+(item.price==null?'Price to confirm':'৳ '+Number(item.price).toLocaleString('en-BD'))).join(' | ');
   const subtotal=document.createElement('p');subtotal.textContent='Customer cart subtotal: ৳ '+Number(order.subtotal||0).toLocaleString('en-BD');
-  const finalLine=document.createElement('p');finalLine.textContent='Final price: '+(order.final_price==null?'Not set':'৳ '+Number(order.final_price).toLocaleString('en-BD'));
   const paymentLine=document.createElement('p');paymentLine.textContent='Customer preference: '+({bkash:'bKash',nagad:'Nagad',cod:'Cash on Delivery',not_selected:'Not selected'}[order.payment_method||'not_selected']||order.payment_method)+' · Payment: '+(order.payment_status==='paid'?'Paid':'Unpaid');
-  card.append(head,address,items,subtotal,finalLine,paymentLine);
+  card.append(head,address,items,subtotal,paymentLine);
   if(order.customer_note){const note=document.createElement('p');note.className='note';note.textContent='Customer note: '+order.customer_note;card.append(note)}
   const controls=document.createElement('div');controls.className='actions';
   const statusLabel=document.createElement('label');statusLabel.textContent='Order status';statusLabel.className='muted';
@@ -306,25 +305,60 @@ async function loadOrders(){
   const method=document.createElement('select');method.className='field';method.style.margin='0';method.style.maxWidth='190px';method.setAttribute('aria-label','Payment method');
   [['bkash','bKash'],['nagad','Nagad'],['cod','Cash on Delivery'],['not_selected','Not selected']].forEach(([value,label])=>{const option=document.createElement('option');option.value=value;option.textContent=label;method.append(option)});
   method.value=order.payment_method||'not_selected';
-  const finalLabel=document.createElement('label');finalLabel.textContent='Final price (BDT)';finalLabel.className='muted';
-  const finalInput=document.createElement('input');finalInput.type='number';finalInput.min='0';finalInput.step='0.01';finalInput.placeholder='Enter confirmed final price';finalInput.value=order.final_price??'';finalInput.className='field';finalInput.style.margin='0';finalInput.style.maxWidth='190px';finalInput.setAttribute('aria-label','Final price in BDT');
+
+  const chargeSection=document.createElement('div');chargeSection.style.margin='12px 0';chargeSection.style.padding='12px';chargeSection.style.border='1px solid var(--border,#ddd)';chargeSection.style.borderRadius='10px';
+  const chargeHeading=document.createElement('strong');chargeHeading.textContent='Price & Additional Charges';
+  const productLabel=document.createElement('label');productLabel.className='muted';productLabel.textContent='Confirmed product total (BDT)';
+  const productInput=document.createElement('input');productInput.type='number';productInput.min='0';productInput.step='0.01';productInput.className='field';productInput.style.margin='4px 0 10px';productInput.placeholder='Enter confirmed product total';productInput.value=order.product_total??order.subtotal??'';
+  const chargesList=document.createElement('div');chargesList.style.display='grid';chargesList.style.gap='8px';
+  const charges=Array.isArray(order.additional_charges)?order.additional_charges:[];
+  const chargeRows=[];
+  const totalLine=document.createElement('p');totalLine.style.fontWeight='700';totalLine.style.margin='12px 0 0';
+  function updateTotal(){
+   const base=Number(productInput.value);
+   const extras=chargeRows.reduce((sum,row)=>sum+(row.amount.value.trim()===''?0:Number(row.amount.value)),0);
+   const valid=productInput.value.trim()!==''&&Number.isFinite(base)&&base>=0&&chargeRows.every(row=>row.amount.value.trim()===''||(Number.isFinite(Number(row.amount.value))&&Number(row.amount.value)>=0));
+   totalLine.textContent='Final Total: '+(valid?'৳ '+(base+extras).toLocaleString('en-BD',{maximumFractionDigits:2}):'Enter valid amounts');
+   return valid?Number((base+extras).toFixed(2)):null;
+  }
+  function addChargeRow(name='',amount=''){
+   const row=document.createElement('div');row.style.display='flex';row.style.gap='8px';row.style.alignItems='center';
+   const chargeName=document.createElement('input');chargeName.type='text';chargeName.className='field';chargeName.placeholder='Charge name (e.g. Delivery)';chargeName.value=name;chargeName.style.margin='0';chargeName.style.flex='1';chargeName.style.minWidth='0';
+   const chargeAmount=document.createElement('input');chargeAmount.type='number';chargeAmount.min='0';chargeAmount.step='0.01';chargeAmount.className='field';chargeAmount.placeholder='Amount';chargeAmount.value=amount;chargeAmount.style.margin='0';chargeAmount.style.width='115px';
+   const remove=makeButton('Remove','light',()=>{row.remove();const index=chargeRows.findIndex(item=>item.row===row);if(index>=0)chargeRows.splice(index,1);updateTotal()});
+   row.append(chargeName,chargeAmount,remove);chargesList.append(row);chargeRows.push({row,name:chargeName,amount:chargeAmount});
+   chargeName.addEventListener('input',updateTotal);chargeAmount.addEventListener('input',updateTotal);
+  }
+  charges.forEach(charge=>addChargeRow(charge.name||'',charge.amount??''));
+  productInput.addEventListener('input',updateTotal);
+  const addCharge=makeButton('＋ Add charge','light',()=>addChargeRow());
+  chargeSection.append(chargeHeading,productLabel,productInput,chargesList,addCharge,totalLine);
+  updateTotal();
+
   const paymentLabel=document.createElement('label');paymentLabel.textContent='Payment status';paymentLabel.className='muted';
   const payment=document.createElement('select');payment.className='field';payment.style.margin='0';payment.style.maxWidth='190px';payment.setAttribute('aria-label','Payment status');
   [['unpaid','Unpaid'],['paid','Paid']].forEach(([value,label])=>{const option=document.createElement('option');option.value=value;option.textContent=label;payment.append(option)});
   payment.value=order.payment_status||'unpaid';
   const save=makeButton('Save order details','dark',async()=>{
-   const priceText=finalInput.value.trim();
-   if(priceText!==''&&(!Number.isFinite(Number(priceText))||Number(priceText)<0)){message('ordersMessage','Enter a valid non-negative final price.');return}
-   if(payment.value==='paid'&&priceText===''){message('ordersMessage','Set the confirmed final price before marking payment as Paid.');return}
+   const total=updateTotal();
+   if(total===null){message('ordersMessage','Enter a valid product total and valid non-negative charge amounts.');return}
+   const savedCharges=[];
+   for(const row of chargeRows){
+    const name=row.name.value.trim(),amountText=row.amount.value.trim();
+    if(!name&&!amountText)continue;
+    if(!name||amountText===''||!Number.isFinite(Number(amountText))||Number(amountText)<0){message('ordersMessage','For each additional charge, enter both its name and a valid amount.');return}
+    savedCharges.push({name,amount:Number(amountText)});
+   }
    if(payment.value==='paid'&&status.value!=='Delivered'&&method.value==='cod'){message('ordersMessage','For Cash on Delivery, mark the order Delivered first, after the customer receives the product.');return}
    save.disabled=true;
-   const update={status:status.value,payment_method:method.value,payment_status:payment.value,final_price:priceText===''?null:Number(priceText)};
+   const update={status:status.value,payment_method:method.value,payment_status:payment.value,product_total:Number(productInput.value),additional_charges:savedCharges,final_price:total};
    const {error:updateError}=await supabase.from('orders').update(update).eq('id',order.id);
    save.disabled=false;
    if(updateError){message('ordersMessage','Order update failed: '+updateError.message);return}
    message('ordersMessage','Order '+(order.customer_order_code||('GC-'+String(order.id).toUpperCase()))+' updated successfully.');await loadOrders();
   });
-  controls.append(statusLabel,status,methodLabel,method,finalLabel,finalInput,paymentLabel,payment,save);
+  controls.append(statusLabel,status,methodLabel,method,paymentLabel,payment);
+  card.append(chargeSection,controls,save);
   if((order.status||'Pending')==='Confirmed'){
    const whatsapp=makeButton('WhatsApp customer','success',()=>{
     let phone=String(order.customer_phone||'').replace(/\D/g,'');
@@ -335,10 +369,9 @@ async function loadOrders(){
     const text='Dear Valued Customer,\n\nAssalamu Alaikum!\n\n🎉 Your order '+orderCode+' has been successfully confirmed by Galaxy Computer.\n\nOur team will contact you shortly to provide further details and assist you with the next steps.\n\nThank you for choosing Galaxy Computer and for placing your trust in us.';
     window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(text),'_blank','noopener,noreferrer');
    });
-   whatsapp.title='Open WhatsApp with a prepared order confirmation message';
-   controls.append(whatsapp);
+   whatsapp.title='Open WhatsApp with a prepared order confirmation message';controls.append(whatsapp);
   }
-  card.append(controls);list.append(card);
+  list.append(card);
  });
 }
 $('refreshOrders').addEventListener('click',loadOrders);
