@@ -26,7 +26,6 @@ function applySiteLanguage() {
   if (search) search.placeholder = english ? 'Search products...' : 'পণ্য খুঁজুন...';
   if (typeof productsCache !== 'undefined') { populateCategoryFilter(); filterProducts(search?.value || ''); }
 }
-applySiteLanguage();
 $('languageBtn')?.addEventListener('click', () => {
   english = !english;
   applySiteLanguage();
@@ -219,6 +218,7 @@ const SUPABASE_URL = 'https://wfuvzfiwnpbgbzzeygei.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_FMsWzO2LqaTzM8tem94M2w_i3HhnWHR';
 const productGrid = $('productGrid');
 let productsCache = [];
+applySiteLanguage();
 
 function showProductMessage(message, className = 'product-empty') {
   if (!productGrid) return;
