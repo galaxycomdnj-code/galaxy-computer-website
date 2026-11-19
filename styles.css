@@ -99,7 +99,7 @@ button{cursor:pointer}
 .product-card a:hover{background:#ffad2e}
 .product-loading,.product-empty{grid-column:1/-1;text-align:center;padding:42px 16px;background:#fff;border:1px dashed #ddd;border-radius:12px;color:#777;font-size:13px}
 /* orange service promo */
-.service-promo{background:var(--orange);padding:27px 0;color:#111}
+.service-promo{background:#FF8004;padding:27px 0;color:#111}
 .service-promo-inner{display:flex;align-items:center;justify-content:space-between;gap:25px}
 .service-promo .eyebrow{color:#3b2600}
 .service-promo h2{font-size:clamp(20px,2.2vw,27px);margin:4px 0}
@@ -207,7 +207,7 @@ button{cursor:pointer}
 .product-card:hover{border-color:#ffc36c;box-shadow:0 10px 24px #11111112}
 .product-card a{background:var(--orange);color:#111}
 .product-price{color:#df7800}
-.service-promo{background:var(--orange)}
+.service-promo{background:#FF8004}
 .service-promo .btn{background:#111;color:#fff}
 .service-card{box-shadow:0 3px 14px #11111106}
 .service-card:hover{border-color:#ffbd59}
