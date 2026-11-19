@@ -1133,3 +1133,7 @@ button{cursor:pointer}
 #categoryDrawer .category-submenu.category-nested-submenu{display:none;flex-direction:row;flex-wrap:wrap;padding:7px 0 10px 16px;gap:7px;}
 #categoryDrawer .category-submenu.category-nested-submenu.open{display:flex;}
 #categoryDrawer .category-submenu.category-nested-submenu a{display:inline-block;font-size:11px;padding:6px 9px;background:#f6f6f6;border-radius:6px;}
+
+
+/* Force the logo-mark orange on the service promo strip */
+.service-promo{background-color:#FF8004!important;background-image:none!important;}
