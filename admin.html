@@ -366,7 +366,8 @@ async function loadOrders(){
     else if(phone.startsWith('1')&&phone.length===10)phone='880'+phone;
     if(!/^8801[3-9]\d{8}$/.test(phone)){message('ordersMessage','A valid Bangladesh mobile number is required for WhatsApp.');return}
     const orderCode=order.customer_order_code||('GC-'+String(order.id).toUpperCase());
-    const text='Dear Valued Customer,\n\nAssalamu Alaikum!\n\n🎉 Your order '+orderCode+' has been successfully confirmed by Galaxy Computer.\n\nOur team will contact you shortly to provide further details and assist you with the next steps.\n\nThank you for choosing Galaxy Computer and for placing your trust in us.';
+    const totalLine=order.final_price==null?'\n\n💰 Your final order total, including delivery charge and any applicable additional charges, will be shared with you shortly.':'\n\n💰 Your final order total, including delivery charge and any applicable additional charges, is ৳ '+Number(order.final_price).toLocaleString('en-BD')+'.';
+    const text='Dear Valued Customer,\n\nAssalamu Alaikum!\n\n🎉 Your order '+orderCode+' has been successfully confirmed by Galaxy Computer.'+totalLine+'\n\nOur team will contact you shortly to provide further details and assist you with the next steps.\n\nThank you for choosing Galaxy Computer and for placing your trust in us.';
     window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(text),'_blank','noopener,noreferrer');
    });
    whatsapp.title='Open WhatsApp with a prepared order confirmation message';controls.append(whatsapp);
