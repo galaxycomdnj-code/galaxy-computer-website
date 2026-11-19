@@ -1168,7 +1168,7 @@ button{cursor:pointer}
 
 
 /* Match the home-service card treatment: orange only behind promo content */
-.service-promo{background:transparent!important;background-image:none!important;padding:24px 0!important;color:#111;}
+.service-promo{background:#F5F5F5!important;background-image:none!important;padding:24px 0!important;color:#111;}
 .service-promo-inner{background:#fff!important;border-radius:12px;padding:32px 38px!important;box-sizing:border-box;}
 .service-promo-inner>div:first-child{flex:0 1 500px;width:100%;max-width:500px;min-width:0;}
 .service-promo h2,.service-promo p{max-width:100%;overflow-wrap:break-word;}
