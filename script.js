@@ -153,7 +153,9 @@ $('checkoutForm')?.addEventListener('submit', async event => {
   const note = $('customerNote').value.trim();
   if (!name || !phone || !address) return;
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price === null ? 0 : item.price * item.quantity), 0);
+  const publicOrderId = 'GC-' + crypto.randomUUID().toUpperCase();
   const payload = {
+    customer_order_code: publicOrderId,
     customer_name: name,
     customer_phone: phone,
     delivery_address: address,
@@ -183,7 +185,7 @@ $('checkoutForm')?.addEventListener('submit', async event => {
         apikey: SUPABASE_KEY,
         Authorization: `Bearer ${SUPABASE_KEY}`,
         'Content-Type': 'application/json',
-        Prefer: 'return=representation'
+        Prefer: 'return=minimal'
       },
       body: JSON.stringify(payload)
     });
@@ -192,12 +194,6 @@ $('checkoutForm')?.addEventListener('submit', async event => {
       try { const result = await response.json(); detail = result.message || result.details || result.hint || ''; } catch {}
       throw new Error(detail || `Order submission failed (${response.status})`);
     }
-    const savedOrders = await response.json();
-    const savedOrderId = savedOrders?.[0]?.id;
-    if (savedOrderId === undefined || savedOrderId === null) {
-      throw new Error('Order was saved but the generated Order ID could not be read. Please contact Galaxy Computer before submitting again.');
-    }
-    const publicOrderId = 'GC-' + String(savedOrderId);
     orderSubmitted = true;
     form.reset();
     const hasUnpricedItems = cartItems.some(item => item.price === null);
