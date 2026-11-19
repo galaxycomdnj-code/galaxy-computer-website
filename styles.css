@@ -1151,21 +1151,7 @@ button{cursor:pointer}
   max-width:100%;
   overflow-wrap:anywhere;
 }
-.home-service-inner>div:first-child{
-  flex:0 1 500px;
-  width:100%;
-  max-width:500px;
-  min-width:0;
-}
-.home-service h2,
-.home-service p{
-  max-width:100%;
-  overflow-wrap:anywhere;
-}
+/* Keep the home-service text layout at its original width */
 @media(max-width:760px){
   .service-promo-inner>div:first-child,
-  .home-service-inner>div:first-child{
-    flex-basis:100%;
-    max-width:100%;
-  }
 }
