@@ -277,7 +277,7 @@ $('cancelServiceEdit').addEventListener('click',resetServiceForm);
 
 async function loadOrders(){
  const list=$('ordersList');list.replaceChildren();
- const {data,error}=await supabase.from('orders').select('id,customer_name,customer_phone,delivery_address,customer_note,items,subtotal,status,payment_method,payment_status,final_price,created_at').order('created_at',{ascending:false}).limit(100);
+ const {data,error}=await supabase.from('orders').select('id,customer_name,customer_phone,delivery_address,customer_note,items,subtotal,status,payment_method,payment_status,final_price,customer_order_code,created_at').order('created_at',{ascending:false}).limit(100);
  if(error){$('orderTotal').textContent='—';message('ordersMessage','Could not load orders: '+error.message+' (Check the Orders RLS policies.)');list.innerHTML='<div class="empty">Orders are not available until admin read access is configured.</div>';return}
  const orders=data||[];$('orderTotal').textContent=String(orders.length);
  if(!orders.length){list.innerHTML='<div class="empty">No customer orders yet.</div>';return}
@@ -285,7 +285,7 @@ async function loadOrders(){
  orders.forEach(order=>{
   const card=document.createElement('article');card.className='panel-card';card.style.boxShadow='none';card.style.padding='14px';
   const head=document.createElement('div');head.className='panel-head';head.style.marginBottom='10px';
-  const customer=document.createElement('div');const title=document.createElement('strong');title.textContent='GC-'+String(order.id).toUpperCase()+' · '+(order.customer_name||'Customer');
+  const customer=document.createElement('div');const title=document.createElement('strong');title.textContent=(order.customer_order_code||('GC-'+String(order.id).toUpperCase()))+' · '+(order.customer_name||'Customer');
   const meta=document.createElement('small');meta.className='muted';meta.textContent=new Date(order.created_at).toLocaleString('en-BD')+' · '+(order.customer_phone||'');
   customer.append(title,meta);head.append(customer);
   const address=document.createElement('p');address.className='muted';address.textContent='Delivery: '+(order.delivery_address||'');
@@ -322,7 +322,7 @@ async function loadOrders(){
    const {error:updateError}=await supabase.from('orders').update(update).eq('id',order.id);
    save.disabled=false;
    if(updateError){message('ordersMessage','Order update failed: '+updateError.message);return}
-   message('ordersMessage','Order GC-'+String(order.id).toUpperCase()+' updated successfully.');await loadOrders();
+   message('ordersMessage','Order '+(order.customer_order_code||('GC-'+String(order.id).toUpperCase()))+' updated successfully.');await loadOrders();
   });
   controls.append(statusLabel,status,methodLabel,method,finalLabel,finalInput,paymentLabel,payment,save);card.append(controls);list.append(card);
  });
