@@ -332,7 +332,7 @@ async function loadOrders(){
     else if(phone.startsWith('1')&&phone.length===10)phone='880'+phone;
     if(!/^8801[3-9]\\d{8}$/.test(phone)){message('ordersMessage','A valid Bangladesh mobile number is required for WhatsApp.');return}
     const orderCode=order.customer_order_code||('GC-'+String(order.id).toUpperCase());
-    const text='Hello '+(order.customer_name||'')+', your order '+orderCode+' has been confirmed by Galaxy Computer. We are checking distributor stock and will share the final price and delivery charge shortly.';
+    const text='Hello '+(order.customer_name||'')+', your order '+orderCode+' has been confirmed by Galaxy Computer.';
     window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(text),'_blank','noopener,noreferrer');
    });
    whatsapp.title='Open WhatsApp with a prepared order confirmation message';
