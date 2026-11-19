@@ -276,7 +276,7 @@ function renderProducts(products) {
     // Keep home-page product cards compact; the full description stays on product.html.
     productLink.append(imageWrap, title);
 
-    if (product.price !== null && product.price !== undefined && product.price !== '') {
+    if (product.stock_status !== 'price_on_request' && product.price !== null && product.price !== undefined && product.price !== '') {
       const price = document.createElement('div');
       price.className = 'product-price';
       price.textContent = `৳ ${Number(product.price).toLocaleString('en-BD')}`;
