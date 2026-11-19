@@ -10,6 +10,7 @@
     return Number.isFinite(number) ? '৳ ' + number.toLocaleString('en-BD') : String(value);
   };
   const label = value => String(value).replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  const stockLabel = value => ({available_on_order:'Available on Order',out_of_stock:'Out of Stock',price_on_request:'Price on Request'}[value] || 'Available on Order');
   const textValue = value => {
     if (value === null || value === undefined || value === '') return '';
     if (Array.isArray(value)) return value.map(item => typeof item === 'object' ? JSON.stringify(item) : String(item)).join(', ');
@@ -130,14 +131,14 @@
         const item = document.createElement('div');
         item.className = 'product-detail-meta-item';
         const key = document.createElement('span'); key.textContent = name;
-        const val = document.createElement('strong'); val.textContent = textValue(value);
+        const val = document.createElement('strong'); val.textContent = name === 'Availability' ? stockLabel(value) : textValue(value);
         item.append(key,val); quickMeta.append(item);
       });
       if (metaItems.length) summary.append(quickMeta);
 
       const price = document.createElement('strong');
       price.className = 'product-page-price';
-      price.textContent = product.price !== null && product.price !== undefined && String(product.price).trim() !== '' ? money(product.price) : 'Contact for Price';
+      price.textContent = (product.stock_status === 'price_on_request' || product.price === null || product.price === undefined || String(product.price).trim() === '') ? 'Contact for Price' : money(product.price);
       summary.append(price);
       const reassurance = document.createElement('p');
       reassurance.className = 'product-detail-note';
@@ -154,7 +155,8 @@
       const buyNow = document.createElement('button');
       buyNow.type = 'button';
       buyNow.className = 'product-page-buy-now';
-      buyNow.textContent = 'Buy Now';
+      buyNow.textContent = product.stock_status === 'out_of_stock' ? 'Out of Stock' : product.stock_status === 'price_on_request' ? 'Contact for Price' : 'Buy Now';
+      buyNow.disabled = product.stock_status === 'out_of_stock' || product.stock_status === 'price_on_request';
       buyNow.addEventListener('click', () => {
         try {
           const key = 'galaxy-computer-cart-v1';
