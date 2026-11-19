@@ -15,17 +15,21 @@ menuButton?.addEventListener('click', () => {
 });
 document.querySelectorAll('.nav-links a').forEach(link => link.addEventListener('click', closeMainMenu));
 
-let english = false;
-$('languageBtn')?.addEventListener('click', () => {
-  english = !english;
+let english = true;
+function applySiteLanguage() {
   document.documentElement.lang = english ? 'en' : 'bn';
   document.querySelectorAll('[data-bn][data-en]').forEach(element => {
     element.textContent = english ? element.dataset.en : element.dataset.bn;
   });
-  $('languageBtn').textContent = english ? 'বাংলা' : 'EN';
+  if ($('languageBtn')) $('languageBtn').textContent = english ? 'বাংলা' : 'EN';
   const search = $('productSearch');
   if (search) search.placeholder = english ? 'Search products...' : 'পণ্য খুঁজুন...';
   if (typeof productsCache !== 'undefined') { populateCategoryFilter(); filterProducts(search?.value || ''); }
+}
+applySiteLanguage();
+$('languageBtn')?.addEventListener('click', () => {
+  english = !english;
+  applySiteLanguage();
 });
 if ($('year')) $('year').textContent = new Date().getFullYear();
 
@@ -285,7 +289,7 @@ function renderProducts(products) {
     card.append(productLink);
 
     const stockStatus = product.stock_status || 'available_on_order';
-    const stockLabels = { available_on_order: english ? 'Available on Order' : 'অর্ডার করা যাবে', out_of_stock: english ? 'Out of Stock' : 'স্টক শেষ', price_on_request: english ? 'Price on Request' : 'দাম জানতে যোগাযোগ করুন' };
+    const stockLabels = { available_on_order: english ? 'Available on Order' : 'অর্ডার করা যাবে', out_of_stock: english ? 'Out of Stock' : 'স্টক শেষ', price_on_request: english ? 'Price on Request' : 'দাম জানতে' };
     const stockBadge = document.createElement('span');
     stockBadge.className = 'product-stock-status ' + stockStatus;
     stockBadge.textContent = stockLabels[stockStatus] || stockLabels.available_on_order;
