@@ -1178,3 +1178,8 @@ button{cursor:pointer}
 /* Fit the orange promo background tightly around its text and support button */
 .service-promo-inner{width:min(1440px,94%)!important;max-width:none!important;margin-inline:auto!important;box-sizing:border-box!important;}
 @media(max-width:760px){.service-promo-inner{width:100%!important;}}
+
+
+/* WhatsApp brand color for the technical support button */
+.service-promo .btn{background:#25D366!important;color:#fff!important;}
+.service-promo .btn:hover{background:#1EBE5D!important;color:#fff!important;}
