@@ -42,6 +42,7 @@
 <div class="field"><label for="pspec">Product Specifications</label><textarea id="pspec" maxlength="5000" placeholder="Brand: Golden Field&#10;Model: GF-KM605W&#10;Connection: 2.4GHz Wireless&#10;Warranty: 1 Year"></textarea><span class="note">প্রতিটি Specification আলাদা লাইনে লিখুন। যেমন: Processor, RAM, Storage, Display, Warranty।</span></div>
 <div class="field"><label for="pdesc">Product Description</label><textarea id="pdesc" maxlength="3000" placeholder="Write a separate detailed description of this product..."></textarea></div>
 <div class="field"><label for="price">Price (BDT)</label><input id="price" type="number" min="0" step="0.01" placeholder="e.g. 65000"></div>
+<div class="field"><label for="stockStatus">Stock Status</label><select id="stockStatus"><option value="available_on_order">Available on Order</option><option value="out_of_stock">Out of Stock</option><option value="price_on_request">Price on Request</option></select><span class="note">ডিস্ট্রিবিউটরের স্টক অনুযায়ী এই অবস্থা পরিবর্তন করুন।</span></div>
 <div class="field"><label for="category">Category *</label><input id="category" list="categorySuggestions" maxlength="80" required placeholder="Select or type a category..."><datalist id="categorySuggestions"><option value="Laptop"></option><option value="Desktop"></option><option value="Components"></option><option value="RAM"></option><option value="Storage"></option><option value="Monitor"></option><option value="Accessories"></option><option value="Networking"></option><option value="Printer & Office"></option><option value="Power & UPS"></option><option value="Gaming"></option><option value="Software"></option><option value="CCTV &amp; Security"></option><option value="Cables &amp; Converters"></option><option value="TV &amp; Sound">
         <option value="Gadget"></option></datalist></div>
 <div class="field"><label for="subcategory">Subcategory *</label><input id="subcategory" list="subcategorySuggestions" maxlength="80" required placeholder="Choose a category first..."><datalist id="subcategorySuggestions"></datalist><span class="note">Choose a category to get matching subcategory suggestions. You can also type a new subcategory.</span></div>
@@ -142,17 +143,17 @@ function renderProducts(){
   const img=document.createElement('img');img.alt='';img.loading='lazy';img.src=safeImageUrl(p.image_url||'')||'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22%3E%3Crect width=%22100%25%22 height=%22100%25%22 fill=%22%23f4f4f4%22/%3E%3C/svg%3E';
   const info=document.createElement('div');info.className='item-info';
   const title=document.createElement('strong');title.textContent=p.name||'Unnamed product';
-  const meta=document.createElement('small');meta.textContent=[p.category,p.subcategory,p.brand,p.model].filter(Boolean).join(' › ')+' · '+(p.price===null||p.price===''?'Price on request':'৳ '+Number(p.price).toLocaleString('en-BD'));
+  const meta=document.createElement('small');const stockLabels={available_on_order:'Available on Order',out_of_stock:'Out of Stock',price_on_request:'Price on Request'};meta.textContent=[p.category,p.subcategory,p.brand,p.model].filter(Boolean).join(' › ')+' · '+(p.price===null||p.price===''?'Price on request':'৳ '+Number(p.price).toLocaleString('en-BD'))+' · '+(stockLabels[p.stock_status||'available_on_order']||'Available on Order');
   info.append(title,meta);const actions=document.createElement('div');actions.className='item-actions';
   actions.append(makeButton('Edit','light',()=>editProduct(p)),makeButton('Delete','danger',()=>deleteProduct(p)));
   item.append(img,info,actions);list.append(item);
  });
 }
 function resetProductForm(){
- $('productForm').reset();syncSubcategorySuggestions();$('productId').value='';$('pbrand').value='';$('pmodel').value='';$('productFormTitle').textContent='Add a product';$('productSubmit').textContent='Add product';$('cancelProductEdit').classList.add('hidden');$('imagePreview').classList.remove('visible');$('imagePreview').removeAttribute('src');editingGalleryImages=[];$('productGalleryPreview').replaceChildren();$('pgalleryFiles').value='';
+ $('productForm').reset();$('stockStatus').value='available_on_order';syncSubcategorySuggestions();$('productId').value='';$('pbrand').value='';$('pmodel').value='';$('productFormTitle').textContent='Add a product';$('productSubmit').textContent='Add product';$('cancelProductEdit').classList.add('hidden');$('imagePreview').classList.remove('visible');$('imagePreview').removeAttribute('src');editingGalleryImages=[];$('productGalleryPreview').replaceChildren();$('pgalleryFiles').value='';
 }
 function editProduct(p){
- $('productId').value=p.id;$('pname').value=p.name||'';$('pbrand').value=p.brand||'';$('pmodel').value=p.model||'';$('pspec').value=p.specifications||'';$('pdesc').value=p.description||'';$('price').value=p.price??'';$('category').value=p.category||'';syncSubcategorySuggestions();$('subcategory').value=p.subcategory||'';$('pimage').value=p.image_url||'';editingGalleryImages=Array.isArray(p.gallery_images)?p.gallery_images.filter(x=>typeof x==='string'&&safeImageUrl(x)):[];renderProductGalleryPreview();
+ $('productId').value=p.id;$('pname').value=p.name||'';$('pbrand').value=p.brand||'';$('pmodel').value=p.model||'';$('pspec').value=p.specifications||'';$('pdesc').value=p.description||'';$('price').value=p.price??'';$('stockStatus').value=p.stock_status||'available_on_order';$('category').value=p.category||'';syncSubcategorySuggestions();$('subcategory').value=p.subcategory||'';$('pimage').value=p.image_url||'';editingGalleryImages=Array.isArray(p.gallery_images)?p.gallery_images.filter(x=>typeof x==='string'&&safeImageUrl(x)):[];renderProductGalleryPreview();
  $('productFormTitle').textContent='Edit product';$('productSubmit').textContent='Save changes';$('cancelProductEdit').classList.remove('hidden');previewImage();
  $('productForm').scrollIntoView({behavior:'smooth',block:'start'});
 }
@@ -187,7 +188,7 @@ $('productForm').addEventListener('submit',async e=>{
    for(const file of galleryFiles)uploadedGallery.push(await uploadProductImage(file));
    if(!finalImageUrl&&uploadedGallery.length)finalImageUrl=uploadedGallery.shift();
    galleryImages=[...galleryImages,...uploadedGallery];
-   const payload={name,brand:$('pbrand').value.trim(),model:$('pmodel').value.trim(),specifications:$('pspec').value.trim(),description:$('pdesc').value.trim(),price:priceText===''?null:Number(priceText),category:$('category').value.trim(),subcategory:$('subcategory').value.trim(),image_url:finalImageUrl,gallery_images:galleryImages};
+   const payload={name,brand:$('pbrand').value.trim(),model:$('pmodel').value.trim(),specifications:$('pspec').value.trim(),description:$('pdesc').value.trim(),price:priceText===''?null:Number(priceText),stock_status:$('stockStatus').value,category:$('category').value.trim(),subcategory:$('subcategory').value.trim(),image_url:finalImageUrl,gallery_images:galleryImages};
    const result=id?await supabase.from('products').update(payload).eq('id',id):await supabase.from('products').insert([payload]);
    if(result.error)throw result.error;
    message('productMessage',id?'Product updated successfully.':'Product added successfully.');
