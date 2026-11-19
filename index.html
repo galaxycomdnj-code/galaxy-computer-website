@@ -210,6 +210,17 @@
         <label for="customerNote">Order note (optional)</label><textarea id="customerNote" name="note" maxlength="300" rows="2" placeholder="Any additional information"></textarea>
         <button class="btn btn-primary checkout-submit" type="submit">অর্ডার জমা দিন</button>
       </form>
+      <section id="orderSuccess" class="order-success" hidden aria-live="polite">
+        <div class="order-success-icon" aria-hidden="true">✓</div>
+        <h3 data-bn="অর্ডার সফল হয়েছে!" data-en="ORDER SUCCESSFUL!">অর্ডার সফল হয়েছে!</h3>
+        <p data-bn="আপনার অর্ডারটি আমরা পেয়েছি। নিচে আপনার Order ID দেওয়া হলো।" data-en="We have received your order. Your Order ID is below.">আপনার অর্ডারটি আমরা পেয়েছি। নিচে আপনার Order ID দেওয়া হলো।</p>
+        <div class="order-id-label">ORDER ID</div>
+        <strong id="customerOrderId" class="customer-order-id"></strong>
+        <button id="copyOrderId" class="btn btn-primary" type="button" data-bn="Order ID কপি করুন" data-en="Copy Order ID">Order ID কপি করুন</button>
+        <p id="orderCopyMessage" class="order-copy-message" role="status"></p>
+        <p id="orderSuccessSummary" class="order-success-summary"></p>
+        <p class="cart-note" data-bn="এই Order ID-টি সংরক্ষণ করুন। অর্ডার সম্পর্কে যোগাযোগের সময় এটি প্রয়োজন হবে। Galaxy Computer থেকে শিগগিরই যোগাযোগ করা হবে।" data-en="Please keep this Order ID. You may need it when contacting Galaxy Computer about your order. We will contact you shortly.">এই Order ID-টি সংরক্ষণ করুন। অর্ডার সম্পর্কে যোগাযোগের সময় এটি প্রয়োজন হবে। Galaxy Computer থেকে শিগগিরই যোগাযোগ করা হবে।</p>
+      </section>
     </div>
   </dialog>
 
