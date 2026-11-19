@@ -324,7 +324,21 @@ async function loadOrders(){
    if(updateError){message('ordersMessage','Order update failed: '+updateError.message);return}
    message('ordersMessage','Order '+(order.customer_order_code||('GC-'+String(order.id).toUpperCase()))+' updated successfully.');await loadOrders();
   });
-  controls.append(statusLabel,status,methodLabel,method,finalLabel,finalInput,paymentLabel,payment,save);card.append(controls);list.append(card);
+  controls.append(statusLabel,status,methodLabel,method,finalLabel,finalInput,paymentLabel,payment,save);
+  if((order.status||'Pending')==='Confirmed'){
+   const whatsapp=makeButton('WhatsApp customer','success',()=>{
+    let phone=String(order.customer_phone||'').replace(/\\D/g,'');
+    if(phone.startsWith('0'))phone='88'+phone;
+    else if(phone.startsWith('1')&&phone.length===10)phone='880'+phone;
+    if(!/^8801[3-9]\\d{8}$/.test(phone)){message('ordersMessage','A valid Bangladesh mobile number is required for WhatsApp.');return}
+    const orderCode=order.customer_order_code||('GC-'+String(order.id).toUpperCase());
+    const text='Hello '+(order.customer_name||'')+', your order '+orderCode+' has been confirmed by Galaxy Computer. We are checking distributor stock and will share the final price and delivery charge shortly.';
+    window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(text),'_blank','noopener,noreferrer');
+   });
+   whatsapp.title='Open WhatsApp with a prepared order confirmation message';
+   controls.append(whatsapp);
+  }
+  card.append(controls);list.append(card);
  });
 }
 $('refreshOrders').addEventListener('click',loadOrders);
