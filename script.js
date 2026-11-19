@@ -123,8 +123,20 @@ $('cartDialog')?.addEventListener('close', () => {
   orderSubmitted = false;
   cartItems = [];
   saveCart();
-  const feedback = $('checkoutMessage');
-  if (feedback) feedback.textContent = '';
+  $('checkoutForm').hidden = false;
+  $('orderSuccess').hidden = true;
+  $('customerOrderId').textContent = '';
+  $('orderCopyMessage').textContent = '';
+});
+$('copyOrderId')?.addEventListener('click', async () => {
+  const orderId = $('customerOrderId')?.textContent || '';
+  if (!orderId) return;
+  try {
+    await navigator.clipboard.writeText(orderId);
+    $('orderCopyMessage').textContent = english ? 'Order ID copied.' : 'Order ID কপি হয়েছে।';
+  } catch {
+    $('orderCopyMessage').textContent = english ? 'Please select and copy the Order ID above.' : 'উপরের Order ID সিলেক্ট করে কপি করুন।';
+  }
 });
 $('checkoutForm')?.addEventListener('submit', async event => {
   event.preventDefault();
@@ -137,7 +149,10 @@ $('checkoutForm')?.addEventListener('submit', async event => {
   const note = $('customerNote').value.trim();
   if (!name || !phone || !address) return;
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price === null ? 0 : item.price * item.quantity), 0);
+  const orderUuid = crypto.randomUUID();
+  const publicOrderId = 'GC-' + orderUuid.toUpperCase();
   const payload = {
+    id: orderUuid,
     customer_name: name,
     customer_phone: phone,
     delivery_address: address,
@@ -177,10 +192,13 @@ $('checkoutForm')?.addEventListener('submit', async event => {
     form.reset();
     const hasUnpricedItems = cartItems.some(item => item.price === null);
     const orderTotalText = formatBDT(subtotal);
-    feedback.textContent = english
-      ? `Your order has been submitted successfully. Subtotal: ${orderTotalText}${hasUnpricedItems ? ' (some item prices will be confirmed by Galaxy Computer).' : ''} Galaxy Computer will contact you shortly. Delivery charge, if applicable, will be confirmed separately.`
-      : `আপনার অর্ডার সফলভাবে জমা হয়েছে। Subtotal: ${orderTotalText}${hasUnpricedItems ? ' (কিছু পণ্যের দাম Galaxy Computer থেকে নিশ্চিত করা হবে)।' : ''} ডেলিভারি চার্জ প্রযোজ্য হলে আলাদাভাবে নিশ্চিত করা হবে। Galaxy Computer থেকে শিগগিরই যোগাযোগ করা হবে।`;
-    feedback.style.color = '#187044';
+    form.hidden = true;
+    $('orderSuccess').hidden = false;
+    $('customerOrderId').textContent = publicOrderId;
+    $('orderSuccessSummary').textContent = english
+      ? `Subtotal: ${orderTotalText}${hasUnpricedItems ? ' (some item prices will be confirmed by Galaxy Computer).' : ''} Delivery charge, if applicable, will be confirmed separately.`
+      : `সাবটোটাল: ${orderTotalText}${hasUnpricedItems ? ' (কিছু পণ্যের দাম Galaxy Computer থেকে নিশ্চিত করা হবে)।' : ''} ডেলিভারি চার্জ প্রযোজ্য হলে আলাদাভাবে নিশ্চিত করা হবে।`;
+    $('orderCopyMessage').textContent = '';
   } catch (error) {
     feedback.textContent = (english ? 'Order could not be submitted: ' : 'অর্ডার জমা হয়নি: ') + error.message;
     feedback.style.color = '#b42318';
