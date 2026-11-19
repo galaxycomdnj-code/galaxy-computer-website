@@ -284,7 +284,7 @@ async function loadOrders(){
  orders.forEach(order=>{
   const card=document.createElement('article');card.className='panel-card';card.style.boxShadow='none';card.style.padding='14px';
   const head=document.createElement('div');head.className='panel-head';head.style.marginBottom='10px';
-  const customer=document.createElement('div');const title=document.createElement('strong');title.textContent='#'+order.id+' · '+(order.customer_name||'Customer');
+  const customer=document.createElement('div');const title=document.createElement('strong');title.textContent='GC-'+String(order.id).toUpperCase()+' · '+(order.customer_name||'Customer');
   const meta=document.createElement('small');meta.className='muted';meta.textContent=new Date(order.created_at).toLocaleString('en-BD')+' · '+(order.customer_phone||'');
   customer.append(title,meta);head.append(customer);
   const address=document.createElement('p');address.className='muted';address.textContent='Delivery: '+(order.delivery_address||'');
@@ -301,7 +301,7 @@ async function loadOrders(){
   const save=makeButton('Update status','dark',async()=>{
    save.disabled=true;const {error:updateError}=await supabase.from('orders').update({status:select.value}).eq('id',order.id);
    save.disabled=false;if(updateError){message('ordersMessage','Status update failed: '+updateError.message);return}
-   message('ordersMessage','Order #'+order.id+' status updated.');await loadOrders();
+   message('ordersMessage','Order GC-'+String(order.id).toUpperCase()+' status updated.');await loadOrders();
   });
   controls.append(select,save);card.append(controls);list.append(card);
  });
