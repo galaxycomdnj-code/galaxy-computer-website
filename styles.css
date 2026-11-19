@@ -1141,8 +1141,9 @@ button{cursor:pointer}
 
 /* Keep service section text within a neat readable width */
 .service-promo-inner>div:first-child{
-  flex:1 1 620px;
-  max-width:620px;
+  flex:0 1 500px;
+  width:100%;
+  max-width:500px;
   min-width:0;
 }
 .service-promo h2,
@@ -1151,8 +1152,9 @@ button{cursor:pointer}
   overflow-wrap:anywhere;
 }
 .home-service-inner>div:first-child{
-  flex:1 1 620px;
-  max-width:620px;
+  flex:0 1 500px;
+  width:100%;
+  max-width:500px;
   min-width:0;
 }
 .home-service h2,
