@@ -1157,3 +1157,11 @@ button{cursor:pointer}
 @media(max-width:760px){
   .service-promo-inner>div:first-child,
 }
+
+
+/* Final override: only the home-service content card is dark */
+.home-service{background:transparent!important;color:#fff!important;padding-block:24px!important;}
+.home-service-inner{background:#111!important;border-radius:12px;padding:54px 38px!important;overflow:hidden;position:relative;}
+.home-service-inner::after{z-index:0;pointer-events:none;}
+.home-service-inner>div,.home-service-inner .service-orbit{position:relative;z-index:1;}
+@media(max-width:760px){.home-service{padding-block:18px!important;}.home-service-inner{padding:38px 22px!important;}}
