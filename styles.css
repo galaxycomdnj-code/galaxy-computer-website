@@ -1165,3 +1165,11 @@ button{cursor:pointer}
 .home-service-inner::after{z-index:0;pointer-events:none;}
 .home-service-inner>div,.home-service-inner .service-orbit{position:relative;z-index:1;}
 @media(max-width:760px){.home-service{padding-block:18px!important;}.home-service-inner{padding:38px 22px!important;}}
+
+
+/* Match the home-service card treatment: orange only behind promo content */
+.service-promo{background:transparent!important;background-image:none!important;padding:24px 0!important;color:#111;}
+.service-promo-inner{background:#FF8004!important;border-radius:12px;padding:32px 38px!important;box-sizing:border-box;}
+.service-promo-inner>div:first-child{flex:0 1 500px;width:100%;max-width:500px;min-width:0;}
+.service-promo h2,.service-promo p{max-width:100%;overflow-wrap:break-word;}
+@media(max-width:760px){.service-promo{padding:18px 0!important;}.service-promo-inner{padding:26px 22px!important;align-items:flex-start;flex-direction:column;gap:14px;}}
