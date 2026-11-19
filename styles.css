@@ -1209,3 +1209,14 @@ button{cursor:pointer}
     justify-self:stretch;
   }
 }
+
+.order-success{border-top:1px solid #eee;padding-top:22px;text-align:center}
+.order-success[hidden]{display:none}
+.order-success-icon{width:54px;height:54px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;background:#e8f6ee;color:#187044;font-size:30px;font-weight:800}
+.order-success h3{font:800 20px var(--font-brand),var(--font-bn),sans-serif;color:#187044;margin:0 0 8px}
+.order-success>p{font-size:13px;line-height:1.65;color:#555}
+.order-id-label{font-size:10px;font-weight:800;letter-spacing:1.5px;color:#777;margin-top:18px}
+.customer-order-id{display:block;overflow-wrap:anywhere;font:800 15px var(--font-brand),sans-serif;letter-spacing:.3px;padding:12px 8px;margin:7px 0 12px;border:1px dashed #d8d8d8;border-radius:9px;background:#fafafa;color:#111}
+.order-success .btn{width:100%;margin:0 0 8px}
+.order-copy-message{min-height:18px;margin:0 0 8px!important;color:#187044!important;font-size:11px!important}
+.order-success-summary{font-weight:700}
