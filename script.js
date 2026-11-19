@@ -394,6 +394,18 @@ async function loadProducts() {
     const products = await response.json();
     productsCache = Array.isArray(products) ? products : [];
     allProductsCache = productsCache;
+    try {
+      const catalogueResponse = await fetch(
+        `${SUPABASE_URL}/rest/v1/products?select=category,subcategory,brand&order=created_at.desc`,
+        { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+      );
+      if (catalogueResponse.ok) {
+        const catalogue = await catalogueResponse.json();
+        if (Array.isArray(catalogue)) allProductsCache = catalogue;
+      }
+    } catch (catalogueError) {
+      console.warn('Full catalogue categories could not be loaded:', catalogueError);
+    }
     populateDynamicCategorySubmenus();
     populateCategoryFilter();
     filterProducts($('productSearch')?.value || '');
