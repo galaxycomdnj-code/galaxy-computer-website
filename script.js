@@ -284,10 +284,18 @@ function renderProducts(products) {
     }
     card.append(productLink);
 
+    const stockStatus = product.stock_status || 'available_on_order';
+    const stockLabels = { available_on_order: english ? 'Available on Order' : 'অর্ডার করা যাবে', out_of_stock: english ? 'Out of Stock' : 'স্টক শেষ', price_on_request: english ? 'Price on Request' : 'দাম জানতে যোগাযোগ করুন' };
+    const stockBadge = document.createElement('span');
+    stockBadge.className = 'product-stock-status ' + stockStatus;
+    stockBadge.textContent = stockLabels[stockStatus] || stockLabels.available_on_order;
+    card.append(stockBadge);
+
     const cartButton = document.createElement('button');
     cartButton.type = 'button';
     cartButton.className = 'cart-add-btn';
-    cartButton.textContent = english ? 'Add to Cart' : 'কার্টে যোগ করুন';
+    cartButton.textContent = stockStatus === 'out_of_stock' ? (english ? 'Out of Stock' : 'স্টক শেষ') : stockStatus === 'price_on_request' ? (english ? 'Contact for Price' : 'দাম জানতে যোগাযোগ') : (english ? 'Add to Cart' : 'কার্টে যোগ করুন');
+    cartButton.disabled = stockStatus === 'out_of_stock' || stockStatus === 'price_on_request';
     cartButton.addEventListener('click', () => addToCart(product));
 
     const detailsButton = document.createElement('button');
@@ -366,7 +374,7 @@ async function loadProducts() {
   if (!productGrid) return;
   try {
     const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/products?select=id,name,brand,model,description,price,image_url,category,subcategory,created_at&order=created_at.desc`,
+      `${SUPABASE_URL}/rest/v1/products?select=id,name,brand,model,description,price,image_url,category,subcategory,stock_status,created_at&order=created_at.desc`,
       { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
     );
     if (!response.ok) throw new Error(`Product request failed (${response.status})`);
