@@ -1193,12 +1193,19 @@ button{cursor:pointer}
   box-sizing:border-box;
   background:#fafafa;
   border-radius:14px;
-  padding:34px 38px;
+  padding:34px 0 34px 38px;
+}
+.about-section .about-card{
+  justify-self:end;
+  margin-right:0;
 }
 @media(max-width:760px){
   .about-section .about-grid{
     width:94%;
     padding:25px 20px;
     gap:24px;
+  }
+  .about-section .about-card{
+    justify-self:stretch;
   }
 }
