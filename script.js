@@ -739,4 +739,8 @@ if (new URLSearchParams(window.location.search).get('buyNow') === '1') {
   renderCart();
   const cartDialog = $('cartDialog');
   if (cartDialog && !cartDialog.open) cartDialog.showModal();
+  // Consume the one-time Buy Now flag so Home navigation and reload do not reopen checkout.
+  const cleanUrl = new URL(window.location.href);
+  cleanUrl.searchParams.delete('buyNow');
+  window.history.replaceState({}, document.title, cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
 }
