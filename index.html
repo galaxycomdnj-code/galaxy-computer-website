@@ -201,12 +201,19 @@
       <div class="cart-heading"><div><span class="eyebrow">GALAXY COMPUTER</span><h2 id="cartTitle">Shopping Cart</h2></div><button id="closeCart" class="cart-close" type="button" aria-label="Close cart">×</button></div>
       <div id="cartItems" class="cart-items" aria-live="polite"><p class="cart-empty">Your cart is empty.</p></div>
       <div class="cart-summary"><span>Subtotal</span><strong id="cartSubtotal">৳ 0</strong></div>
-      <p class="cart-note">Delivery charges, availability and final price will be confirmed by Galaxy Computer.</p>
+      <p class="cart-note">Choose how you would prefer to pay. Galaxy Computer will confirm distributor stock, final price and delivery charge before requesting any payment.</p>
       <form id="checkoutForm" class="checkout-form">
         <h3>Checkout details</h3>
         <label for="customerName">Full name</label><input id="customerName" name="name" autocomplete="name" required maxlength="80" placeholder="Your name">
         <label for="customerPhone">Phone number</label><input id="customerPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required pattern="(?:\+?88)?01[3-9][0-9]{8}" maxlength="14" title="Enter a valid Bangladesh mobile number, e.g. 01XXXXXXXXX or +8801XXXXXXXXX." placeholder="01XXXXXXXXX">
         <label for="customerAddress">Delivery address</label><textarea id="customerAddress" name="address" autocomplete="street-address" required maxlength="400" rows="2" placeholder="House, road, area, city"></textarea>
+        <label for="paymentMethod">Preferred payment method *</label>
+        <select id="paymentMethod" name="payment_method" required>
+          <option value="">Select payment method</option>
+          <option value="bkash">bKash (Pay after price confirmation)</option>
+          <option value="nagad">Nagad (Pay after price confirmation)</option>
+          <option value="cod">Cash on Delivery (Pay after receiving the product)</option>
+        </select>
         <label for="customerNote">Order note (optional)</label><textarea id="customerNote" name="note" maxlength="300" rows="2" placeholder="Any additional information"></textarea>
         <button class="btn btn-primary checkout-submit" type="submit">অর্ডার জমা দিন</button>
       </form>
