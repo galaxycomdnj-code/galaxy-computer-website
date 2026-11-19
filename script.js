@@ -227,6 +227,7 @@ const SUPABASE_URL = 'https://wfuvzfiwnpbgbzzeygei.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_FMsWzO2LqaTzM8tem94M2w_i3HhnWHR';
 const productGrid = $('productGrid');
 let productsCache = [];
+let allProductsCache = [];
 
 function showProductMessage(message, className = 'product-empty') {
   if (!productGrid) return;
@@ -386,12 +387,13 @@ async function loadProducts() {
   if (!productGrid) return;
   try {
     const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/products?select=id,name,brand,model,description,price,image_url,category,subcategory,stock_status,created_at&order=created_at.desc`,
+      `${SUPABASE_URL}/rest/v1/products?select=id,name,brand,model,description,price,image_url,category,subcategory,stock_status,created_at,is_featured,featured_order&is_featured=eq.true&order=featured_order.asc,created_at.desc`,
       { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
     );
     if (!response.ok) throw new Error(`Product request failed (${response.status})`);
     const products = await response.json();
     productsCache = Array.isArray(products) ? products : [];
+    allProductsCache = productsCache;
     populateDynamicCategorySubmenus();
     populateCategoryFilter();
     filterProducts($('productSearch')?.value || '');
@@ -590,7 +592,7 @@ function populateDynamicCategorySubmenus(){
     return [normalizeCategoryText(label),group];
   }));
   const hiddenLegacyCategories=new Set(['ram','storage']);
-  [...new Set(productsCache.map(product=>String(product.category||'').trim()).filter(Boolean))]
+  [...new Set(allProductsCache.map(product=>String(product.category||'').trim()).filter(Boolean))]
     .sort((a,b)=>a.localeCompare(b)).forEach(label=>{
       const key=normalizeCategoryText(label);
       if(groupByKey.has(key)||hiddenLegacyCategories.has(key)) return;
@@ -610,7 +612,7 @@ function populateDynamicCategorySubmenus(){
         const type=(typeButton?.childNodes[0]?.textContent||typeButton?.textContent||'').replace(/[+−]/g,'').trim();
         const brandMenu=nested.querySelector(':scope > .category-submenu');
         if(!brandMenu||!type)return;
-        const brands=[...new Set(productsCache
+        const brands=[...new Set(allProductsCache
           .filter(product=>
             normalizeCategoryText(product.category)===key &&
             normalizeCategoryText(product.subcategory)===normalizeCategoryText(type) &&
@@ -629,7 +631,7 @@ function populateDynamicCategorySubmenus(){
     }
     const values=new Map();
     submenu.querySelectorAll(':scope > a').forEach(anchor=>{const value=anchor.textContent.trim();if(value)values.set(normalizeCategoryText(value),value);});
-    productsCache.forEach(product=>{
+    allProductsCache.forEach(product=>{
       if(normalizeCategoryText(product.category)!==key)return;
       const value=String(product.subcategory||'').trim();
       if(value&&!values.has(normalizeCategoryText(value)))values.set(normalizeCategoryText(value),value);
