@@ -16,7 +16,7 @@ menuButton?.addEventListener('click', () => {
 document.querySelectorAll('.nav-links a').forEach(link => link.addEventListener('click', closeMainMenu));
 
 let english = true;
-function applySiteLanguage() {
+function applySiteLanguage(refreshProducts = true) {
   document.documentElement.lang = english ? 'en' : 'bn';
   document.querySelectorAll('[data-bn][data-en]').forEach(element => {
     element.textContent = english ? element.dataset.en : element.dataset.bn;
@@ -24,8 +24,9 @@ function applySiteLanguage() {
   if ($('languageBtn')) $('languageBtn').textContent = english ? 'বাংলা' : 'EN';
   const search = $('productSearch');
   if (search) search.placeholder = english ? 'Search products...' : 'পণ্য খুঁজুন...';
-  if (typeof productsCache !== 'undefined') { populateCategoryFilter(); filterProducts(search?.value || ''); }
+  if (refreshProducts && typeof productsCache !== 'undefined') { populateCategoryFilter(); filterProducts(search?.value || ''); }
 }
+applySiteLanguage(false);
 $('languageBtn')?.addEventListener('click', () => {
   english = !english;
   applySiteLanguage();
@@ -218,7 +219,6 @@ const SUPABASE_URL = 'https://wfuvzfiwnpbgbzzeygei.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_FMsWzO2LqaTzM8tem94M2w_i3HhnWHR';
 const productGrid = $('productGrid');
 let productsCache = [];
-applySiteLanguage();
 
 function showProductMessage(message, className = 'product-empty') {
   if (!productGrid) return;
