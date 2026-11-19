@@ -153,9 +153,7 @@ $('checkoutForm')?.addEventListener('submit', async event => {
   const note = $('customerNote').value.trim();
   if (!name || !phone || !address) return;
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price === null ? 0 : item.price * item.quantity), 0);
-  const publicOrderId = 'GC-' + crypto.randomUUID().toUpperCase();
   const payload = {
-    customer_order_code: publicOrderId,
     customer_name: name,
     customer_phone: phone,
     delivery_address: address,
@@ -179,21 +177,21 @@ $('checkoutForm')?.addEventListener('submit', async event => {
   }
   feedback.textContent = '';
   try {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/submit_customer_order`, {
       method: 'POST',
       headers: {
         apikey: SUPABASE_KEY,
         Authorization: `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        Prefer: 'return=minimal'
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ p_order: payload })
     });
     if (!response.ok) {
       let detail = '';
       try { const result = await response.json(); detail = result.message || result.details || result.hint || ''; } catch {}
       throw new Error(detail || `Order submission failed (${response.status})`);
     }
+    const publicOrderId = await response.json();
     orderSubmitted = true;
     form.reset();
     const hasUnpricedItems = cartItems.some(item => item.price === null);
