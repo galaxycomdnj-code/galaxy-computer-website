@@ -277,7 +277,7 @@ $('cancelServiceEdit').addEventListener('click',resetServiceForm);
 
 async function loadOrders(){
  const list=$('ordersList');list.replaceChildren();
- const {data,error}=await supabase.from('orders').select('id,customer_name,customer_phone,delivery_address,customer_note,items,subtotal,status,created_at').order('created_at',{ascending:false}).limit(100);
+ const {data,error}=await supabase.from('orders').select('id,customer_name,customer_phone,delivery_address,customer_note,items,subtotal,status,payment_method,payment_status,final_price,created_at').order('created_at',{ascending:false}).limit(100);
  if(error){$('orderTotal').textContent='—';message('ordersMessage','Could not load orders: '+error.message+' (Check the Orders RLS policies.)');list.innerHTML='<div class="empty">Orders are not available until admin read access is configured.</div>';return}
  const orders=data||[];$('orderTotal').textContent=String(orders.length);
  if(!orders.length){list.innerHTML='<div class="empty">No customer orders yet.</div>';return}
@@ -289,22 +289,42 @@ async function loadOrders(){
   const meta=document.createElement('small');meta.className='muted';meta.textContent=new Date(order.created_at).toLocaleString('en-BD')+' · '+(order.customer_phone||'');
   customer.append(title,meta);head.append(customer);
   const address=document.createElement('p');address.className='muted';address.textContent='Delivery: '+(order.delivery_address||'');
-  const items=document.createElement('div');items.className='note';
   const rows=Array.isArray(order.items)?order.items:[];
+  const items=document.createElement('div');items.className='note';
   items.textContent=rows.map(item=>(item.name||'Product')+' × '+(item.quantity||1)+' — '+(item.price==null?'Price to confirm':'৳ '+Number(item.price).toLocaleString('en-BD'))).join(' | ');
-  const total=document.createElement('p');total.innerHTML='<b>Subtotal: </b>';const amount=document.createElement('span');amount.textContent='৳ '+Number(order.subtotal||0).toLocaleString('en-BD');total.append(amount);
-  card.append(head,address,items,total);
-  if(order.customer_note){const note=document.createElement('p');note.className='note';note.textContent='Note: '+order.customer_note;card.append(note)}
+  const subtotal=document.createElement('p');subtotal.textContent='Customer cart subtotal: ৳ '+Number(order.subtotal||0).toLocaleString('en-BD');
+  const finalLine=document.createElement('p');finalLine.textContent='Final price: '+(order.final_price==null?'Not set':'৳ '+Number(order.final_price).toLocaleString('en-BD'));
+  const paymentLine=document.createElement('p');paymentLine.textContent='Customer preference: '+({bkash:'bKash',nagad:'Nagad',cod:'Cash on Delivery',not_selected:'Not selected'}[order.payment_method||'not_selected']||order.payment_method)+' · Payment: '+(order.payment_status==='paid'?'Paid':'Unpaid');
+  card.append(head,address,items,subtotal,finalLine,paymentLine);
+  if(order.customer_note){const note=document.createElement('p');note.className='note';note.textContent='Customer note: '+order.customer_note;card.append(note)}
   const controls=document.createElement('div');controls.className='actions';
-  const select=document.createElement('select');select.className='field';select.style.margin='0';select.style.maxWidth='190px';select.setAttribute('aria-label','Order status');
-  ['Pending','Confirmed','Processing','Delivered','Cancelled'].forEach(status=>{const option=document.createElement('option');option.value=status;option.textContent=status;select.append(option)});
-  select.value=order.status||'Pending';
-  const save=makeButton('Update status','dark',async()=>{
-   save.disabled=true;const {error:updateError}=await supabase.from('orders').update({status:select.value}).eq('id',order.id);
-   save.disabled=false;if(updateError){message('ordersMessage','Status update failed: '+updateError.message);return}
-   message('ordersMessage','Order GC-'+String(order.id).toUpperCase()+' status updated.');await loadOrders();
+  const statusLabel=document.createElement('label');statusLabel.textContent='Order status';statusLabel.className='muted';
+  const status=document.createElement('select');status.className='field';status.style.margin='0';status.style.maxWidth='190px';status.setAttribute('aria-label','Order status');
+  ['Pending','Confirmed','Processing','Shipped','Delivered','Cancelled'].forEach(value=>{const option=document.createElement('option');option.value=value;option.textContent=value;status.append(option)});
+  status.value=order.status||'Pending';
+  const methodLabel=document.createElement('label');methodLabel.textContent='Payment method';methodLabel.className='muted';
+  const method=document.createElement('select');method.className='field';method.style.margin='0';method.style.maxWidth='190px';method.setAttribute('aria-label','Payment method');
+  [['bkash','bKash'],['nagad','Nagad'],['cod','Cash on Delivery'],['not_selected','Not selected']].forEach(([value,label])=>{const option=document.createElement('option');option.value=value;option.textContent=label;method.append(option)});
+  method.value=order.payment_method||'not_selected';
+  const finalLabel=document.createElement('label');finalLabel.textContent='Final price (BDT)';finalLabel.className='muted';
+  const finalInput=document.createElement('input');finalInput.type='number';finalInput.min='0';finalInput.step='0.01';finalInput.placeholder='Enter confirmed final price';finalInput.value=order.final_price??'';finalInput.className='field';finalInput.style.margin='0';finalInput.style.maxWidth='190px';finalInput.setAttribute('aria-label','Final price in BDT');
+  const paymentLabel=document.createElement('label');paymentLabel.textContent='Payment status';paymentLabel.className='muted';
+  const payment=document.createElement('select');payment.className='field';payment.style.margin='0';payment.style.maxWidth='190px';payment.setAttribute('aria-label','Payment status');
+  [['unpaid','Unpaid'],['paid','Paid']].forEach(([value,label])=>{const option=document.createElement('option');option.value=value;option.textContent=label;payment.append(option)});
+  payment.value=order.payment_status||'unpaid';
+  const save=makeButton('Save order details','dark',async()=>{
+   const priceText=finalInput.value.trim();
+   if(priceText!==''&&(!Number.isFinite(Number(priceText))||Number(priceText)<0)){message('ordersMessage','Enter a valid non-negative final price.');return}
+   if(payment.value==='paid'&&priceText===''){message('ordersMessage','Set the confirmed final price before marking payment as Paid.');return}
+   if(payment.value==='paid'&&status.value!=='Delivered'&&method.value==='cod'){message('ordersMessage','For Cash on Delivery, mark the order Delivered first, after the customer receives the product.');return}
+   save.disabled=true;
+   const update={status:status.value,payment_method:method.value,payment_status:payment.value,final_price:priceText===''?null:Number(priceText)};
+   const {error:updateError}=await supabase.from('orders').update(update).eq('id',order.id);
+   save.disabled=false;
+   if(updateError){message('ordersMessage','Order update failed: '+updateError.message);return}
+   message('ordersMessage','Order GC-'+String(order.id).toUpperCase()+' updated successfully.');await loadOrders();
   });
-  controls.append(select,save);card.append(controls);list.append(card);
+  controls.append(statusLabel,status,methodLabel,method,finalLabel,finalInput,paymentLabel,payment,save);card.append(controls);list.append(card);
  });
 }
 $('refreshOrders').addEventListener('click',loadOrders);
