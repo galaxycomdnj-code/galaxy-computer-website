@@ -366,7 +366,18 @@ async function loadOrders(){
     else if(phone.startsWith('1')&&phone.length===10)phone='880'+phone;
     if(!/^8801[3-9]\d{8}$/.test(phone)){message('ordersMessage','A valid Bangladesh mobile number is required for WhatsApp.');return}
     const orderCode=order.customer_order_code||('GC-'+String(order.id).toUpperCase());
-    const totalLine=order.final_price==null?'\n\n💰 Your Grand Total, including delivery charge and any applicable additional charges, will be shared with you shortly.':'\n\n💰 Your Grand Total, including delivery charge and any applicable additional charges, is ৳ '+Number(order.final_price).toLocaleString('en-BD')+'.';
+    const money=value=>'৳ '+Number(value).toLocaleString('en-BD',{maximumFractionDigits:2});
+    const savedProductTotal=Number(order.product_total??order.subtotal??0);
+    const savedCharges=Array.isArray(order.additional_charges)?order.additional_charges:[];
+    const deliveryCharges=savedCharges.filter(charge=>/delivery/i.test(String(charge.name||'')));
+    const otherCharges=savedCharges.filter(charge=>!/delivery/i.test(String(charge.name||'')));
+    let priceBreakdown='\n\n📦 Product Total: '+money(savedProductTotal);
+    deliveryCharges.forEach(charge=>{priceBreakdown+='\n🚚 '+String(charge.name).trim()+': '+money(charge.amount)});
+    if(otherCharges.length){
+     priceBreakdown+='\n➕ Additional Charges:';
+     otherCharges.forEach(charge=>{priceBreakdown+='\n   • '+String(charge.name).trim()+': '+money(charge.amount)});
+    }
+    const totalLine=order.final_price==null?'\n\n💰 Your Grand Total and detailed price breakdown will be shared with you shortly.':priceBreakdown+'\n\n💰 Grand Total: '+money(order.final_price);
     const text='Dear Valued Customer,\n\nAssalamu Alaikum!\n\n🎉 Your order '+orderCode+' has been successfully confirmed by Galaxy Computer.'+totalLine+'\n\nOur team will contact you shortly to provide further details and assist you with the next steps.\n\nThank you for choosing Galaxy Computer and for placing your trust in us. ❤️';
     window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(text),'_blank','noopener,noreferrer');
    });
