@@ -226,30 +226,31 @@ renderCart();
 const SUPABASE_URL = 'https://wfuvzfiwnpbgbzzeygei.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_FMsWzO2LqaTzM8tem94M2w_i3HhnWHR';
 const productGrid = $('productGrid');
+const featuredProductsGrid = $('featuredProductsGrid');
 let productsCache = [];
 let allProductsCache = [];
 
-function showProductMessage(message, className = 'product-empty') {
-  if (!productGrid) return;
-  productGrid.replaceChildren();
-  productGrid.setAttribute('aria-busy', 'false');
+function showProductMessage(message, className = 'product-empty', targetGrid = productGrid) {
+  if (!targetGrid) return;
+  targetGrid.replaceChildren();
+  targetGrid.setAttribute('aria-busy', 'false');
   const messageBox = document.createElement('div');
   messageBox.className = className;
   messageBox.textContent = message;
-  productGrid.append(messageBox);
+  targetGrid.append(messageBox);
 }
 
-function renderProducts(products) {
-  if (!productGrid) return;
-  productGrid.replaceChildren();
-  productGrid.setAttribute('aria-busy', 'false');
+function renderProducts(products, targetGrid = productGrid, countTarget = $('productCount'), emptyMessage = null) {
+  if (!targetGrid) return;
+  targetGrid.replaceChildren();
+  targetGrid.setAttribute('aria-busy', 'false');
   if (!products.length) {
-    showProductMessage(english ? 'No matching products found. Contact us and we will help you find it.' : 'কোনো পণ্য পাওয়া যায়নি। পণ্য খুঁজে পেতে আমাদের সঙ্গে যোগাযোগ করুন।');
-    $('productCount').textContent = english ? '0 products' : '০টি পণ্য';
+    showProductMessage(emptyMessage || (english ? 'No matching products found. Contact us and we will help you find it.' : 'কোনো পণ্য পাওয়া যায়নি। পণ্য খুঁজে পেতে আমাদের সঙ্গে যোগাযোগ করুন।'), 'product-empty', targetGrid);
+    if (countTarget) countTarget.textContent = english ? '0 products' : '০টি পণ্য';
     return;
   }
 
-  $('productCount').textContent = english ? `${products.length} product${products.length === 1 ? '' : 's'}` : `${products.length}টি পণ্য`;
+  if (countTarget) countTarget.textContent = english ? `${products.length} product${products.length === 1 ? '' : 's'}` : `${products.length}টি পণ্য`;
   products.forEach(product => {
     const card = document.createElement('article');
     card.className = 'product-card';
@@ -318,7 +319,7 @@ function renderProducts(products) {
     detailsButton.addEventListener('click', () => { window.location.href = productUrl; });
 
     card.append(cartButton, detailsButton);
-    productGrid.append(card);
+    targetGrid.append(card);
   });
 }
 
@@ -384,35 +385,28 @@ function filterProducts(term) {
 }
 
 async function loadProducts() {
-  if (!productGrid) return;
+  if (!productGrid && !featuredProductsGrid) return;
   try {
     const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/products?select=id,name,brand,model,description,price,image_url,category,subcategory,stock_status,created_at,is_featured,featured_order&is_featured=eq.true&order=featured_order.asc,created_at.desc`,
+      `${SUPABASE_URL}/rest/v1/products?select=id,name,brand,model,description,price,image_url,category,subcategory,stock_status,created_at,is_featured,featured_order&order=created_at.desc`,
       { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
     );
     if (!response.ok) throw new Error(`Product request failed (${response.status})`);
     const products = await response.json();
     productsCache = Array.isArray(products) ? products : [];
     allProductsCache = productsCache;
-    try {
-      const catalogueResponse = await fetch(
-        `${SUPABASE_URL}/rest/v1/products?select=category,subcategory,brand&order=created_at.desc`,
-        { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
-      );
-      if (catalogueResponse.ok) {
-        const catalogue = await catalogueResponse.json();
-        if (Array.isArray(catalogue)) allProductsCache = catalogue;
-      }
-    } catch (catalogueError) {
-      console.warn('Full catalogue categories could not be loaded:', catalogueError);
-    }
+    const featuredProducts = productsCache
+      .filter(product => product.is_featured === true)
+      .sort((a, b) => Number(a.featured_order || 1) - Number(b.featured_order || 1) || String(b.created_at || '').localeCompare(String(a.created_at || '')));
+    renderProducts(featuredProducts, featuredProductsGrid, null, english ? 'No featured products selected yet.' : 'এখনো কোনো Featured Product নির্বাচন করা হয়নি।');
     populateDynamicCategorySubmenus();
     populateCategoryFilter();
     filterProducts($('productSearch')?.value || '');
   } catch (error) {
     console.error('Could not load products:', error);
     showProductMessage(english ? 'Products could not be loaded right now. Please contact us on WhatsApp.' : 'এই মুহূর্তে পণ্য লোড করা যায়নি। WhatsApp-এ যোগাযোগ করুন।');
-    $('productCount').textContent = english ? 'Products unavailable' : 'পণ্য লোড হয়নি';
+    showProductMessage(english ? 'Featured products could not be loaded.' : 'Featured পণ্য লোড করা যায়নি।', 'product-empty', featuredProductsGrid);
+    if ($('productCount')) $('productCount').textContent = english ? 'Products unavailable' : 'পণ্য লোড হয়নি';
   }
 }
 
