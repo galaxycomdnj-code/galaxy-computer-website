@@ -34,6 +34,51 @@
     root.className = 'product-page-message';
     root.textContent = message;
   };
+
+  let detailCompareItems=[];
+  function detailSpecs(item){
+    const out={};const structured=item.specifications_data&&typeof item.specifications_data==='object'?item.specifications_data:{};
+    Object.entries(structured).forEach(([k,v])=>out[k]=Array.isArray(v)?v.join(', '):String(v??''));
+    String(item.specifications||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).forEach(line=>{const i=line.indexOf(':');if(i>0&&!out[line.slice(0,i).trim()])out[line.slice(0,i).trim()]=line.slice(i+1).trim();});
+    return out;
+  }
+  function ensureDetailCompare(){
+    if(document.getElementById('detailCompareDock'))return;
+    const dock=document.createElement('div');dock.id='detailCompareDock';dock.className='compare-dock';dock.hidden=true;
+    dock.innerHTML='<div class="compare-dock-inner"><div><strong>Compare Products</strong><span id="detailCompareCount">0/4 selected</span></div><div class="compare-dock-actions"><button type="button" id="detailCompareClear">Clear</button><button type="button" id="detailCompareOpen" disabled>Compare Now</button></div></div>';
+    document.body.append(dock);dock.querySelector('#detailCompareClear').addEventListener('click',()=>{detailCompareItems=[];updateDetailCompare();});dock.querySelector('#detailCompareOpen').addEventListener('click',showDetailCompare);
+    const modal=document.createElement('div');modal.id='detailCompareModal';modal.className='compare-dialog';modal.hidden=true;
+    modal.innerHTML='<div class="compare-dialog-backdrop" data-detail-close></div><section class="compare-dialog-panel" role="dialog" aria-modal="true"><div class="compare-dialog-head"><h2>Product Comparison</h2><button type="button" data-detail-close aria-label="Close">×</button></div><div id="detailCompareTable" class="compare-table-wrap"></div></section>';
+    document.body.append(modal);modal.querySelectorAll('[data-detail-close]').forEach(el=>el.addEventListener('click',()=>modal.hidden=true));
+  }
+  function updateDetailCompare(){
+    ensureDetailCompare();document.getElementById('detailCompareDock').hidden=!detailCompareItems.length;
+    document.getElementById('detailCompareCount').textContent=detailCompareItems.length+'/4 selected';
+    document.getElementById('detailCompareOpen').disabled=detailCompareItems.length<2;
+    document.querySelectorAll('.detail-compare-item').forEach(btn=>{const yes=detailCompareItems.some(x=>String(x.id)===String(btn.dataset.id));btn.classList.toggle('is-selected',yes);btn.textContent=yes?'✓ Added to Compare':'⇄ Compare';});
+  }
+  function toggleDetailCompare(item){
+    const exists=detailCompareItems.some(x=>String(x.id)===String(item.id));
+    if(exists)detailCompareItems=detailCompareItems.filter(x=>String(x.id)!==String(item.id));
+    else if(detailCompareItems.length>=4){alert('You can compare up to 4 products.');return;}
+    else detailCompareItems.push(item);
+    updateDetailCompare();
+  }
+  function showDetailCompare(){
+    if(detailCompareItems.length<2)return;
+    const keys=[...new Set(detailCompareItems.flatMap(x=>Object.keys(detailSpecs(x))))].sort();
+    const wrap=document.getElementById('detailCompareTable');wrap.replaceChildren();
+    const table=document.createElement('table');table.className='compare-table';
+    const head=document.createElement('tr');const first=document.createElement('th');first.textContent='Specification';head.append(first);
+    detailCompareItems.forEach(item=>{const th=document.createElement('th');th.textContent=item.name||'Product';head.append(th);});
+    const thead=document.createElement('thead');thead.append(head);table.append(thead);
+    const body=document.createElement('tbody');
+    const add=(label,values)=>{const tr=document.createElement('tr');const th=document.createElement('th');th.textContent=label;tr.append(th);values.forEach(v=>{const td=document.createElement('td');td.textContent=v||'—';tr.append(td);});body.append(tr);};
+    add('Price',detailCompareItems.map(x=>money(x.price)||'Contact for Price'));add('Availability',detailCompareItems.map(x=>stockLabel(x.stock_status)));
+    keys.forEach(key=>add(key,detailCompareItems.map(x=>detailSpecs(x)[key]||'')));
+    table.append(body);wrap.append(table);document.getElementById('detailCompareModal').hidden=false;
+  }
+
   async function loadRelatedProducts(product,container){
     if(!product.subcategory)return;
     const query=SUPABASE_URL+'/rest/v1/products?select=id,name,price,image_url,stock_status,category,subcategory&id=not.is.null&category=eq.'+encodeURIComponent(product.category||'')+'&subcategory=eq.'+encodeURIComponent(product.subcategory)+'&order=created_at.desc&limit=4';
@@ -57,11 +102,12 @@
       const name=document.createElement('h3');name.textContent=item.name||'Product';link.append(imageWrap,name);
       if(item.stock_status!=='price_on_request'&&item.price!==null&&item.price!==undefined&&item.price!==''){const price=document.createElement('div');price.className='product-price';price.textContent=money(item.price);link.append(price)}
       card.append(link);
+      const compare=document.createElement('button');compare.type='button';compare.className='detail-compare-item';compare.dataset.id=String(item.id);compare.textContent='⇄ Compare';compare.addEventListener('click',()=>toggleDetailCompare(item));card.append(compare);
       const status=document.createElement('span');status.className='product-stock-status '+(item.stock_status||'available_on_order');status.textContent=stockLabel(item.stock_status||'available_on_order');card.append(status);
       const details=document.createElement('a');details.className='similar-product-link';details.href=link.href;details.textContent='View Details';card.append(details);
       grid.append(card);
     });
-    section.append(grid);container.append(section);
+    section.append(grid);container.append(section);updateDetailCompare();
   }
   async function loadProduct() {
     if (!productId) return showMessage('Product link is incomplete. Please return to the product list.');
@@ -212,7 +258,10 @@
       call.className = 'product-page-call';
       call.href = 'tel:01621422327';
       call.textContent = 'Call: 01621422327';
-      actions.append(contact,buyNow,call);
+      const compareButton=document.createElement('button');
+      compareButton.type='button';compareButton.className='product-page-compare-btn';compareButton.textContent='⇄ Compare';
+      compareButton.addEventListener('click',()=>toggleDetailCompare(product));
+      actions.append(contact,buyNow,call,compareButton);
       summary.append(actions);
       top.append(gallery,summary);
       root.append(top);
