@@ -291,6 +291,23 @@ function getComparisonSpecs(product) {
   });
   return specs;
 }
+function getProductCardShortSpecs(product) {
+  const specs = getComparisonSpecs(product);
+  const normalize = value => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const fields = [
+    { label: 'CPU Socket', aliases: ['cpu socket', 'cpu sockets', 'processor socket', 'socket'] },
+    { label: 'RAM Type', aliases: ['ram type', 'memory type', 'memory technology', 'ram technology'] },
+    { label: 'Form Factor', aliases: ['form factor', 'motherboard form factor', 'formfactor'] },
+    { label: 'Special Features', aliases: ['special features', 'special feature', 'specialfeature', 'features'] }
+  ];
+  const entries = Object.entries(specs);
+  return fields.map(field => {
+    const aliases = field.aliases.map(normalize);
+    const match = entries.find(([key, value]) => aliases.includes(normalize(key)) && String(value).trim());
+    return match ? [field.label, String(match[1]).trim()] : null;
+  }).filter(Boolean);
+}
+
 function showProductComparison() {
   const selected=compareSelectedProducts.map(getCompareProduct).filter(Boolean);
   if(selected.length<2)return;
@@ -359,9 +376,7 @@ function renderProducts(products, targetGrid = productGrid, countTarget = $('pro
     // Keep featured cards compact; show only a few key specifications in the main catalogue.
     productLink.append(imageWrap, title);
     if (targetGrid === productGrid) {
-      const shortSpecs = Object.entries(getComparisonSpecs(product))
-        .filter(([key, value]) => String(key).trim() && String(value).trim())
-        .slice(0, 4);
+      const shortSpecs = getProductCardShortSpecs(product);
       if (shortSpecs.length) {
         const specList = document.createElement('ul');
         specList.className = 'product-card-specs';
