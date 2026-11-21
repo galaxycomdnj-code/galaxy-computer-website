@@ -34,23 +34,24 @@
     root.className = 'product-page-message';
     root.textContent = message;
   };
-  async function loadRelatedProducts(product){
+  async function loadRelatedProducts(product,container){
     if(!product.subcategory)return;
     const query=SUPABASE_URL+'/rest/v1/products?select=id,name,price,image_url,stock_status,category,subcategory&id=not.is.null&category=eq.'+encodeURIComponent(product.category||'')+'&subcategory=eq.'+encodeURIComponent(product.subcategory)+'&order=created_at.desc&limit=4';
     let rows=[];
     try{const response=await fetch(query,{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}});if(response.ok){const data=await response.json();if(Array.isArray(data))rows=data;}}
     catch(error){console.warn('Similar products could not be loaded:',error)}
-    rows=[product,...rows.filter(item=>String(item.id)!==String(product.id))].slice(0,4);
-    const section=document.createElement('section');section.className='similar-products-section';
+    const others=rows.filter(item=>String(item.id)!==String(product.id));
+    if(!others.length)return;
+    rows=[product,...others].slice(0,4);
+    const section=document.createElement('aside');section.className='similar-products-section';
     const heading=document.createElement('div');heading.className='similar-products-heading';
     const title=document.createElement('h2');title.textContent='Similar Products';
-    const subtitle=document.createElement('p');subtitle.textContent='More products from the same category';
-    heading.append(title,subtitle);section.append(heading);
-    const grid=document.createElement('div');grid.className='product-grid';
+    heading.append(title);section.append(heading);
+    const grid=document.createElement('div');grid.className='similar-products-list';
     rows.forEach(item=>{
-      const card=document.createElement('article');card.className='product-card';
+      const card=document.createElement('article');card.className='similar-product-card';
       const link=document.createElement('a');link.className='product-main-link';link.href='product.html?id='+encodeURIComponent(item.id);
-      const imageWrap=document.createElement('div');imageWrap.className='product-image-wrap';
+      const imageWrap=document.createElement('div');imageWrap.className='similar-product-image';
       if(item.image_url){const img=document.createElement('img');img.src=item.image_url;img.alt=item.name||'Product';img.loading='lazy';imageWrap.append(img)}
       else{const placeholder=document.createElement('span');placeholder.className='product-placeholder';placeholder.textContent='▣';imageWrap.append(placeholder)}
       const name=document.createElement('h3');name.textContent=item.name||'Product';link.append(imageWrap,name);
@@ -60,7 +61,7 @@
       const details=document.createElement('a');details.className='similar-product-link';details.href=link.href;details.textContent='View Details';card.append(details);
       grid.append(card);
     });
-    section.append(grid);root.append(section);
+    section.append(grid);container.append(section);
   }
   async function loadProduct() {
     if (!productId) return showMessage('Product link is incomplete. Please return to the product list.');
@@ -222,10 +223,11 @@
       [['description','Description'],['specifications','Specifications']].forEach(([id,name]) => {
         const a = document.createElement('a'); a.href = '#' + id; a.textContent = name; nav.append(a);
       });
-      root.append(nav);
-
       const lower = document.createElement('div');
       lower.className = 'product-detail-lower';
+      const infoColumn = document.createElement('div');
+      infoColumn.className = 'product-detail-info-column';
+      infoColumn.append(nav);
       const specs = document.createElement('div');
       specs.className = 'product-spec-table';
       const enteredSpecs = String(product.specifications || '').trim();
@@ -241,16 +243,17 @@
         empty.textContent = 'Detailed technical specifications have not been added for this product yet. Contact us for assistance.';
         specs.append(empty);
       }
-      lower.append(makeSection('specifications','Specifications',specs));
+      infoColumn.append(makeSection('specifications','Specifications',specs));
 
       const description = document.createElement('div');
       description.className = 'product-overview-copy product-description-copy';
       const descriptionText = document.createElement('p');
       descriptionText.textContent = product.description || 'No additional description is available for this product yet.';
       description.append(descriptionText);
-      lower.append(makeSection('description','Product Description',description));
+      infoColumn.append(makeSection('description','Product Description',description));
+      lower.append(infoColumn);
       root.append(lower);
-      await loadRelatedProducts(product);
+      await loadRelatedProducts(product,lower);
 
       const help = document.createElement('aside');
       help.className = 'product-detail-help';
