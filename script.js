@@ -456,24 +456,39 @@ function renderDynamicSpecFilters(){
   const shortcutMatch=!activeCategoryTerms.length||activeCategoryTerms.some(word=>[product.name,product.category,product.subcategory].filter(Boolean).join(' ').toLowerCase().includes(word));
   return categoryMatch&&subMatch&&shortcutMatch;
  });
- const facets=new Map();
+ const preferred=[
+  {label:'CPU Socket',aliases:['cpu socket','cpu sockets','processor socket','socket']},
+  {label:'RAM Type',aliases:['ram type','memory type','memory technology','ram technology']},
+  {label:'Form Factor',aliases:['form factor','motherboard form factor','formfactor']},
+  {label:'Special Features',aliases:['special features','special feature','specialfeature','features']}
+ ];
+ const normalize=value=>String(value||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+ const groups=[];
+ preferred.forEach(field=>{
+  const values=new Set();
+  base.forEach(product=>{
+   Object.entries(getComparisonSpecs(product)).forEach(([key,raw])=>{
+    if(field.aliases.map(normalize).includes(normalize(key)))
+     String(raw).split(',').map(value=>value.trim()).filter(Boolean).forEach(value=>values.add(value));
+   });
+  });
+  if(values.size)groups.push({key:field.label,values:[...values]});
+ });
+ const preferredAliases=new Set(preferred.flatMap(field=>field.aliases.map(normalize)));
+ const otherFacets=new Map();
  base.forEach(product=>{
-  const specs=product.specifications_data&&typeof product.specifications_data==='object'?product.specifications_data:{};
-  Object.entries(specs).forEach(([key,raw])=>{
-   const values=(Array.isArray(raw)?raw:String(raw??'').split(',')).map(value=>String(value).trim()).filter(Boolean);
-   if(!facets.has(key))facets.set(key,new Set());values.forEach(value=>facets.get(key).add(value));
+  Object.entries(getComparisonSpecs(product)).forEach(([key,raw])=>{
+   if(preferredAliases.has(normalize(key)))return;
+   const values=String(raw).split(',').map(value=>value.trim()).filter(Boolean);
+   if(!otherFacets.has(key))otherFacets.set(key,new Set());
+   values.forEach(value=>otherFacets.get(key).add(value));
   });
  });
- const preferredFacetOrder = ['availability','cpu socket','cpu sockets','ram type','form factor','formfactor','special features','specialfeature','special features'];
- const facetRank = key => {
-  const normalized = normalizeCategoryText(key);
-  const index = preferredFacetOrder.findIndex(name => normalizeCategoryText(name) === normalized);
-  return index < 0 ? 100 : index;
- };
- [...facets.entries()].sort(([a],[b])=>facetRank(a)-facetRank(b) || a.localeCompare(b)).forEach(([key,values])=>{
+ [...otherFacets.entries()].sort(([a],[b])=>a.localeCompare(b)).forEach(([key,values])=>groups.push({key,values:[...values]}));
+ groups.forEach(({key,values})=>{
   const group=document.createElement('details');group.className='filter-group';group.open=true;
   const heading=document.createElement('summary');heading.textContent=key;group.append(heading);
-  [...values].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'})).forEach(value=>{
+  values.sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'})).forEach(value=>{
    const label=document.createElement('label');const input=document.createElement('input');input.type='checkbox';input.value=value;input.dataset.specKey=key;input.checked=(selectedSpecificationFilters[key]||[]).includes(value);
    input.addEventListener('change',()=>{const chosen=new Set(selectedSpecificationFilters[key]||[]);if(input.checked)chosen.add(value);else chosen.delete(value);selectedSpecificationFilters[key]=[...chosen];if(!selectedSpecificationFilters[key].length)delete selectedSpecificationFilters[key];filterProducts($('productSearch')?.value||'');});
    label.append(input,document.createTextNode(' '+value));group.append(label);
@@ -509,9 +524,17 @@ function filterProducts(term) {
     const matchesMax=!maxText||(price!==null&&Number.isFinite(price)&&price<=Number(maxText));
     const chosenStock=[...document.querySelectorAll('.stock-filter:checked')].map(input=>input.value);
     const matchesStock=!chosenStock.length||chosenStock.includes(product.stock_status||'available_on_order');
-    const specs=product.specifications_data&&typeof product.specifications_data==='object'?product.specifications_data:{};
+    const specs=Object.entries(getComparisonSpecs(product));
+    const normalizeSpec=value=>String(value||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+    const aliasesByFilter={
+      'CPU Socket':['cpu socket','cpu sockets','processor socket','socket'],
+      'RAM Type':['ram type','memory type','memory technology','ram technology'],
+      'Form Factor':['form factor','motherboard form factor','formfactor'],
+      'Special Features':['special features','special feature','specialfeature','features']
+    };
     const matchesSpecs=Object.entries(selectedSpecificationFilters).every(([key,values])=>{
-      const raw=specs[key];const productValues=(Array.isArray(raw)?raw:String(raw??'').split(',')).map(value=>String(value).trim());
+      const aliases=(aliasesByFilter[key]||[key]).map(normalizeSpec);
+      const productValues=specs.filter(([specKey])=>aliases.includes(normalizeSpec(specKey))).flatMap(([,raw])=>String(raw).split(',').map(value=>value.trim()));
       return values.some(value=>productValues.includes(value));
     });
     return matchesQuery && matchesCategory && matchesShortcut && matchesSubcategory && matchesBrand && matchesMin && matchesMax && matchesStock && matchesSpecs;
