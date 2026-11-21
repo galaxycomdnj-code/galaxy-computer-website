@@ -34,6 +34,34 @@
     root.className = 'product-page-message';
     root.textContent = message;
   };
+  async function loadRelatedProducts(product){
+    if(!product.subcategory)return;
+    const query=SUPABASE_URL+'/rest/v1/products?select=id,name,price,image_url,stock_status,category,subcategory&id=not.is.null&category=eq.'+encodeURIComponent(product.category||'')+'&subcategory=eq.'+encodeURIComponent(product.subcategory)+'&order=created_at.desc&limit=4';
+    const response=await fetch(query,{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}});
+    if(!response.ok)throw new Error('Similar products request failed ('+response.status+')');
+    const rows=await response.json();
+    if(!Array.isArray(rows)||!rows.length)return;
+    const section=document.createElement('section');section.className='similar-products-section';
+    const heading=document.createElement('div');heading.className='similar-products-heading';
+    const title=document.createElement('h2');title.textContent='Similar Products';
+    const subtitle=document.createElement('p');subtitle.textContent='More products from the same category';
+    heading.append(title,subtitle);section.append(heading);
+    const grid=document.createElement('div');grid.className='product-grid';
+    rows.forEach(item=>{
+      const card=document.createElement('article');card.className='product-card';
+      const link=document.createElement('a');link.className='product-main-link';link.href='product.html?id='+encodeURIComponent(item.id);
+      const imageWrap=document.createElement('div');imageWrap.className='product-image-wrap';
+      if(item.image_url){const img=document.createElement('img');img.src=item.image_url;img.alt=item.name||'Product';img.loading='lazy';imageWrap.append(img)}
+      else{const placeholder=document.createElement('span');placeholder.className='product-placeholder';placeholder.textContent='▣';imageWrap.append(placeholder)}
+      const name=document.createElement('h3');name.textContent=item.name||'Product';link.append(imageWrap,name);
+      if(item.stock_status!=='price_on_request'&&item.price!==null&&item.price!==undefined&&item.price!==''){const price=document.createElement('div');price.className='product-price';price.textContent=money(item.price);link.append(price)}
+      card.append(link);
+      const status=document.createElement('span');status.className='product-stock-status '+(item.stock_status||'available_on_order');status.textContent=stockLabel(item.stock_status||'available_on_order');card.append(status);
+      const details=document.createElement('a');details.className='similar-product-link';details.href=link.href;details.textContent='View Details';card.append(details);
+      grid.append(card);
+    });
+    section.append(grid);root.append(section);
+  }
   async function loadProduct() {
     if (!productId) return showMessage('Product link is incomplete. Please return to the product list.');
     try {
@@ -222,6 +250,7 @@
       description.append(descriptionText);
       lower.append(makeSection('description','Product Description',description));
       root.append(lower);
+      await loadRelatedProducts(product);
 
       const help = document.createElement('aside');
       help.className = 'product-detail-help';
