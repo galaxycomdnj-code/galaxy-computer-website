@@ -37,10 +37,10 @@
   async function loadRelatedProducts(product){
     if(!product.subcategory)return;
     const query=SUPABASE_URL+'/rest/v1/products?select=id,name,price,image_url,stock_status,category,subcategory&id=not.is.null&category=eq.'+encodeURIComponent(product.category||'')+'&subcategory=eq.'+encodeURIComponent(product.subcategory)+'&order=created_at.desc&limit=4';
-    const response=await fetch(query,{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}});
-    if(!response.ok)throw new Error('Similar products request failed ('+response.status+')');
-    const rows=await response.json();
-    if(!Array.isArray(rows)||!rows.length)return;
+    let rows=[];
+    try{const response=await fetch(query,{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}});if(response.ok){const data=await response.json();if(Array.isArray(data))rows=data;}}
+    catch(error){console.warn('Similar products could not be loaded:',error)}
+    rows=[product,...rows.filter(item=>String(item.id)!==String(product.id))].slice(0,4);
     const section=document.createElement('section');section.className='similar-products-section';
     const heading=document.createElement('div');heading.className='similar-products-heading';
     const title=document.createElement('h2');title.textContent='Similar Products';
