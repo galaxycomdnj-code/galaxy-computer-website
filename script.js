@@ -241,6 +241,74 @@ function showProductMessage(message, className = 'product-empty', targetGrid = p
   targetGrid.append(messageBox);
 }
 
+
+let compareSelectedProducts = [];
+function getCompareProduct(id) {
+  return [...allProductsCache, ...productsCache].find(item => String(item.id) === String(id));
+}
+function ensureCompareUI() {
+  if (!document.getElementById('compareDock')) {
+    const dock = document.createElement('div');
+    dock.id = 'compareDock'; dock.className = 'compare-dock'; dock.hidden = true;
+    dock.innerHTML = '<div class="compare-dock-inner"><div><strong>Compare Products</strong><span id="compareSelectedCount">0/4 selected</span></div><div class="compare-dock-actions"><button type="button" id="clearCompare">Clear</button><button type="button" id="openCompare" disabled>Compare Now</button></div></div>';
+    document.body.append(dock);
+    dock.querySelector('#clearCompare').addEventListener('click', () => { compareSelectedProducts=[]; updateCompareUI(); });
+    dock.querySelector('#openCompare').addEventListener('click', showProductComparison);
+  }
+  if (!document.getElementById('compareDialog')) {
+    const dialog = document.createElement('div');
+    dialog.id='compareDialog'; dialog.className='compare-dialog'; dialog.hidden=true;
+    dialog.innerHTML='<div class="compare-dialog-backdrop" data-close-compare></div><section class="compare-dialog-panel" role="dialog" aria-modal="true" aria-labelledby="compareDialogTitle"><div class="compare-dialog-head"><h2 id="compareDialogTitle">Product Comparison</h2><button type="button" aria-label="Close comparison" data-close-compare>×</button></div><div id="compareTableWrap" class="compare-table-wrap"></div></section>';
+    document.body.append(dialog);
+    dialog.querySelectorAll('[data-close-compare]').forEach(el=>el.addEventListener('click',()=>{dialog.hidden=true;}));
+  }
+}
+function updateCompareUI() {
+  ensureCompareUI();
+  const dock=document.getElementById('compareDock');
+  dock.hidden=compareSelectedProducts.length===0;
+  document.getElementById('compareSelectedCount').textContent=compareSelectedProducts.length+'/4 selected';
+  document.getElementById('openCompare').disabled=compareSelectedProducts.length<2;
+  document.querySelectorAll('.compare-product-btn').forEach(btn=>{
+    const selected=compareSelectedProducts.includes(String(btn.dataset.productId));
+    btn.classList.toggle('is-selected',selected);
+    btn.textContent=selected?'✓ Added to Compare':'⇄ Compare';
+  });
+}
+function toggleProductCompare(product) {
+  const id=String(product.id);
+  if(compareSelectedProducts.includes(id)) compareSelectedProducts=compareSelectedProducts.filter(item=>item!==id);
+  else if(compareSelectedProducts.length>=4) { alert('You can compare up to 4 products at a time.'); return; }
+  else compareSelectedProducts.push(id);
+  updateCompareUI();
+}
+function getComparisonSpecs(product) {
+  const specs={};
+  const structured=product.specifications_data&&typeof product.specifications_data==='object'?product.specifications_data:{};
+  Object.entries(structured).forEach(([key,value])=>{specs[key]=Array.isArray(value)?value.join(', '):String(value??'');});
+  String(product.specifications||'').split(/\r?\n/).map(line=>line.trim()).filter(Boolean).forEach(line=>{
+    const at=line.indexOf(':'); if(at>0){const key=line.slice(0,at).trim();if(!specs[key])specs[key]=line.slice(at+1).trim();}
+  });
+  return specs;
+}
+function showProductComparison() {
+  const selected=compareSelectedProducts.map(getCompareProduct).filter(Boolean);
+  if(selected.length<2)return;
+  const keys=[...new Set(selected.flatMap(getComparisonSpecs).flatMap(spec=>Object.keys(spec)))].sort((a,b)=>a.localeCompare(b));
+  const wrap=document.getElementById('compareTableWrap');wrap.replaceChildren();
+  const table=document.createElement('table');table.className='compare-table';
+  const head=document.createElement('tr');const first=document.createElement('th');first.textContent='Specification';head.append(first);
+  selected.forEach(product=>{const th=document.createElement('th');th.textContent=product.name||'Product';head.append(th);});
+  const thead=document.createElement('thead');thead.append(head);table.append(thead);
+  const body=document.createElement('tbody');
+  const addRow=(label,values)=>{const tr=document.createElement('tr');const th=document.createElement('th');th.textContent=label;tr.append(th);values.forEach(value=>{const td=document.createElement('td');td.textContent=value||'—';tr.append(td);});body.append(tr);};
+  addRow('Price',selected.map(p=>p.price===null||p.price===undefined||p.price===''?'Contact for Price':'৳ '+Number(p.price).toLocaleString('en-BD')));
+  addRow('Availability',selected.map(p=>({available_on_order:'Available on Order',out_of_stock:'Out of Stock',price_on_request:'Price on Request'}[p.stock_status||'available_on_order']||'Available on Order')));
+  keys.forEach(key=>addRow(key,selected.map(p=>getComparisonSpecs(p)[key]||'')));
+  table.append(body);wrap.append(table);
+  document.getElementById('compareDialog').hidden=false;
+}
+
 function renderProducts(products, targetGrid = productGrid, countTarget = $('productCount'), emptyMessage = null) {
   if (!targetGrid) return;
   targetGrid.replaceChildren();
@@ -319,9 +387,16 @@ function renderProducts(products, targetGrid = productGrid, countTarget = $('pro
     detailsButton.textContent = english ? 'View Details' : 'বিস্তারিত দেখুন';
     detailsButton.addEventListener('click', () => { window.location.href = productUrl; });
 
-    card.append(cartButton, detailsButton);
+    const compareButton = document.createElement('button');
+    compareButton.type = 'button';
+    compareButton.className = 'compare-product-btn';
+    compareButton.dataset.productId = String(product.id);
+    compareButton.textContent = '⇄ Compare';
+    compareButton.addEventListener('click', () => toggleProductCompare(product));
+    card.append(cartButton, detailsButton, compareButton);
     targetGrid.append(card);
   });
+  updateCompareUI();
 }
 
 
