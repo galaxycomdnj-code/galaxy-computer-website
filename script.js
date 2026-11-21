@@ -466,6 +466,7 @@ function filterProducts(term) {
     ($('productCategoryFilter')?.value || '').trim()
   );
   catalogLayout?.classList.toggle('has-category-context', hasCategoryContext);
+  document.querySelector('.products-section')?.classList.toggle('has-category-context', hasCategoryContext);
   const query = (term || '').trim().toLowerCase();
   const selectedCategory = ($('productCategoryFilter')?.value || '').trim().toLowerCase();
   let filtered = productsCache.filter(product => {
@@ -517,7 +518,12 @@ function filterProducts(term) {
   const limit=$('productLimit')?.value||'20';
   const visible=limit==='all'?filtered:filtered.slice(0,Number(limit)||20);
   renderProducts(visible);
-  if($('productCount'))$('productCount').textContent=english?(total+' product'+(total===1?'':'s')):(total+'টি পণ্য');
+  if ($('productCount')) {
+    const categoryTitle = activeBrandTerm || activeSubcategory || (activeCategoryTerms.length ? activeCategoryTerms.join(' / ') : selectedCategory);
+    $('productCount').textContent = hasCategoryContext && categoryTitle
+      ? categoryTitle
+      : (english ? (total+' product'+(total===1?'':'s')) : (total+'টি পণ্য'));
+  }
   $('clearProductSearch').hidden = !(query || selectedCategory || activeCategoryTerms.length || activeSubcategory || activeBrandTerm || $('filterMinPrice')?.value || $('filterMaxPrice')?.value || Object.keys(selectedSpecificationFilters).length || document.querySelector('.stock-filter:checked'));
 }
 
