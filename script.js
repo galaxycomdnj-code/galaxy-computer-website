@@ -229,6 +229,7 @@ const productGrid = $('productGrid');
 const featuredProductsGrid = $('featuredProductsGrid');
 let productsCache = [];
 let allProductsCache = [];
+let selectedSpecificationFilters = {};
 
 function showProductMessage(message, className = 'product-empty', targetGrid = productGrid) {
   if (!targetGrid) return;
@@ -345,6 +346,33 @@ function populateCategoryFilter() {
   categories.forEach(category => { const option = document.createElement('option'); option.value = category; option.textContent = category; select.append(option); });
   select.value = categories.includes(current) ? current : '';
 }
+function renderDynamicSpecFilters(){
+ const host=$('dynamicSpecFilters');if(!host)return;host.replaceChildren();
+ const category=($('productCategoryFilter')?.value||'').trim().toLowerCase();
+ const base=productsCache.filter(product=>{
+  const categoryMatch=!category||String(product.category||'').toLowerCase()===category;
+  const subMatch=!activeSubcategory||normalizeCategoryText(product.subcategory)===normalizeCategoryText(activeSubcategory);
+  const shortcutMatch=!activeCategoryTerms.length||activeCategoryTerms.some(word=>[product.name,product.category,product.subcategory].filter(Boolean).join(' ').toLowerCase().includes(word));
+  return categoryMatch&&subMatch&&shortcutMatch;
+ });
+ const facets=new Map();
+ base.forEach(product=>{
+  const specs=product.specifications_data&&typeof product.specifications_data==='object'?product.specifications_data:{};
+  Object.entries(specs).forEach(([key,raw])=>{
+   const values=(Array.isArray(raw)?raw:String(raw??'').split(',')).map(value=>String(value).trim()).filter(Boolean);
+   if(!facets.has(key))facets.set(key,new Set());values.forEach(value=>facets.get(key).add(value));
+  });
+ });
+ [...facets.entries()].sort(([a],[b])=>a.localeCompare(b)).forEach(([key,values])=>{
+  const group=document.createElement('details');group.className='filter-group';group.open=true;
+  const heading=document.createElement('summary');heading.textContent=key;group.append(heading);
+  [...values].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'})).forEach(value=>{
+   const label=document.createElement('label');const input=document.createElement('input');input.type='checkbox';input.value=value;input.dataset.specKey=key;input.checked=(selectedSpecificationFilters[key]||[]).includes(value);
+   input.addEventListener('change',()=>{const chosen=new Set(selectedSpecificationFilters[key]||[]);if(input.checked)chosen.add(value);else chosen.delete(value);selectedSpecificationFilters[key]=[...chosen];if(!selectedSpecificationFilters[key].length)delete selectedSpecificationFilters[key];filterProducts($('productSearch')?.value||'');});
+   label.append(input,document.createTextNode(' '+value));group.append(label);
+  });host.append(group);
+ });
+}
 function filterProducts(term) {
   const query = (term || '').trim().toLowerCase();
   const selectedCategory = ($('productCategoryFilter')?.value || '').trim().toLowerCase();
@@ -359,8 +387,20 @@ function filterProducts(term) {
     const matchesSubcategory = !activeSubcategory || productType === normalizedFilter || productCategory === normalizedFilter;
     const brandSearchable = normalizeCategoryText([product.brand, product.name].filter(Boolean).join(' '));
     const normalizedBrand = normalizeCategoryText(activeBrandTerm);
+
     const matchesBrand = !activeBrandTerm || brandSearchable.includes(normalizedBrand);
-    return matchesQuery && matchesCategory && matchesShortcut && matchesSubcategory && matchesBrand;
+    const price=product.price===null||product.price===undefined||product.price===''?null:Number(product.price);
+    const minText=$('filterMinPrice')?.value.trim()||'',maxText=$('filterMaxPrice')?.value.trim()||'';
+    const matchesMin=!minText||(price!==null&&Number.isFinite(price)&&price>=Number(minText));
+    const matchesMax=!maxText||(price!==null&&Number.isFinite(price)&&price<=Number(maxText));
+    const chosenStock=[...document.querySelectorAll('.stock-filter:checked')].map(input=>input.value);
+    const matchesStock=!chosenStock.length||chosenStock.includes(product.stock_status||'available_on_order');
+    const specs=product.specifications_data&&typeof product.specifications_data==='object'?product.specifications_data:{};
+    const matchesSpecs=Object.entries(selectedSpecificationFilters).every(([key,values])=>{
+      const raw=specs[key];const productValues=(Array.isArray(raw)?raw:String(raw??'').split(',')).map(value=>String(value).trim());
+      return values.some(value=>productValues.includes(value));
+    });
+    return matchesQuery && matchesCategory && matchesShortcut && matchesSubcategory && matchesBrand && matchesMin && matchesMax && matchesStock && matchesSpecs;
   });
   const sort = $('productSort')?.value || 'newest';
   const getPrice = product => {
@@ -380,15 +420,20 @@ function filterProducts(term) {
   else if (sort === 'price-desc') filtered.sort((a, b) => comparePrice(a, b, -1));
   else if (sort === 'name-asc') filtered.sort((a,b) => String(a.name || '').localeCompare(String(b.name || ''), undefined, { sensitivity: 'base' }));
   else filtered.sort((a,b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
-  renderProducts(filtered);
-  $('clearProductSearch').hidden = !(query || selectedCategory || activeCategoryTerms.length || activeSubcategory || activeBrandTerm);
+
+  const total=filtered.length;
+  const limit=$('productLimit')?.value||'20';
+  const visible=limit==='all'?filtered:filtered.slice(0,Number(limit)||20);
+  renderProducts(visible);
+  if($('productCount'))$('productCount').textContent=english?(total+' product'+(total===1?'':'s')):(total+'টি পণ্য');
+  $('clearProductSearch').hidden = !(query || selectedCategory || activeCategoryTerms.length || activeSubcategory || activeBrandTerm || $('filterMinPrice')?.value || $('filterMaxPrice')?.value || Object.keys(selectedSpecificationFilters).length || document.querySelector('.stock-filter:checked'));
 }
 
 async function loadProducts() {
   if (!productGrid && !featuredProductsGrid) return;
   try {
     const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/products?select=id,name,brand,model,description,price,image_url,category,subcategory,stock_status,created_at,is_featured,featured_order&order=created_at.desc`,
+      `${SUPABASE_URL}/rest/v1/products?select=id,name,brand,model,description,price,image_url,category,subcategory,stock_status,created_at,is_featured,featured_order,specifications_data&order=created_at.desc`,
       { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
     );
     if (!response.ok) throw new Error(`Product request failed (${response.status})`);
@@ -401,6 +446,7 @@ async function loadProducts() {
     renderProducts(featuredProducts, featuredProductsGrid, null, english ? 'No featured products selected yet.' : 'এখনো কোনো Featured Product নির্বাচন করা হয়নি।');
     populateDynamicCategorySubmenus();
     populateCategoryFilter();
+    renderDynamicSpecFilters();
     filterProducts($('productSearch')?.value || '');
   } catch (error) {
     console.error('Could not load products:', error);
@@ -416,11 +462,12 @@ $('productSearchForm')?.addEventListener('submit', event => {
   $('products').scrollIntoView({ behavior: 'smooth' });
 });
 $('productSearch')?.addEventListener('input', event => { activeCategoryTerms = []; activeSubcategory = ''; activeBrandTerm = ''; filterProducts(event.target.value); });
-$('productCategoryFilter')?.addEventListener('change', () => { activeCategoryTerms = []; activeSubcategory = ''; activeBrandTerm = ''; filterProducts($('productSearch')?.value || ''); });
+$('productCategoryFilter')?.addEventListener('change', () => { activeCategoryTerms = []; activeSubcategory = ''; activeBrandTerm = ''; selectedSpecificationFilters={};renderDynamicSpecFilters();filterProducts($('productSearch')?.value || ''); });
 $('productSort')?.addEventListener('change', () => filterProducts($('productSearch')?.value || ''));
 $('clearProductSearch')?.addEventListener('click', () => {
   $('productSearch').value = '';
   $('productCategoryFilter').value = '';
+  $('filterMinPrice').value='';$('filterMaxPrice').value='';document.querySelectorAll('.stock-filter').forEach(input=>input.checked=false);selectedSpecificationFilters={};renderDynamicSpecFilters();
   activeCategoryTerms = [];
   activeSubcategory = '';
   activeBrandTerm = '';
@@ -445,9 +492,14 @@ document.querySelectorAll('.category-tile').forEach(tile => {
     activeCategoryTerms = aliases[category] || [category];
     $('productSearch').value = '';
     $('productCategoryFilter').value = '';
-    filterProducts('');
+
+    selectedSpecificationFilters={};renderDynamicSpecFilters();filterProducts('');
   });
 });
+['filterMinPrice','filterMaxPrice'].forEach(id=>$(id)?.addEventListener('input',()=>filterProducts($('productSearch')?.value||'')));
+document.querySelectorAll('.stock-filter').forEach(input=>input.addEventListener('change',()=>filterProducts($('productSearch')?.value||'')));
+$('productLimit')?.addEventListener('change',()=>filterProducts($('productSearch')?.value||''));
+$('mobileFilterToggle')?.addEventListener('click',()=>{const body=$('catalogFilterBody');const open=body.classList.toggle('is-open');$('mobileFilterToggle').setAttribute('aria-expanded',String(open));});
 loadProducts();
 
 function addServiceReadMore(grid) {
