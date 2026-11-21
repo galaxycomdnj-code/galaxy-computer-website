@@ -1430,3 +1430,20 @@ button{cursor:pointer}
 @media(prefers-reduced-motion:reduce){
   .product-card .cart-add-btn,.product-card .product-details-btn{transition:none}
 }
+
+
+/* Refined product detail price panel and feature summary */
+.product-detail-price-panel{margin:16px 0 18px;padding:14px 16px;background:#fff;border:1px solid #e8e8e8;border-radius:11px;box-shadow:0 4px 16px #111108}
+.product-detail-price-table{display:grid;gap:0}
+.product-detail-price-row{display:grid;grid-template-columns:minmax(110px,34%) minmax(0,1fr);gap:12px;align-items:center;padding:9px 3px;border-bottom:1px solid #eee;font-size:13px}
+.product-detail-price-row:last-child{border-bottom:0}
+.product-detail-price-row>span{color:#687080;font-weight:600}
+.product-detail-price-row>strong{color:#20242a;font-weight:700;overflow-wrap:anywhere}
+.product-detail-price-row.current-price-row>strong{color:#d97706;font-size:20px}
+.product-detail-note{margin:10px 2px 0;color:#737373;font-size:11px;line-height:1.5}
+.product-key-features-list{margin:0;padding:0 0 0 19px;display:grid;gap:8px;color:#343a40;font-size:13px;line-height:1.55}
+.product-key-features-list li::marker{color:#e58a00}
+.product-more-info-toggle{display:inline-flex;align-items:center;justify-content:center;margin:0 0 12px;padding:9px 15px;border:1px solid #e58a00;border-radius:7px;background:#fff8ed;color:#8b5000;font:700 12px 'Sora',sans-serif;cursor:pointer}
+.product-more-info-toggle:hover{background:#ffefd8}
+.product-spec-table[hidden]{display:none!important}
+@media(max-width:600px){.product-detail-price-panel{padding:11px 12px;margin:12px 0 15px}.product-detail-price-row{grid-template-columns:105px minmax(0,1fr);padding:8px 2px;font-size:12px}.product-detail-price-row.current-price-row>strong{font-size:18px}}
