@@ -333,7 +333,7 @@ function selectSubcategory(term) {
   activeSubcategory = String(term || '').trim();
   if ($('productSearch')) $('productSearch').value = '';
   if ($('productCategoryFilter')) $('productCategoryFilter').value = '';
-  filterProducts('');
+  renderDynamicSpecFilters();filterProducts('');
   $('products')?.scrollIntoView({ behavior: 'smooth' });
 }
 function populateCategoryFilter() {
@@ -461,17 +461,17 @@ $('productSearchForm')?.addEventListener('submit', event => {
   filterProducts($('productSearch').value);
   $('products').scrollIntoView({ behavior: 'smooth' });
 });
-$('productSearch')?.addEventListener('input', event => { activeCategoryTerms = []; activeSubcategory = ''; activeBrandTerm = ''; filterProducts(event.target.value); });
+$('productSearch')?.addEventListener('input', event => { activeCategoryTerms = []; activeSubcategory = ''; activeBrandTerm = '';renderDynamicSpecFilters();filterProducts(event.target.value); });
 $('productCategoryFilter')?.addEventListener('change', () => { activeCategoryTerms = []; activeSubcategory = ''; activeBrandTerm = ''; selectedSpecificationFilters={};renderDynamicSpecFilters();filterProducts($('productSearch')?.value || ''); });
 $('productSort')?.addEventListener('change', () => filterProducts($('productSearch')?.value || ''));
 $('clearProductSearch')?.addEventListener('click', () => {
   $('productSearch').value = '';
   $('productCategoryFilter').value = '';
-  $('filterMinPrice').value='';$('filterMaxPrice').value='';document.querySelectorAll('.stock-filter').forEach(input=>input.checked=false);selectedSpecificationFilters={};renderDynamicSpecFilters();
+  $('filterMinPrice').value='';$('filterMaxPrice').value='';document.querySelectorAll('.stock-filter').forEach(input=>input.checked=false);selectedSpecificationFilters={};
   activeCategoryTerms = [];
   activeSubcategory = '';
   activeBrandTerm = '';
-  filterProducts('');
+  renderDynamicSpecFilters();filterProducts('');
 });
 document.querySelectorAll('.category-tile').forEach(tile => {
   tile.addEventListener('click', () => {
