@@ -222,6 +222,28 @@
       summaryMeta.append(reassurance);
       summary.append(summaryMeta);
 
+      const structuredSpecs = detailSpecs(product);
+      const modelValue = firstValue(product,['model','model_number','product_model']);
+      const keyFeatureSource = firstValue(product,['key_features','features','highlights']);
+      let keyFeatures = [];
+      if (Array.isArray(keyFeatureSource)) keyFeatures = keyFeatureSource.map(textValue).filter(Boolean);
+      else if (typeof keyFeatureSource === 'string' && keyFeatureSource.trim()) keyFeatures = keyFeatureSource.split(/\\r?\\n|•|;/).map(x=>x.replace(/^\\s*[-–—]\\s*/, '').trim()).filter(Boolean);
+      if (!keyFeatures.length) keyFeatures = Object.entries(structuredSpecs)
+        .filter(([key]) => !/^model( number)?$/i.test(key.trim()))
+        .map(([key,value]) => key + ': ' + value).filter(Boolean);
+      const modelFeature = modelValue ? 'Model: ' + textValue(modelValue) : '';
+      if (modelFeature && !keyFeatures.some(feature => /^model\\s*:/i.test(feature))) keyFeatures.unshift(modelFeature);
+      const featureSection = document.createElement('section');
+      featureSection.className = 'product-detail-key-features';
+      const featureHeading = document.createElement('h2');
+      featureHeading.textContent = 'Key Features';
+      const features = document.createElement('ul');
+      features.className = 'product-key-features-list';
+      keyFeatures.slice(0,5).forEach(feature => { const li=document.createElement('li'); li.textContent=feature; features.append(li); });
+      if (!keyFeatures.length) { const li=document.createElement('li'); li.textContent='Key features will be updated soon. Contact us for details.'; features.append(li); }
+      featureSection.append(featureHeading,features);
+      summary.append(featureSection);
+
       const actions = document.createElement('div');
       actions.className = 'product-page-actions';
       const contact = document.createElement('a');
@@ -280,19 +302,6 @@
       const infoColumn = document.createElement('div');
       infoColumn.className = 'product-detail-info-column';
       infoColumn.append(nav);
-      const enteredSpecs = String(product.specifications || '').trim();
-      const structuredSpecs = detailSpecs(product);
-      const keyFeatureSource = firstValue(product,['key_features','features','highlights']);
-      let keyFeatures = [];
-      if (Array.isArray(keyFeatureSource)) keyFeatures = keyFeatureSource.map(textValue).filter(Boolean);
-      else if (typeof keyFeatureSource === 'string' && keyFeatureSource.trim()) keyFeatures = keyFeatureSource.split(/\\r?\\n|•|;/).map(x=>x.replace(/^\\s*[-–—]\\s*/, '').trim()).filter(Boolean);
-      if (!keyFeatures.length) keyFeatures = Object.entries(structuredSpecs).map(([key,value]) => key + ': ' + value).filter(Boolean).slice(0,5);
-      const features = document.createElement('ul');
-      features.className = 'product-key-features-list';
-      keyFeatures.slice(0,5).forEach(feature => { const li=document.createElement('li'); li.textContent=feature; features.append(li); });
-      if (!keyFeatures.length) { const li=document.createElement('li'); li.textContent='Key features will be updated soon. Contact us for details.'; features.append(li); }
-      infoColumn.append(makeSection('key-features','Key Features',features));
-
       const specs = document.createElement('div');
       specs.className = 'product-spec-table';
       Object.entries(structuredSpecs).forEach(([name,value]) => {
