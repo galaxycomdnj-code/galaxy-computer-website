@@ -449,7 +449,13 @@ function renderDynamicSpecFilters(){
    if(!facets.has(key))facets.set(key,new Set());values.forEach(value=>facets.get(key).add(value));
   });
  });
- [...facets.entries()].sort(([a],[b])=>a.localeCompare(b)).forEach(([key,values])=>{
+ const preferredFacetOrder = ['availability','cpu socket','cpu sockets','ram type','form factor','formfactor','special features','specialfeature','special features'];
+ const facetRank = key => {
+  const normalized = normalizeCategoryText(key);
+  const index = preferredFacetOrder.findIndex(name => normalizeCategoryText(name) === normalized);
+  return index < 0 ? 100 : index;
+ };
+ [...facets.entries()].sort(([a],[b])=>facetRank(a)-facetRank(b) || a.localeCompare(b)).forEach(([key,values])=>{
   const group=document.createElement('details');group.className='filter-group';group.open=true;
   const heading=document.createElement('summary');heading.textContent=key;group.append(heading);
   [...values].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'})).forEach(value=>{
@@ -594,7 +600,43 @@ document.querySelectorAll('.category-tile').forEach(tile => {
     selectedSpecificationFilters={};renderDynamicSpecFilters();filterProducts('');
   });
 });
-['filterMinPrice','filterMaxPrice'].forEach(id=>$(id)?.addEventListener('input',()=>filterProducts($('productSearch')?.value||'')));
+function setupPriceRangeSliders() {
+ const minRange=$('filterMinRange'), maxRange=$('filterMaxRange');
+ const minInput=$('filterMinPrice'), maxInput=$('filterMaxPrice');
+ const minLabel=$('filterMinRangeValue'), maxLabel=$('filterMaxRangeValue');
+ if(!minRange||!maxRange||!minInput||!maxInput)return;
+ const prices=productsCache.map(p=>Number(p.price)).filter(p=>Number.isFinite(p)&&p>=0);
+ const floor=prices.length?Math.floor(Math.min(...prices)/100)*100:0;
+ const ceiling=prices.length?Math.ceil(Math.max(...prices)/100)*100:200000;
+ [minRange,maxRange].forEach(range=>{range.min=String(floor);range.max=String(Math.max(ceiling,floor+100));});
+ minRange.step=maxRange.step='100';
+ minRange.value=String(floor);maxRange.value=String(Math.max(ceiling,floor+100));
+ const refresh=changed=>{
+  let low=Number(minRange.value),high=Number(maxRange.value);
+  if(low>high){if(changed==='min')minRange.value=String(high);else maxRange.value=String(low);low=Number(minRange.value);high=Number(maxRange.value);}
+  minInput.value=low<=floor?'':String(low);
+  maxInput.value=high>=Number(maxRange.max)?'':String(high);
+  minLabel.textContent='৳ '+low.toLocaleString('en-BD');
+  maxLabel.textContent='৳ '+high.toLocaleString('en-BD');
+  filterProducts($('productSearch')?.value||'');
+ };
+ minRange.addEventListener('input',()=>refresh('min'));
+ maxRange.addEventListener('input',()=>refresh('max'));
+ minInput.addEventListener('input',()=>{
+  const value=minInput.value===''?floor:Math.min(Number(minInput.value),Number(maxRange.value));
+  minRange.value=String(Math.max(floor,value));
+  minLabel.textContent='৳ '+Number(minRange.value).toLocaleString('en-BD');
+  filterProducts($('productSearch')?.value||'');
+ });
+ maxInput.addEventListener('input',()=>{
+  const value=maxInput.value===''?Number(maxRange.max):Math.max(Number(maxInput.value),Number(minRange.value));
+  maxRange.value=String(Math.min(Number(maxRange.max),value));
+  maxLabel.textContent='৳ '+Number(maxRange.value).toLocaleString('en-BD');
+  filterProducts($('productSearch')?.value||'');
+ });
+}
+['filterMinPrice','filterMaxPrice'].forEach(id=>$(id)?.addEventListener('change',()=>filterProducts($('productSearch')?.value||'')));
+setupPriceRangeSliders();
 document.querySelectorAll('.stock-filter').forEach(input=>input.addEventListener('change',()=>filterProducts($('productSearch')?.value||'')));
 $('productLimit')?.addEventListener('change',()=>filterProducts($('productSearch')?.value||''));
 $('mobileFilterToggle')?.addEventListener('click',()=>{const body=$('catalogFilterBody');const open=body.classList.toggle('is-open');$('mobileFilterToggle').setAttribute('aria-expanded',String(open));});
