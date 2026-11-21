@@ -1359,3 +1359,62 @@ button{cursor:pointer}
 .product-page-compare-btn:hover{background:#fff6e8;border-color:#d97800}
 .detail-compare-item{display:inline-flex;width:auto;min-height:28px;align-items:center;justify-content:center;margin-top:6px;padding:5px 9px;border:1px solid #e7a13c;border-radius:6px;background:#fff;color:#8b5000;font:700 10px/1.2 var(--font-brand),sans-serif;cursor:pointer;white-space:nowrap}
 .detail-compare-item:hover,.detail-compare-item.is-selected{border-color:#d97800;background:#fff4df;color:#8b5000}
+
+
+/* Premium orange Add to Cart + clean View Details buttons */
+.product-card .cart-add-btn,
+.product-card .product-details-btn{
+  width:100%;
+  min-height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:11px 14px;
+  border-radius:9px;
+  font:700 11px/1.2 var(--font-brand),var(--font-bn),sans-serif;
+  letter-spacing:.12px;
+  cursor:pointer;
+  transition:background .2s ease,color .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease;
+}
+.product-card .cart-add-btn{
+  margin:0 0 8px;
+  color:#fff;
+  background:linear-gradient(135deg,#f39800 0%,#e87500 100%);
+  border:1px solid #e87500;
+  box-shadow:0 3px 9px #e8750026;
+}
+.product-card .cart-add-btn:hover:not(:disabled){
+  color:#fff;
+  background:linear-gradient(135deg,#e87500 0%,#cc6200 100%);
+  border-color:#cc6200;
+  box-shadow:0 5px 13px #e8750038;
+  transform:translateY(-1px);
+}
+.product-card .product-details-btn{
+  margin:0;
+  color:#242424;
+  background:#fff;
+  border:1px solid #d8d8d8;
+  box-shadow:0 1px 3px #00000008;
+}
+.product-card .product-details-btn:hover{
+  color:#a65b00;
+  background:#fff8ed;
+  border-color:#e58a00;
+  box-shadow:0 3px 9px #e58a0018;
+  transform:translateY(-1px);
+}
+.product-card .cart-add-btn:focus-visible,
+.product-card .product-details-btn:focus-visible{
+  outline:3px solid #f3980055;
+  outline-offset:2px;
+}
+.product-card .cart-add-btn:disabled{
+  opacity:.58;
+  cursor:not-allowed;
+  box-shadow:none;
+  transform:none;
+}
+@media(prefers-reduced-motion:reduce){
+  .product-card .cart-add-btn,.product-card .product-details-btn{transition:none}
+}
