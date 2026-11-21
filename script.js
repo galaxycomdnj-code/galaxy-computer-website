@@ -285,9 +285,9 @@ function toggleProductCompare(product) {
 function getComparisonSpecs(product) {
   const specs={};
   const structured=product.specifications_data&&typeof product.specifications_data==='object'?product.specifications_data:{};
-  Object.entries(structured).forEach(([key,value])=>{specs[key]=Array.isArray(value)?value.join(', '):String(value??'');});
+  Object.entries(structured).forEach(([key,value])=>{const cleanKey=String(key).replace(/^\\s*[-–—]\\s*/,'').trim();specs[cleanKey]=Array.isArray(value)?value.join(', '):String(value??'');});
   String(product.specifications||'').split(/\r?\n/).map(line=>line.trim()).filter(Boolean).forEach(line=>{
-    const at=line.indexOf(':'); if(at>0){const key=line.slice(0,at).trim();if(!specs[key])specs[key]=line.slice(at+1).trim();}
+    const at=line.indexOf(':'); if(at>0){const key=line.slice(0,at).replace(/^\\s*[-–—]\\s*/,'').trim();if(!specs[key])specs[key]=line.slice(at+1).trim();}
   });
   return specs;
 }
