@@ -1277,3 +1277,42 @@ button{cursor:pointer}
  .specification-field-row .btn{grid-column:1/-1}
  .similar-products-section{padding:13px}
 }
+
+
+/* Product information with a right-side similar-products rail */
+.product-detail-lower{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 245px;
+  gap:18px;
+  align-items:start;
+}
+.product-detail-info-column{display:grid;gap:16px;min-width:0}
+.product-detail-info-column .product-detail-tabs{margin:0}
+.similar-products-section{
+  margin:0;
+  padding:15px;
+  background:#fff;
+  border:1px solid #e8e8e8;
+  border-radius:10px;
+  min-width:0;
+}
+.similar-products-heading{margin:0 0 12px;padding-bottom:10px;border-bottom:1px solid #eee;text-align:center}
+.similar-products-heading h2{font:800 14px var(--font-brand),sans-serif;margin:0;color:#222}
+.similar-products-list{display:grid;grid-template-columns:1fr;gap:0}
+.similar-product-card{display:grid;grid-template-columns:58px minmax(0,1fr);column-gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #eee;min-width:0}
+.similar-product-card:last-child{border-bottom:0}
+.similar-product-card .product-main-link{display:contents}
+.similar-product-image{grid-column:1;grid-row:1 / span 3;width:58px;height:58px;display:grid;place-items:center;overflow:hidden;background:#fff}
+.similar-product-image img{width:100%;height:100%;object-fit:contain}
+.similar-product-card h3{grid-column:2;margin:0;color:#222;font:600 11px/1.45 var(--font-brand),var(--font-bn),sans-serif;overflow-wrap:anywhere}
+.similar-product-card .product-price{grid-column:2;margin:5px 0 0;color:#d97900;font:700 12px var(--font-brand),sans-serif}
+.similar-product-card .product-stock-status{grid-column:2;margin:5px 0 0;font-size:9px;padding:3px 6px}
+.similar-product-card .similar-product-link{grid-column:2;justify-self:start;margin-top:5px;padding:0;background:transparent;color:#555;font:500 9px var(--font-brand),sans-serif;text-align:left;text-decoration:underline}
+@media(max-width:760px){
+ .product-detail-lower{grid-template-columns:minmax(0,1fr);gap:16px}
+ .product-detail-info-column{gap:13px}
+ .similar-products-section{padding:13px}
+ .similar-products-list{grid-template-columns:1fr 1fr;column-gap:12px}
+ .similar-product-card{grid-template-columns:48px minmax(0,1fr);column-gap:7px}
+ .similar-product-image{width:48px;height:48px}
+}
