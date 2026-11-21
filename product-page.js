@@ -210,7 +210,17 @@
         row.append(key, val); priceTable.append(row);
       };
       const currentPrice = (product.stock_status === 'price_on_request' || product.price === null || product.price === undefined || String(product.price).trim() === '') ? 'Contact for Price' : money(product.price);
-      addPriceRow('Price', currentPrice, 'current-price-row');
+      const oldPrice = firstValue(product,['old_price','previous_price','compare_at_price','crossed_price']);
+      const priceRow = document.createElement('div');
+      priceRow.className = 'product-detail-price-row current-price-row';
+      const priceKey = document.createElement('span'); priceKey.textContent = 'Price';
+      const priceValue = document.createElement('strong'); priceValue.textContent = currentPrice;
+      if (oldPrice !== '' && Number(oldPrice) > Number(product.price)) {
+        const oldPriceText = document.createElement('del');
+        oldPriceText.textContent = ' ' + money(oldPrice);
+        priceValue.append(oldPriceText);
+      }
+      priceRow.append(priceKey,priceValue); priceTable.append(priceRow);
       if (regularPrice !== '') addPriceRow('Regular Price', money(regularPrice));
       addPriceRow('Status', stockLabel(product.stock_status || 'available_on_order'));
       if (productCode !== '') addPriceRow('Product Code', textValue(productCode));
