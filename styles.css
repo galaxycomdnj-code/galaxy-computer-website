@@ -1263,7 +1263,7 @@ button{cursor:pointer}
 .similar-products-section .product-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 .similar-product-link{display:block;text-align:center;background:var(--orange);color:#111;text-decoration:none;border-radius:7px;padding:9px 6px;margin-top:8px;font:700 10px var(--font-brand),sans-serif}
 @media(max-width:980px){
- .catalog-layout{grid-template-columns:210px minmax(0,1fr);gap:13px}
+ .catalog-layout.has-category-context{grid-template-columns:210px minmax(0,1fr);gap:13px}
  .catalog-results .product-grid,.similar-products-section .product-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media(max-width:760px){
