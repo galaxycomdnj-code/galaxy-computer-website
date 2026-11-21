@@ -176,6 +176,7 @@ function readSpecificationFields(){
  return result;
 }
 $('addSpecificationField').addEventListener('click',()=>addSpecificationField());
+renderSpecificationFields();
 function resetProductForm(){
  $('productForm').reset();renderSpecificationFields();$('stockStatus').value='available_on_order';$('isFeatured').checked=false;$('featuredOrder').value='1';syncSubcategorySuggestions();$('productId').value='';$('pbrand').value='';$('pmodel').value='';$('productFormTitle').textContent='Add a product';$('productSubmit').textContent='Add product';$('cancelProductEdit').classList.add('hidden');$('imagePreview').classList.remove('visible');$('imagePreview').removeAttribute('src');editingGalleryImages=[];$('productGalleryPreview').replaceChildren();$('pgalleryFiles').value='';
 }
