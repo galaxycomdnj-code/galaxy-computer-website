@@ -331,6 +331,7 @@ let activeBrandTerm = '';
 const normalizeCategoryText = value => String(value || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ').trim();
 function selectSubcategory(term) {
   activeSubcategory = String(term || '').trim();
+  activeCategoryTerms=[];activeBrandTerm='';selectedSpecificationFilters={};
   if ($('productSearch')) $('productSearch').value = '';
   if ($('productCategoryFilter')) $('productCategoryFilter').value = '';
   renderDynamicSpecFilters();filterProducts('');
@@ -775,7 +776,7 @@ categoryDrawer?.addEventListener('click',event=>{
       const typeButton = nestedGroup.querySelector(':scope > .category-item');
       activeSubcategory = (typeButton?.childNodes[0]?.textContent || typeButton?.textContent || '').replace(/[+−]/g,'').trim();
       activeBrandTerm = (link.dataset.filter || link.textContent || '').trim();
-      activeCategoryTerms = [];
+      activeCategoryTerms = [];selectedSpecificationFilters={};
       if ($('productSearch')) $('productSearch').value = '';
       if ($('productCategoryFilter')) $('productCategoryFilter').value = '';
       renderDynamicSpecFilters();filterProducts('');
