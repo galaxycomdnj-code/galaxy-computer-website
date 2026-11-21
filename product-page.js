@@ -55,7 +55,7 @@
     ensureDetailCompare();document.getElementById('detailCompareDock').hidden=!detailCompareItems.length;
     document.getElementById('detailCompareCount').textContent=detailCompareItems.length+'/4 selected';
     document.getElementById('detailCompareOpen').disabled=detailCompareItems.length<2;
-    document.querySelectorAll('.detail-compare-item').forEach(btn=>{const yes=detailCompareItems.some(x=>String(x.id)===String(btn.dataset.id));btn.classList.toggle('is-selected',yes);btn.textContent=yes?'✓ Added to Compare':'⇄ Compare';});
+    document.querySelectorAll('.detail-compare-item').forEach(btn=>{const yes=detailCompareItems.some(x=>String(x.id)===String(btn.dataset.id));btn.classList.toggle('is-selected',yes);btn.textContent=yes?'✓ Added':'＋ Add to Compare';});
   }
   function toggleDetailCompare(item){
     const exists=detailCompareItems.some(x=>String(x.id)===String(item.id));
@@ -102,7 +102,7 @@
       const name=document.createElement('h3');name.textContent=item.name||'Product';link.append(imageWrap,name);
       if(item.stock_status!=='price_on_request'&&item.price!==null&&item.price!==undefined&&item.price!==''){const price=document.createElement('div');price.className='product-price';price.textContent=money(item.price);link.append(price)}
       card.append(link);
-      const compare=document.createElement('button');compare.type='button';compare.className='detail-compare-item';compare.dataset.id=String(item.id);compare.textContent='⇄ Compare';compare.addEventListener('click',()=>toggleDetailCompare(item));card.append(compare);
+      const compare=document.createElement('button');compare.type='button';compare.className='detail-compare-item';compare.dataset.id=String(item.id);compare.textContent='＋ Add to Compare';compare.addEventListener('click',()=>toggleDetailCompare(item));card.append(compare);
       const status=document.createElement('span');status.className='product-stock-status '+(item.stock_status||'available_on_order');status.textContent=stockLabel(item.stock_status||'available_on_order');card.append(status);
       const details=document.createElement('a');details.className='similar-product-link';details.href=link.href;details.textContent='View Details';card.append(details);
       grid.append(card);
@@ -259,7 +259,7 @@
       call.href = 'tel:01621422327';
       call.textContent = 'Call: 01621422327';
       const compareButton=document.createElement('button');
-      compareButton.type='button';compareButton.className='product-page-compare-btn';compareButton.textContent='⇄ Compare';
+      compareButton.type='button';compareButton.className='product-page-compare-btn';compareButton.textContent='＋ Add to Compare';
       compareButton.addEventListener('click',()=>toggleDetailCompare(product));
       actions.append(contact,buyNow,call,compareButton);
       summary.append(actions);
