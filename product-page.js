@@ -38,8 +38,8 @@
   let detailCompareItems=[];
   function detailSpecs(item){
     const out={};const structured=item.specifications_data&&typeof item.specifications_data==='object'?item.specifications_data:{};
-    Object.entries(structured).forEach(([k,v])=>out[k]=Array.isArray(v)?v.join(', '):String(v??''));
-    String(item.specifications||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).forEach(line=>{const i=line.indexOf(':');if(i>0&&!out[line.slice(0,i).trim()])out[line.slice(0,i).trim()]=line.slice(i+1).trim();});
+    Object.entries(structured).forEach(([k,v])=>{const cleanKey=String(k).replace(/^\\s*[-–—]\\s*/,'').trim();out[cleanKey]=Array.isArray(v)?v.join(', '):String(v??'');});
+    String(item.specifications||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).forEach(line=>{const i=line.indexOf(':');if(i>0){const key=line.slice(0,i).replace(/^\\s*[-–—]\\s*/,'').trim();if(!out[key])out[key]=line.slice(i+1).trim();}});
     return out;
   }
   function ensureDetailCompare(){
