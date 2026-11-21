@@ -1447,3 +1447,10 @@ button{cursor:pointer}
 .product-more-info-toggle:hover{background:#ffefd8}
 .product-spec-table[hidden]{display:none!important}
 @media(max-width:600px){.product-detail-price-panel{padding:11px 12px;margin:12px 0 15px}.product-detail-price-row{grid-template-columns:105px minmax(0,1fr);padding:8px 2px;font-size:12px}.product-detail-price-row.current-price-row>strong{font-size:18px}}
+
+
+/* Product detail: show each product's key features directly below the price/status rows */
+.product-detail-key-features{margin:16px 0 18px;padding:0 2px}
+.product-detail-key-features h2{margin:0 0 11px;color:#20242a;font-size:17px;font-weight:750;line-height:1.35}
+.product-detail-key-features .product-key-features-list{padding-left:20px;gap:7px;font-size:13px;line-height:1.6}
+@media(max-width:600px){.product-detail-key-features{margin:13px 0 16px}.product-detail-key-features h2{font-size:15px}.product-detail-key-features .product-key-features-list{font-size:12px}}
