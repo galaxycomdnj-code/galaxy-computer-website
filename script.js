@@ -544,6 +544,7 @@ async function loadProducts() {
     const products = await response.json();
     productsCache = Array.isArray(products) ? products : [];
     allProductsCache = productsCache;
+    setupPriceRangeSliders();
     const featuredProducts = productsCache
       .filter(product => product.is_featured === true)
       .sort((a, b) => Number(a.featured_order || 1) - Number(b.featured_order || 1) || String(b.created_at || '').localeCompare(String(a.created_at || '')));
@@ -636,7 +637,7 @@ function setupPriceRangeSliders() {
  });
 }
 ['filterMinPrice','filterMaxPrice'].forEach(id=>$(id)?.addEventListener('change',()=>filterProducts($('productSearch')?.value||'')));
-setupPriceRangeSliders();
+
 document.querySelectorAll('.stock-filter').forEach(input=>input.addEventListener('change',()=>filterProducts($('productSearch')?.value||'')));
 $('productLimit')?.addEventListener('change',()=>filterProducts($('productSearch')?.value||''));
 $('mobileFilterToggle')?.addEventListener('click',()=>{const body=$('catalogFilterBody');const open=body.classList.toggle('is-open');$('mobileFilterToggle').setAttribute('aria-expanded',String(open));});
