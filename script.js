@@ -387,13 +387,7 @@ function renderProducts(products, targetGrid = productGrid, countTarget = $('pro
     detailsButton.textContent = english ? 'View Details' : 'বিস্তারিত দেখুন';
     detailsButton.addEventListener('click', () => { window.location.href = productUrl; });
 
-    const compareButton = document.createElement('button');
-    compareButton.type = 'button';
-    compareButton.className = 'compare-product-btn';
-    compareButton.dataset.productId = String(product.id);
-    compareButton.textContent = '⇄ Compare';
-    compareButton.addEventListener('click', () => toggleProductCompare(product));
-    card.append(cartButton, detailsButton, compareButton);
+    card.append(cartButton, detailsButton);
     targetGrid.append(card);
   });
   updateCompareUI();
