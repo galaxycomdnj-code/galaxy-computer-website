@@ -326,20 +326,8 @@
         specs.append(empty);
       }
       const specsSection = makeSection('specifications','Full Specifications',specs);
-      const specsToggle = document.createElement('button');
-      specsToggle.type = 'button';
-      specsToggle.className = 'product-more-info-toggle';
-      specsToggle.textContent = 'View More Info';
-      specsToggle.setAttribute('aria-expanded','false');
-      specs.hidden = true;
-      specsSection.querySelector('h2').hidden = true;
-      specsSection.insertBefore(specsToggle, specs);
-      specsToggle.addEventListener('click', () => {
-        const expanded = specsToggle.getAttribute('aria-expanded') === 'true';
-        specsToggle.setAttribute('aria-expanded', String(!expanded));
-        specs.hidden = expanded;
-        specsToggle.textContent = expanded ? 'View More Info' : 'Hide Full Specifications';
-      });
+      // Keep the original full specifications section visible below Key Features.
+      // Key Features is an additional summary and must not hide or replace specifications.
       infoColumn.append(specsSection);
 
       const description = document.createElement('div');
