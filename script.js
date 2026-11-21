@@ -466,7 +466,7 @@ function filterProducts(term) {
     ($('productCategoryFilter')?.value || '').trim()
   );
   catalogLayout?.classList.toggle('has-category-context', hasCategoryContext);
-  document.querySelector('.products-section')?.classList.toggle('has-category-context', hasCategoryContext);
+  document.querySelector('#products.products-section')?.classList.toggle('has-category-context', hasCategoryContext);
   const query = (term || '').trim().toLowerCase();
   const selectedCategory = ($('productCategoryFilter')?.value || '').trim().toLowerCase();
   let filtered = productsCache.filter(product => {
