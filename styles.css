@@ -78,6 +78,10 @@ button{cursor:pointer}
 /* sections */
 .section{padding:54px 0}
 .products-section{background:#f7f7f7}
+.products-section.has-category-context > .container > .section-heading{display:none}
+.products-section.has-category-context .product-toolbar{margin-top:0}
+.products-section.has-category-context #productCount{font-weight:700;color:#111;font-size:12px}
+.products-section.has-category-context #productCategoryFilter{display:none}
 .section-heading{margin-bottom:22px}
 .section-heading h2,.service-promo h2,.home-service h2,.about-grid h2,.contact-grid h2{font:800 clamp(24px,2.5vw,32px)/1.25 var(--font-brand),var(--font-bn),sans-serif;margin:7px 0;color:#111;letter-spacing:-.7px}
 .section-heading p,.about-grid p,.contact-grid p{color:#6b7280;margin:0;font-size:13px}
