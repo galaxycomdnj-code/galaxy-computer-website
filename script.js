@@ -778,7 +778,7 @@ categoryDrawer?.addEventListener('click',event=>{
       activeCategoryTerms = [];
       if ($('productSearch')) $('productSearch').value = '';
       if ($('productCategoryFilter')) $('productCategoryFilter').value = '';
-      filterProducts('');
+      renderDynamicSpecFilters();filterProducts('');
       $('products')?.scrollIntoView({ behavior: 'smooth' });
     } else {
       activeBrandTerm = '';
