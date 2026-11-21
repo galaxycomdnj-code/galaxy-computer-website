@@ -194,31 +194,34 @@
       title.textContent = product.name || 'Product Details';
       summary.append(title);
 
-      const quickMeta = document.createElement('div');
-      quickMeta.className = 'product-detail-quick-meta';
-      const metaItems = [
-        ['Brand', firstValue(product,['brand','manufacturer'])],
-        ['Model', firstValue(product,['model','model_number','part_number'])],
-        ['Warranty', firstValue(product,['warranty','warranty_period'])],
-        ['Availability', firstValue(product,['stock_status','availability','stock'])]
-      ].filter(([,value]) => value !== '');
-      metaItems.forEach(([name,value]) => {
-        const item = document.createElement('div');
-        item.className = 'product-detail-meta-item';
+      const summaryMeta = document.createElement('div');
+      summaryMeta.className = 'product-detail-price-panel';
+      const priceTable = document.createElement('div');
+      priceTable.className = 'product-detail-price-table';
+      const regularPrice = firstValue(product,['regular_price','original_price','list_price','mrp']);
+      const productCode = firstValue(product,['product_code','sku','product_sku','code','part_number']);
+      const brandName = firstValue(product,['brand','manufacturer']);
+      const addPriceRow = (name, value, className = '') => {
+        if (value === '' || value === null || value === undefined) return;
+        const row = document.createElement('div');
+        row.className = 'product-detail-price-row' + (className ? ' ' + className : '');
         const key = document.createElement('span'); key.textContent = name;
-        const val = document.createElement('strong'); val.textContent = name === 'Availability' ? stockLabel(value) : textValue(value);
-        item.append(key,val); quickMeta.append(item);
-      });
-      if (metaItems.length) summary.append(quickMeta);
-
-      const price = document.createElement('strong');
-      price.className = 'product-page-price';
-      price.textContent = (product.stock_status === 'price_on_request' || product.price === null || product.price === undefined || String(product.price).trim() === '') ? 'Contact for Price' : money(product.price);
-      summary.append(price);
+        const val = document.createElement('strong'); val.textContent = value;
+        row.append(key, val); priceTable.append(row);
+      };
+      const currentPrice = (product.stock_status === 'price_on_request' || product.price === null || product.price === undefined || String(product.price).trim() === '') ? 'Contact for Price' : money(product.price);
+      addPriceRow('Price', currentPrice, 'current-price-row');
+      if (regularPrice !== '') addPriceRow('Regular Price', money(regularPrice));
+      addPriceRow('Status', stockLabel(product.stock_status || 'available_on_order'));
+      if (productCode !== '') addPriceRow('Product Code', textValue(productCode));
+      if (brandName !== '') addPriceRow('Brand', textValue(brandName));
+      summaryMeta.append(priceTable);
       const reassurance = document.createElement('p');
       reassurance.className = 'product-detail-note';
       reassurance.textContent = 'Availability and final price will be confirmed by Galaxy Computer.';
-      summary.append(reassurance);
+      summaryMeta.append(reassurance);
+      summary.append(summaryMeta);
+
       const actions = document.createElement('div');
       actions.className = 'product-page-actions';
       const contact = document.createElement('a');
@@ -277,22 +280,48 @@
       const infoColumn = document.createElement('div');
       infoColumn.className = 'product-detail-info-column';
       infoColumn.append(nav);
+      const enteredSpecs = String(product.specifications || '').trim();
+      const structuredSpecs = detailSpecs(product);
+      const keyFeatureSource = firstValue(product,['key_features','features','highlights']);
+      let keyFeatures = [];
+      if (Array.isArray(keyFeatureSource)) keyFeatures = keyFeatureSource.map(textValue).filter(Boolean);
+      else if (typeof keyFeatureSource === 'string' && keyFeatureSource.trim()) keyFeatures = keyFeatureSource.split(/\\r?\\n|•|;/).map(x=>x.replace(/^\\s*[-–—]\\s*/, '').trim()).filter(Boolean);
+      if (!keyFeatures.length) keyFeatures = Object.entries(structuredSpecs).map(([key,value]) => key + ': ' + value).filter(Boolean).slice(0,5);
+      const features = document.createElement('ul');
+      features.className = 'product-key-features-list';
+      keyFeatures.slice(0,5).forEach(feature => { const li=document.createElement('li'); li.textContent=feature; features.append(li); });
+      if (!keyFeatures.length) { const li=document.createElement('li'); li.textContent='Key features will be updated soon. Contact us for details.'; features.append(li); }
+      infoColumn.append(makeSection('key-features','Key Features',features));
+
       const specs = document.createElement('div');
       specs.className = 'product-spec-table';
-      const enteredSpecs = String(product.specifications || '').trim();
-      if (enteredSpecs) enteredSpecs.split(/\r?\n/).map(line => line.trim()).filter(Boolean).forEach(line => {
+      Object.entries(structuredSpecs).forEach(([name,value]) => {
         const row = document.createElement('div'); row.className = 'product-spec-row';
-        const separator = line.indexOf(':');
-        const key = document.createElement('strong'); key.textContent = separator > 0 ? line.slice(0, separator).trim() : 'Specification';
-        const value = document.createElement('span'); value.textContent = separator > 0 ? line.slice(separator + 1).trim() : line;
-        row.append(key, value); specs.append(row);
+        const key = document.createElement('strong'); key.textContent = name;
+        const val = document.createElement('span'); val.textContent = value;
+        row.append(key, val); specs.append(row);
       });
-      if (!enteredSpecs) {
+      if (!Object.keys(structuredSpecs).length) {
         const empty = document.createElement('p'); empty.className = 'product-detail-muted';
         empty.textContent = 'Detailed technical specifications have not been added for this product yet. Contact us for assistance.';
         specs.append(empty);
       }
-      infoColumn.append(makeSection('specifications','Specifications',specs));
+      const specsSection = makeSection('specifications','Full Specifications',specs);
+      const specsToggle = document.createElement('button');
+      specsToggle.type = 'button';
+      specsToggle.className = 'product-more-info-toggle';
+      specsToggle.textContent = 'View More Info';
+      specsToggle.setAttribute('aria-expanded','false');
+      specs.hidden = true;
+      specsSection.querySelector('h2').hidden = true;
+      specsSection.insertBefore(specsToggle, specs);
+      specsToggle.addEventListener('click', () => {
+        const expanded = specsToggle.getAttribute('aria-expanded') === 'true';
+        specsToggle.setAttribute('aria-expanded', String(!expanded));
+        specs.hidden = expanded;
+        specsToggle.textContent = expanded ? 'View More Info' : 'Hide Full Specifications';
+      });
+      infoColumn.append(specsSection);
 
       const description = document.createElement('div');
       description.className = 'product-overview-copy product-description-copy';
