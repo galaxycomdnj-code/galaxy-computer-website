@@ -1343,3 +1343,7 @@ button{cursor:pointer}
 .compare-table thead th{background:#fff6e8;font-weight:800}
 .compare-table tbody th{background:#fafafa;min-width:130px}
 @media(max-width:600px){.compare-dock{padding:9px}.compare-dock-inner{align-items:flex-start;flex-direction:column;gap:8px}.compare-dock-actions{width:100%}.compare-dock-actions button{flex:1}.compare-dialog{padding:8px}.compare-dialog-panel{padding:12px;max-height:90vh}.compare-table th,.compare-table td{padding:8px;font-size:10px;min-width:125px}}
+
+.product-page-compare-btn,.detail-compare-item{border:1px solid #d7d7d7;border-radius:7px;background:#fff;color:#333;padding:10px 13px;font:700 12px var(--font-brand),sans-serif;cursor:pointer}
+.product-page-compare-btn:hover,.detail-compare-item:hover,.detail-compare-item.is-selected{border-color:var(--orange);background:#fff6e8;color:#995700}
+.detail-compare-item{width:100%;margin-top:8px}
