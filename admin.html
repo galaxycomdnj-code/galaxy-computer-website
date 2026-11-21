@@ -40,6 +40,7 @@
 <div class="field"><label for="pbrand">Brand *</label><input id="pbrand" maxlength="80" required placeholder="e.g. MSI"></div>
 <div class="field"><label for="pmodel">Model</label><input id="pmodel" maxlength="120" placeholder="e.g. PRO B760M-A WIFI"></div>
 <div class="field"><label for="pspec">Product Specifications</label><textarea id="pspec" maxlength="5000" placeholder="Brand: Golden Field&#10;Model: GF-KM605W&#10;Connection: 2.4GHz Wireless&#10;Warranty: 1 Year"></textarea><span class="note">প্রতিটি Specification আলাদা লাইনে লিখুন। যেমন: Processor, RAM, Storage, Display, Warranty।</span></div>
+<div class="field"><label>Filter Specifications (Category-specific)</label><div id="specificationFields" class="specification-fields"></div><button class="btn light" id="addSpecificationField" type="button">＋ Add Specification</button><span class="note">যেমন CPU Cooler-এর জন্য Socket: AM4, AM5; Cooler Type: Air Cooler; Fan Speed: 500–1800 RPM। এগুলো Product Filter-এ স্বয়ংক্রিয়ভাবে দেখাবে।</span></div>
 <div class="field"><label for="pdesc">Product Description</label><textarea id="pdesc" maxlength="3000" placeholder="Write a separate detailed description of this product..."></textarea></div>
 <div class="field"><label for="price">Price (BDT)</label><input id="price" type="number" min="0" step="0.01" placeholder="e.g. 65000"></div>
 <div class="field"><label for="stockStatus">Stock Status</label><select id="stockStatus"><option value="available_on_order">Available on Order</option><option value="out_of_stock">Out of Stock</option><option value="price_on_request">Price on Request</option></select><span class="note">ডিস্ট্রিবিউটরের স্টক অনুযায়ী এই অবস্থা পরিবর্তন করুন।</span></div>
@@ -152,11 +153,34 @@ function renderProducts(){
   item.append(img,info,actions);list.append(item);
  });
 }
+function renderSpecificationFields(values={}){
+ const box=$('specificationFields');if(!box)return;box.replaceChildren();
+ const entries=Object.entries(values&&typeof values==='object'&&!Array.isArray(values)?values:{});
+ const rows=entries.length?entries:[['','']];
+ rows.forEach(([key,value])=>addSpecificationField(key,value));
+}
+function addSpecificationField(key='',value=''){
+ const box=$('specificationFields');if(!box)return;
+ const row=document.createElement('div');row.className='specification-field-row';
+ const name=document.createElement('input');name.type='text';name.maxLength=60;name.placeholder='Specification (e.g. Socket)';name.value=String(key??'');name.className='field';
+ const val=document.createElement('input');val.type='text';val.maxLength=160;val.placeholder='Value (e.g. AM4, AM5)';val.value=Array.isArray(value)?value.join(', '):String(value??'');val.className='field';
+ const remove=makeButton('Remove','light',()=>{row.remove();if(!box.children.length)addSpecificationField()});
+ row.append(name,val,remove);box.append(row);
+}
+function readSpecificationFields(){
+ const result={};
+ $('specificationFields').querySelectorAll('.specification-field-row').forEach(row=>{
+  const inputs=row.querySelectorAll('input');const key=inputs[0].value.trim();const value=inputs[1].value.trim();
+  if(key&&value)result[key]=value;
+ });
+ return result;
+}
+$('addSpecificationField').addEventListener('click',()=>addSpecificationField());
 function resetProductForm(){
- $('productForm').reset();$('stockStatus').value='available_on_order';$('isFeatured').checked=false;$('featuredOrder').value='1';syncSubcategorySuggestions();$('productId').value='';$('pbrand').value='';$('pmodel').value='';$('productFormTitle').textContent='Add a product';$('productSubmit').textContent='Add product';$('cancelProductEdit').classList.add('hidden');$('imagePreview').classList.remove('visible');$('imagePreview').removeAttribute('src');editingGalleryImages=[];$('productGalleryPreview').replaceChildren();$('pgalleryFiles').value='';
+ $('productForm').reset();renderSpecificationFields();$('stockStatus').value='available_on_order';$('isFeatured').checked=false;$('featuredOrder').value='1';syncSubcategorySuggestions();$('productId').value='';$('pbrand').value='';$('pmodel').value='';$('productFormTitle').textContent='Add a product';$('productSubmit').textContent='Add product';$('cancelProductEdit').classList.add('hidden');$('imagePreview').classList.remove('visible');$('imagePreview').removeAttribute('src');editingGalleryImages=[];$('productGalleryPreview').replaceChildren();$('pgalleryFiles').value='';
 }
 function editProduct(p){
- $('productId').value=p.id;$('pname').value=p.name||'';$('pbrand').value=p.brand||'';$('pmodel').value=p.model||'';$('pspec').value=p.specifications||'';$('pdesc').value=p.description||'';$('price').value=p.price??'';$('stockStatus').value=p.stock_status||'available_on_order';$('isFeatured').checked=p.is_featured===true;$('featuredOrder').value=p.featured_order??'1';$('category').value=p.category||'';syncSubcategorySuggestions();$('subcategory').value=p.subcategory||'';$('pimage').value=p.image_url||'';editingGalleryImages=Array.isArray(p.gallery_images)?p.gallery_images.filter(x=>typeof x==='string'&&safeImageUrl(x)):[];renderProductGalleryPreview();
+ $('productId').value=p.id;$('pname').value=p.name||'';$('pbrand').value=p.brand||'';$('pmodel').value=p.model||'';$('pspec').value=p.specifications||'';renderSpecificationFields(p.specifications_data||{});$('pdesc').value=p.description||'';$('price').value=p.price??'';$('stockStatus').value=p.stock_status||'available_on_order';$('isFeatured').checked=p.is_featured===true;$('featuredOrder').value=p.featured_order??'1';$('category').value=p.category||'';syncSubcategorySuggestions();$('subcategory').value=p.subcategory||'';$('pimage').value=p.image_url||'';editingGalleryImages=Array.isArray(p.gallery_images)?p.gallery_images.filter(x=>typeof x==='string'&&safeImageUrl(x)):[];renderProductGalleryPreview();
  $('productFormTitle').textContent='Edit product';$('productSubmit').textContent='Save changes';$('cancelProductEdit').classList.remove('hidden');previewImage();
  $('productForm').scrollIntoView({behavior:'smooth',block:'start'});
 }
@@ -192,7 +216,7 @@ $('productForm').addEventListener('submit',async e=>{
    if(!finalImageUrl&&uploadedGallery.length)finalImageUrl=uploadedGallery.shift();
    galleryImages=[...galleryImages,...uploadedGallery];
    const featuredOrderText=$('featuredOrder').value.trim();const featuredOrder=featuredOrderText===''?1:Number(featuredOrderText);if(!Number.isInteger(featuredOrder)||featuredOrder<1)throw new Error('Featured Display Order must be a whole number of 1 or higher.');
-   const payload={name,brand:$('pbrand').value.trim(),model:$('pmodel').value.trim(),specifications:$('pspec').value.trim(),description:$('pdesc').value.trim(),price:priceText===''?null:Number(priceText),stock_status:$('stockStatus').value,is_featured:$('isFeatured').checked,featured_order:featuredOrder,category:$('category').value.trim(),subcategory:$('subcategory').value.trim(),image_url:finalImageUrl,gallery_images:galleryImages};
+   const payload={name,brand:$('pbrand').value.trim(),model:$('pmodel').value.trim(),specifications:$('pspec').value.trim(),specifications_data:readSpecificationFields(),description:$('pdesc').value.trim(),price:priceText===''?null:Number(priceText),stock_status:$('stockStatus').value,is_featured:$('isFeatured').checked,featured_order:featuredOrder,category:$('category').value.trim(),subcategory:$('subcategory').value.trim(),image_url:finalImageUrl,gallery_images:galleryImages};
    const result=id?await supabase.from('products').update(payload).eq('id',id):await supabase.from('products').insert([payload]);
    if(result.error)throw result.error;
    message('productMessage',id?'Product updated successfully.':'Product added successfully.');
