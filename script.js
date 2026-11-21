@@ -356,8 +356,24 @@ function renderProducts(products, targetGrid = productGrid, countTarget = $('pro
 
     const title = document.createElement('h3');
     title.textContent = product.name || 'Product';
-    // Keep home-page product cards compact; the full description stays on product.html.
+    // Keep featured cards compact; show only a few key specifications in the main catalogue.
     productLink.append(imageWrap, title);
+    if (targetGrid === productGrid) {
+      const shortSpecs = Object.entries(getComparisonSpecs(product))
+        .filter(([key, value]) => String(key).trim() && String(value).trim())
+        .slice(0, 4);
+      if (shortSpecs.length) {
+        const specList = document.createElement('ul');
+        specList.className = 'product-card-specs';
+        shortSpecs.forEach(([key, value]) => {
+          const item = document.createElement('li');
+          const specText = `${key}: ${value}`;
+          item.textContent = specText.length > 105 ? specText.slice(0, 102).trimEnd() + '…' : specText;
+          specList.append(item);
+        });
+        productLink.append(specList);
+      }
+    }
 
     if (product.stock_status !== 'price_on_request' && product.price !== null && product.price !== undefined && product.price !== '') {
       const price = document.createElement('div');
@@ -444,6 +460,12 @@ function renderDynamicSpecFilters(){
  });
 }
 function filterProducts(term) {
+  const catalogLayout = document.querySelector('.catalog-layout');
+  const hasCategoryContext = Boolean(
+    activeCategoryTerms.length || activeSubcategory || activeBrandTerm ||
+    ($('productCategoryFilter')?.value || '').trim()
+  );
+  catalogLayout?.classList.toggle('has-category-context', hasCategoryContext);
   const query = (term || '').trim().toLowerCase();
   const selectedCategory = ($('productCategoryFilter')?.value || '').trim().toLowerCase();
   let filtered = productsCache.filter(product => {
