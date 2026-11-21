@@ -1316,3 +1316,30 @@ button{cursor:pointer}
  .similar-product-card{grid-template-columns:48px minmax(0,1fr);column-gap:7px}
  .similar-product-image{width:48px;height:48px}
 }
+
+
+/* Product comparison */
+.compare-product-btn{width:100%;margin-top:7px;padding:9px 10px;border:1px solid #d7d7d7;border-radius:7px;background:#fff;color:#333;font:700 11px var(--font-brand),sans-serif;cursor:pointer}
+.compare-product-btn:hover,.compare-product-btn.is-selected{border-color:#e58a00;background:#fff6e8;color:#9b5800}
+.compare-dock{position:fixed;z-index:1200;left:0;right:0;bottom:0;padding:10px 16px;background:#171717;color:#fff;box-shadow:0 -5px 24px #0002}
+.compare-dock[hidden],.compare-dialog[hidden]{display:none!important}
+.compare-dock-inner{max-width:1200px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.compare-dock-inner>div:first-child{display:flex;align-items:center;gap:12px}
+.compare-dock-inner strong{font:700 13px var(--font-brand),sans-serif}
+.compare-dock-inner span{font:11px var(--font-brand),sans-serif;color:#ccc}
+.compare-dock-actions{display:flex;gap:8px}
+.compare-dock button{border:1px solid #777;border-radius:6px;padding:8px 13px;background:transparent;color:#fff;font:700 11px var(--font-brand),sans-serif;cursor:pointer}
+.compare-dock button:last-child{border-color:#f39800;background:#f39800;color:#111}
+.compare-dock button:disabled{opacity:.45;cursor:not-allowed}
+.compare-dialog{position:fixed;inset:0;z-index:1300;display:grid;place-items:center;padding:18px}
+.compare-dialog-backdrop{position:absolute;inset:0;background:#0009}
+.compare-dialog-panel{position:relative;width:min(1100px,100%);max-height:85vh;overflow:auto;background:#fff;border-radius:12px;padding:18px;box-shadow:0 20px 60px #0004}
+.compare-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.compare-dialog-head h2{margin:0;font:800 18px var(--font-brand),sans-serif}
+.compare-dialog-head button{border:0;background:#f1f1f1;border-radius:50%;width:34px;height:34px;font-size:22px;cursor:pointer}
+.compare-table-wrap{overflow:auto}
+.compare-table{width:100%;border-collapse:collapse;font:12px/1.5 var(--font-brand),var(--font-bn),sans-serif}
+.compare-table th,.compare-table td{padding:11px 12px;border:1px solid #e8e8e8;text-align:left;vertical-align:top;min-width:150px}
+.compare-table thead th{background:#fff6e8;font-weight:800}
+.compare-table tbody th{background:#fafafa;min-width:130px}
+@media(max-width:600px){.compare-dock{padding:9px}.compare-dock-inner{align-items:flex-start;flex-direction:column;gap:8px}.compare-dock-actions{width:100%}.compare-dock-actions button{flex:1}.compare-dialog{padding:8px}.compare-dialog-panel{padding:12px;max-height:90vh}.compare-table th,.compare-table td{padding:8px;font-size:10px;min-width:125px}}
