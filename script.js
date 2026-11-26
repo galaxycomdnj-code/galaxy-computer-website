@@ -430,7 +430,7 @@ let activeSubcategory = '';
 let activeBrandTerm = '';
 let activeCategoryLabel = '';
 const normalizeCategoryText = value => String(value || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ').trim();
-function categoryDisplayName(){return activeSubcategory||activeCategoryLabel||activeCategoryTerms.join(' / ')||($('productCategoryFilter')?.value||'');}
+function categoryDisplayName(){const value=activeSubcategory||activeCategoryLabel||activeCategoryTerms.join(' / ')||($('productCategoryFilter')?.value||'');return normalizeCategoryText(value)==='monitors'||normalizeCategoryText(value)==='monitor display'?'Monitor':value;}
 function categoryBaseProducts(){const selected=($('productCategoryFilter')?.value||'').trim().toLowerCase();return productsCache.filter(p=>{const cat=!selected||String(p.category||'').toLowerCase()===selected;const sub=!activeSubcategory||normalizeCategoryText(p.subcategory)===normalizeCategoryText(activeSubcategory);const text=normalizeCategoryText([p.name,p.category,p.subcategory].filter(Boolean).join(' '));const match=!activeCategoryTerms.length||activeCategoryTerms.some(w=>{const t=normalizeCategoryText(w);return t&&(' '+text+' ').includes(' '+t+' ');});return cat&&sub&&match;});}
 function renderCategoryLanding(){
  const landing=$('categoryLanding'),help=$('categoryHelp');if(!landing)return;const selected=($('productCategoryFilter')?.value||'').trim();const active=Boolean(activeCategoryLabel||activeCategoryTerms.length||activeSubcategory||activeBrandTerm||selected);
@@ -720,7 +720,9 @@ function setupPriceRangeSliders() {
 
 document.querySelectorAll('.stock-filter').forEach(input=>input.addEventListener('change',()=>filterProducts($('productSearch')?.value||'')));
 $('productLimit')?.addEventListener('change',()=>filterProducts($('productSearch')?.value||''));
-$('mobileFilterToggle')?.addEventListener('click',()=>{const body=$('catalogFilterBody');const open=body.classList.toggle('is-open');$('mobileFilterToggle').setAttribute('aria-expanded',String(open));});
+function setMobileFilterOpen(open){const body=$('catalogFilterBody'),panel=document.querySelector('.catalog-filters');body?.classList.toggle('is-open',open);panel?.classList.toggle('mobile-filter-open',open);$('mobileFilterToggle')?.setAttribute('aria-expanded',String(open));$('mobileFilterOpen')?.setAttribute('aria-expanded',String(open));document.body.classList.toggle('filter-drawer-open',open);}
+$('mobileFilterToggle')?.addEventListener('click',()=>setMobileFilterOpen(false));
+$('mobileFilterOpen')?.addEventListener('click',()=>setMobileFilterOpen(true));
 loadProducts();
 
 function addServiceReadMore(grid) {
