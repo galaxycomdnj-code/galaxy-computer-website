@@ -573,7 +573,7 @@ function filterProducts(term) {
   const query = (term || '').trim().toLowerCase();
   const selectedCategory = ($('productCategoryFilter')?.value || '').trim().toLowerCase();
   const collection = new URLSearchParams(window.location.search).get('collection');
-  if (collection) $('products')?.removeAttribute('hidden');
+  if (collection) { $('products')?.removeAttribute('hidden'); if ($('productLimit')) $('productLimit').value = 'all'; }
   let collectionProducts = productsCache;
   if (collection === 'featured') collectionProducts = collectionProducts.filter(product => product.is_featured === true);
   else if (collection === 'flash-sale') collectionProducts = collectionProducts.filter(product => getActiveSalePrice(product) !== null);
