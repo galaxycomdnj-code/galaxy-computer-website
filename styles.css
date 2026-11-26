@@ -1687,3 +1687,33 @@ button{cursor:pointer}
  .category-page-mode .product-toolbar-controls{flex-wrap:nowrap}
  .category-page-mode #mobileFilterOpen{margin-left:auto}
 }
+
+
+/* Final compact category toolbar correction */
+.category-page-mode .mobile-filter-title{display:none!important}
+.category-page-mode .product-toolbar-controls{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;min-width:0}
+.category-page-mode #mobileFilterOpen{
+ display:inline-flex!important;align-items:center;justify-content:center;gap:5px;
+ box-sizing:border-box;height:32px;min-height:32px;min-width:0;width:auto;
+ padding:0 9px;margin:0;border:1px solid #dedede;border-radius:7px;
+ background:#fff;color:#333;font:600 10px var(--font-brand),sans-serif;
+ line-height:1;white-space:nowrap;flex:0 0 auto
+}
+.category-page-mode #mobileFilterOpen .filter-button-icon{display:block;width:13px;height:13px;flex:0 0 13px}
+.category-page-mode .product-toolbar-controls .toolbar-select-label{display:flex;align-items:center;gap:4px;white-space:nowrap;font-size:10px}
+.category-page-mode .product-toolbar-controls .toolbar-select-label select{box-sizing:border-box;height:32px;min-height:32px;min-width:0;padding:0 6px;font-size:10px}
+.category-page-mode .product-toolbar-controls #clearProductSearch{font-size:10px;white-space:nowrap;padding:4px 2px}
+@media(min-width:761px){
+ .category-page-mode .product-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+ .category-page-mode .product-toolbar-controls{margin-left:auto}
+}
+@media(max-width:760px){
+ .category-page-mode .product-toolbar{display:flex;align-items:center;flex-direction:row;flex-wrap:nowrap;gap:5px}
+ .category-page-mode .product-toolbar-controls{width:100%;gap:5px;justify-content:flex-start}
+ .category-page-mode .product-toolbar-controls .toolbar-select-label{font-size:9px;gap:3px}
+ .category-page-mode .product-toolbar-controls .toolbar-select-label select{height:30px;min-height:30px;padding:0 4px;max-width:76px;font-size:9px}
+ .category-page-mode .product-toolbar-controls .toolbar-select-label:nth-child(2) select{max-width:94px}
+ .category-page-mode #mobileFilterOpen{height:30px;min-height:30px;padding:0 7px;font-size:9px;gap:4px}
+ .category-page-mode #mobileFilterOpen .filter-button-icon{width:12px;height:12px;flex-basis:12px}
+ .category-page-mode .product-toolbar-controls #clearProductSearch{font-size:9px}
+}
