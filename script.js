@@ -666,7 +666,7 @@ $('productSort')?.addEventListener('change', () => filterProducts($('productSear
 $('clearProductSearch')?.addEventListener('click', () => {
   $('productSearch').value = '';
   $('productCategoryFilter').value = '';
-  $('filterMinPrice').value='';$('filterMaxPrice').value='';document.querySelectorAll('.stock-filter').forEach(input=>input.checked=false);selectedSpecificationFilters={};selectedBrandFilters=[];selectedBrandFilters=[];
+  $('filterMinPrice').value='';$('filterMaxPrice').value='';document.querySelectorAll('.stock-filter').forEach(input=>input.checked=false);selectedSpecificationFilters={};selectedBrandFilters=[];
   activeCategoryTerms = [];
   activeSubcategory = '';
   activeBrandTerm = '';
