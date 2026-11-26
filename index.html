@@ -160,11 +160,10 @@
         </div>
         <section class="category-landing" id="categoryLanding" aria-live="polite" hidden><nav class="category-breadcrumb" aria-label="Breadcrumb"><a href="#home">Home</a><span>›</span><strong id="categoryBreadcrumbName"></strong></nav><h1 id="categoryLandingTitle"></h1><p class="category-landing-description" id="categoryLandingDescription"></p><div class="category-brand-chips" id="categoryBrandChips"></div></section><div class="product-toolbar">
           <span id="productCount" role="status" aria-live="polite" aria-atomic="true">পণ্য লোড হচ্ছে...</span>
-          <button type="button" id="mobileFilterOpen" aria-expanded="false"><svg class="filter-button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6h16M7 12h10m-7 6h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M7 4v4m10 2v4m-5 2v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Filter</span></button>
+          <div class="product-toolbar-left"><button type="button" id="mobileFilterOpen" aria-expanded="false"><svg class="filter-button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6h16M7 12h10m-7 6h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M7 4v4m10 2v4m-5 2v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Filter</span></button><button type="button" id="clearProductSearch" class="clear-filter" hidden>Clear filters ×</button></div>
           <div class="product-toolbar-controls">
             <label class="toolbar-select-label">Show <select id="productLimit" aria-label="Products per page"><option value="20">20</option><option value="40">40</option><option value="all">All</option></select></label>
             <label class="toolbar-select-label">Sort by <select id="productSort" aria-label="Sort products"><option value="newest">Default</option><option value="price-asc">Price: Low to High</option><option value="price-desc">Price: High to Low</option><option value="name-asc">Name: A to Z</option></select></label><select id="productCategoryFilter" aria-label="Filter by category"><option value="">All categories</option></select>
-            <button type="button" id="clearProductSearch" class="clear-filter" hidden>Clear filters ×</button>
           </div>
         </div>
         <div class="catalog-layout">
