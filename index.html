@@ -126,6 +126,7 @@
     </section>
 
     <section class="hero" id="home">
+      <div class="cover-slides" id="coverSlides" aria-label="Featured promotions"></div>
       <div class="container hero-content">
         <div class="hero-copy">
           <span class="hero-kicker"><i></i><span>TRUSTED IT SOLUTION</span></span>
@@ -138,8 +139,10 @@
           </div>
         </div>
       </div>
-      <div class="hero-dots" aria-hidden="true"><span class="selected"></span><span></span><span></span></div>
+      <div class="hero-dots" id="coverSlideDots" aria-label="Cover photo navigation"></div>
     </section>
+
+    <section class="seasonal-offer-section" id="seasonalOffer" hidden aria-label="Seasonal offer"></section>
 
     <section class="section products-section featured-products-section" id="featured-products">
       <div class="container">
@@ -147,12 +150,20 @@
           <span class="eyebrow">SELECTED FOR YOU</span>
           <h2>Featured Products</h2>
           <p>Explore our handpicked products.</p>
+          <a class="collection-view-all" href="index.html?collection=featured#products">View All Featured Products <span>→</span></a>
         </div>
         <div class="product-grid" id="featuredProductsGrid" aria-live="polite" aria-busy="true"><div class="product-loading">পণ্য লোড হচ্ছে...</div></div>
       </div>
     </section>
 
-    <section class="section products-section" id="products">
+    <section class="section products-section merchandising-section" id="latest-products">
+      <div class="container"><div class="section-heading"><span class="eyebrow">JUST ARRIVED</span><h2>Latest Products</h2><p>Discover the newest additions to our collection.</p><a class="collection-view-all" href="index.html?collection=latest#products">View All Latest Products <span>→</span></a></div><div class="product-grid" id="latestProductsGrid" aria-live="polite"><div class="product-loading">পণ্য লোড হচ্ছে...</div></div></div>
+    </section>
+    <section class="section products-section merchandising-section flash-sale-section" id="flash-sale-products" hidden>
+      <div class="container"><div class="section-heading"><span class="eyebrow">LIMITED-TIME DEALS</span><h2>Flash Sale</h2><p>Special prices on selected products.</p><a class="collection-view-all" href="index.html?collection=flash-sale#products">View All Flash Sale <span>→</span></a></div><div class="product-grid" id="flashSaleProductsGrid" aria-live="polite"></div></div>
+    </section>
+
+    <section class="section products-section" id="products" hidden>
       <div class="container">
         <div class="section-heading section-heading-row">
           <div><span class="eyebrow">SHOP BY COLLECTION</span><h2 data-bn="All Products" data-en="All Products">All Products</h2><p data-bn="আমাদের সব উপলব্ধ পণ্য ও কম্পিউটার এক্সেসরিজ দেখুন।" data-en="Browse all available products and computer accessories.">আমাদের সব উপলব্ধ পণ্য ও কম্পিউটার এক্সেসরিজ দেখুন।</p></div>
@@ -269,6 +280,7 @@
   </footer>
 
   <a class="floating-wa" href="https://wa.me/8801621422327?text=আসসালামু%20আলাইকুম,%20Galaxy%20Computer" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">◉</a>
-  <script src="script.js?v=20261127-category-clear-v2"></script>
+  <script src="script.js?v=20261127-home-merchandising-v1"></script>
+  <script src="merchandising.js?v=20261127-home-merchandising-v1"></script>
 </body>
 </html>
