@@ -503,6 +503,7 @@ function filterProducts(term) {
   );
   catalogLayout?.classList.toggle('has-category-context', hasCategoryContext);
   document.querySelector('#products.products-section')?.classList.toggle('has-category-context', hasCategoryContext);
+  document.querySelector('.featured-products-section')?.classList.toggle('is-hidden-for-category', hasCategoryContext);
   const query = (term || '').trim().toLowerCase();
   const selectedCategory = ($('productCategoryFilter')?.value || '').trim().toLowerCase();
   let filtered = productsCache.filter(product => {
@@ -637,6 +638,7 @@ document.querySelectorAll('.category-tile').forEach(tile => {
     $('productCategoryFilter').value = '';
 
     selectedSpecificationFilters={};renderDynamicSpecFilters();filterProducts('');
+    $('products')?.scrollIntoView({behavior:'smooth',block:'start'});
   });
 });
 function setupPriceRangeSliders() {
