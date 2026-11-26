@@ -496,7 +496,7 @@ b$('homepageBannerForm')?.addEventListener('submit',async e=>{
  b$('homepageBannerSave').disabled=true;bannerMsg(imageFile?'Uploading banner image…':'Saving banner…');let image=imageText,uploadedPath=null;
  try{
   if(imageFile){const clean=imageFile.name.toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'')||'homepage-banner';uploadedPath='products/homepage-'+crypto.randomUUID()+'-'+clean;const {error:uploadError}=await bannerDb.storage.from('product-images').upload(uploadedPath,imageFile,{cacheControl:'31536000',contentType:imageFile.type,upsert:false});if(uploadError)throw uploadError;image=bannerDb.storage.from('product-images').getPublicUrl(uploadedPath).data.publicUrl;}
-  const payload={banner_type:type,title:b$('homepageBannerTitle').value.trim()||null,image_url:image,target_url:target||null,display_order:order,is_active:b$('homepageBannerActive').checked,starts_at:start?new Date(start).toISOString():null,ends_at:end?new Date(end).toISOString():null,updated_at:new Date().toISOString()};
+  const payload={banner_type:type,title:b$('homepageBannerTitle').value.trim()||null,image_url:image,target_url:target||'/',display_order:order,is_active:b$('homepageBannerActive').checked,starts_at:start?new Date(start).toISOString():null,ends_at:end?new Date(end).toISOString():null,updated_at:new Date().toISOString()};
   const result=id?await bannerDb.from('homepage_banners').update(payload).eq('id',id):await bannerDb.from('homepage_banners').insert(payload);
   if(result.error)throw result.error;
   bannerMsg('Banner saved successfully.');resetBanner();await loadBanners();
