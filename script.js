@@ -664,15 +664,32 @@ $('productSearchForm')?.addEventListener('submit', event => {
 $('productSearch')?.addEventListener('input', event => { activeCategoryTerms = []; activeSubcategory = ''; activeBrandTerm = '';renderDynamicSpecFilters();filterProducts(event.target.value); });
 $('productCategoryFilter')?.addEventListener('change', () => { activeCategoryTerms = []; activeSubcategory = ''; activeBrandTerm = ''; selectedSpecificationFilters={};renderDynamicSpecFilters();filterProducts($('productSearch')?.value || ''); });
 $('productSort')?.addEventListener('change', () => filterProducts($('productSearch')?.value || ''));
-$('clearProductSearch')?.addEventListener('click', () => {
-  // Clear active filters while keeping the selected category context.
+$('clearProductSearch')?.addEventListener('click', event => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  // Keep the category navigation state separate from removable filters.
+  const categoryState = {
+    terms: [...activeCategoryTerms],
+    subcategory: activeSubcategory,
+    label: activeCategoryLabel,
+    categorySelect: $('productCategoryFilter')?.value || ''
+  };
+
   $('productSearch').value = '';
   $('filterMinPrice').value = '';
   $('filterMaxPrice').value = '';
-  document.querySelectorAll('.stock-filter').forEach(input => input.checked = false);
+  document.querySelectorAll('.stock-filter').forEach(input => { input.checked = false; });
   selectedSpecificationFilters = {};
   selectedBrandFilters = [];
   activeBrandTerm = '';
+
+  // Restore category context before rebuilding facets and products.
+  activeCategoryTerms = categoryState.terms;
+  activeSubcategory = categoryState.subcategory;
+  activeCategoryLabel = categoryState.label;
+  if ($('productCategoryFilter')) $('productCategoryFilter').value = categoryState.categorySelect;
+
   renderDynamicSpecFilters();
   filterProducts('');
 });
