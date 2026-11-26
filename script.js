@@ -428,9 +428,28 @@ function renderProducts(products, targetGrid = productGrid, countTarget = $('pro
 let activeCategoryTerms = [];
 let activeSubcategory = '';
 let activeBrandTerm = '';
+let activeCategoryLabel = '';
 const normalizeCategoryText = value => String(value || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ').trim();
+function categoryDisplayName(){return activeBrandTerm||activeSubcategory||activeCategoryLabel||activeCategoryTerms.join(' / ')||($('productCategoryFilter')?.value||'');}
+function categoryBaseProducts(){const selected=($('productCategoryFilter')?.value||'').trim().toLowerCase();return productsCache.filter(p=>{const cat=!selected||String(p.category||'').toLowerCase()===selected;const sub=!activeSubcategory||normalizeCategoryText(p.subcategory)===normalizeCategoryText(activeSubcategory);const text=normalizeCategoryText([p.name,p.category,p.subcategory].filter(Boolean).join(' '));const match=!activeCategoryTerms.length||activeCategoryTerms.some(w=>{const t=normalizeCategoryText(w);return t&&(' '+text+' ').includes(' '+t+' ');});return cat&&sub&&match;});}
+function renderCategoryLanding(){
+ const landing=$('categoryLanding'),help=$('categoryHelp');if(!landing)return;const selected=($('productCategoryFilter')?.value||'').trim();const active=Boolean(activeCategoryLabel||activeCategoryTerms.length||activeSubcategory||activeBrandTerm||selected);
+ document.body.classList.toggle('category-page-mode',active);landing.hidden=!active;if(help)help.hidden=!active;if(!active)return;
+ const title=categoryDisplayName()||selected||'Products';$('categoryLandingTitle').textContent=title+' Price in Bangladesh';$('categoryBreadcrumbName').textContent=title;
+ const descriptions={monitor:'Explore monitors for office work, gaming, design and everyday use. Compare brands, display sizes, resolution and refresh rates to find the right display.',laptop:'Explore laptops for study, office work, business and gaming. Compare trusted brands, performance and features before choosing.',desktop:'Find desktop computers for home, office, business and gaming. Compare available systems and choose according to your workload.',components:'Explore essential PC components including processors, motherboards, RAM, storage, graphics cards, power supplies and cooling.',accessories:'Browse computer accessories including keyboards, mice, headsets, webcams and everyday productivity essentials.',casing:'Explore PC casings in different sizes and designs. Check motherboard compatibility, airflow and cooling support before buying.',ssd:'Compare SSD storage options by capacity, form factor and interface for faster boot times and file access.',ram:'Find compatible memory for desktop and laptop upgrades. Check RAM generation, capacity and supported speed.',processor:'Compare processors for everyday computing, productivity and gaming. Check socket and platform compatibility.',graphics:'Explore graphics cards for gaming, creative workloads and professional applications.'};
+ const keys=activeCategoryTerms.map(normalizeCategoryText);const dk=activeSubcategory?normalizeCategoryText(activeSubcategory):keys.find(k=>descriptions[k])||normalizeCategoryText(title);
+ $('categoryLandingDescription').textContent=descriptions[dk]||('Browse '+title+' products at Galaxy Computer. Compare available brands, prices and product specifications to choose the right option for your needs.');
+ const brands=[...new Set(categoryBaseProducts().map(p=>String(p.brand||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));const chips=$('categoryBrandChips');chips.replaceChildren();chips.hidden=!brands.length;
+ if(brands.length){const lab=document.createElement('span');lab.className='brand-chip-label';lab.textContent='Brands:';chips.append(lab);const all=document.createElement('button');all.type='button';all.className='brand-chip'+(!activeBrandTerm?' active':'');all.textContent='All';all.onclick=()=>{activeBrandTerm='';filterProducts($('productSearch')?.value||'');};chips.append(all);brands.forEach(brand=>{const b=document.createElement('button');b.type='button';b.className='brand-chip'+(normalizeCategoryText(activeBrandTerm)===normalizeCategoryText(brand)?' active':'');b.textContent=brand;b.onclick=()=>{activeBrandTerm=brand;filterProducts($('productSearch')?.value||'');};chips.append(b);});}
+ $('categoryGuideTitle').textContent=title+' Buying Guide';$('categoryGuideIntro').textContent='পণ্য কেনার আগে প্রয়োজন, ব্যবহার, সামঞ্জস্য এবং বাজেট বিবেচনা করুন।';const cards=$('categoryGuideCards');cards.replaceChildren();
+ [['আপনার প্রয়োজন বুঝুন','কাজের ধরন অনুযায়ী প্রয়োজনীয় ফিচার ও পারফরম্যান্স নির্বাচন করুন।'],['সামঞ্জস্য যাচাই করুন','আপনার বর্তমান ডিভাইস বা সেটআপের সঙ্গে পণ্যটি compatible কি না নিশ্চিত করুন।'],['দাম ও স্পেসিফিকেশন তুলনা করুন','একই ধরনের কয়েকটি পণ্যের স্পেসিফিকেশন ও দাম মিলিয়ে সিদ্ধান্ত নিন।']].forEach(([h,t])=>{const card=document.createElement('article');card.className='category-guide-card';const hd=document.createElement('h3');hd.textContent=h;const p=document.createElement('p');p.textContent=t;card.append(hd,p);cards.append(card);});
+ const faq=$('categoryFaq');faq.replaceChildren();const fh=document.createElement('h2');fh.textContent='কেনার আগে সাধারণ প্রশ্ন';faq.append(fh);[['কোন পণ্যটি আমার জন্য উপযুক্ত?','আপনার ব্যবহার, প্রয়োজনীয় ফিচার ও বাজেট অনুযায়ী পণ্য বেছে নিন। প্রয়োজনে Galaxy Computer-এর সঙ্গে যোগাযোগ করুন।'],['পণ্যের দাম ও স্টক কি নিশ্চিত?','ওয়েবসাইটে দেখানো দাম ও স্টক পরিবর্তিত হতে পারে। অর্ডারের আগে আমাদের টিমের কাছ থেকে চূড়ান্ত দাম ও প্রাপ্যতা নিশ্চিত করুন।'],['সঠিক মডেল বাছাই করতে সাহায্য পাব কি?','হ্যাঁ। পণ্যের নাম বা Product Code উল্লেখ করে ফোন বা WhatsApp-এ পরামর্শ নিতে পারেন।']].forEach(([q,a])=>{const d=document.createElement('details'),sm=document.createElement('summary'),p=document.createElement('p');sm.textContent=q;p.textContent=a;d.append(sm,p);faq.append(d);});
+ const rel=$('categoryRelated');rel.replaceChildren();const rh=document.createElement('h2');rh.textContent='আরও পণ্য খুঁজুন';rel.append(rh);[['Laptop','laptop'],['Desktop','desktop'],['Monitor','monitor'],['Components','components'],['Accessories','accessories'],['Gaming','gaming']].filter(([,k])=>!keys.includes(k)&&k!==dk).forEach(([n,k])=>{const a=document.createElement('a');a.href='#products';a.className='related-category-link';a.textContent=n;a.onclick=e=>{e.preventDefault();setCategoryLanding(k,n);};rel.append(a);});
+}
+function setCategoryLanding(key,label){const aliases={laptop:['laptop','notebook'],desktop:['desktop','pc'],monitor:['monitor','display'],processor:['processor','cpu'],ram:['ram','memory'],ssd:['ssd','solid state'],graphics:['graphics','gpu','vga'],accessories:['accessory','accessories','keyboard','mouse','headphone'],software:['software','operating system'],components:['components','motherboard','processor','graphics','ram','ssd','casing'],gaming:['gaming'],networking:['network','router','switch'],printer:['printer','scanner'],power:['ups','power supply'],cctv:['cctv','security'],cables:['cable','converter'],tv:['tv','sound'],gadget:['gadget','smart watch','earbuds']};activeCategoryLabel=label||key;activeCategoryTerms=aliases[key]||[key];activeSubcategory='';activeBrandTerm='';selectedSpecificationFilters={};if($('productSearch'))$('productSearch').value='';if($('productCategoryFilter'))$('productCategoryFilter').value='';renderDynamicSpecFilters();filterProducts('');$('products')?.scrollIntoView({behavior:'smooth',block:'start'});}
 function selectSubcategory(term) {
   activeSubcategory = String(term || '').trim();
+  activeCategoryLabel = activeSubcategory;
   activeCategoryTerms=[];activeBrandTerm='';selectedSpecificationFilters={};
   if ($('productSearch')) $('productSearch').value = '';
   if ($('productCategoryFilter')) $('productCategoryFilter').value = '';
@@ -506,6 +525,7 @@ function filterProducts(term) {
     ($('productCategoryFilter')?.value || '').trim()
   );
   catalogLayout?.classList.toggle('has-category-context', hasCategoryContext);
+  renderCategoryLanding();
   document.querySelector('#products.products-section')?.classList.toggle('has-category-context', hasCategoryContext);
   document.querySelector('.featured-products-section')?.classList.toggle('is-hidden-for-category', hasCategoryContext);
   const query = (term || '').trim().toLowerCase();
@@ -628,6 +648,7 @@ $('clearProductSearch')?.addEventListener('click', () => {
 document.querySelectorAll('.category-tile').forEach(tile => {
   tile.addEventListener('click', () => {
     const category = tile.dataset.category || '';
+    setCategoryLanding(category,tile.querySelector('b')?.textContent.trim()||category);
     const aliases = {
       laptop: ['laptop', 'notebook'],
       desktop: ['desktop', 'pc'],
@@ -756,6 +777,7 @@ loadManagedServices();
 
 
 /* Build category menus from the catalogue so new Admin categories appear automatically. */
+document.querySelector('.nav-links')?.addEventListener('click',event=>{const link=event.target.closest('a[data-nav-category]');if(!link)return;event.preventDefault();const key=normalizeCategoryText(link.dataset.navCategory||link.textContent).replace(/\s+/g,'');const map={components:'components',printeroffice:'printer',powerups:'power',cctvsecurity:'cctv',cablesconverters:'cables',tvsound:'tv'};setCategoryLanding(map[key]||key,link.textContent.trim());});
 function refreshDesktopCategoryDropdowns(){
   const nav=document.querySelector('.nav-links');
   const list=$('categoryList');
