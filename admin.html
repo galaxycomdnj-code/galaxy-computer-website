@@ -85,10 +85,10 @@
 </div>
 <section class="panel-card section-gap"><div class="panel-head"><div><h2>Customer Orders</h2><p class="muted">Orders submitted through website checkout.</p></div><button class="btn light" id="refreshOrders" type="button">Refresh orders</button></div><p id="ordersMessage" class="message" role="status"></p><div id="ordersList" class="list"><div class="empty">Loading orders…</div></div></section>
 <section class="panel-card section-gap" id="homepageBannerManager">
- <div class="panel-head"><div><h2>Homepage Banners</h2><p class="muted">Manage the Cover Photo Slider and Seasonal Offer separately.</p></div></div>
+ <div class="panel-head"><div><h2>Homepage Banners</h2><p class="muted">Manage up to 4 square promotional banners separately from the Cover Photo Slider.</p></div></div>
  <form id="homepageBannerForm" class="admin-banner-form">
   <input id="homepageBannerId" type="hidden">
-  <div class="field"><label for="homepageBannerType">Banner Type</label><select id="homepageBannerType"><option value="cover">Cover Photo Slider</option><option value="seasonal">Seasonal Offer Banner</option></select></div>
+  <div class="field"><label for="homepageBannerType">Banner Type</label><select id="homepageBannerType"><option value="cover">Cover Photo Slider</option><option value="seasonal">Banner 1 — Seasonal Offer</option><option value="promo_2">Banner 2 — Special Deal</option><option value="promo_3">Banner 3 — New Arrival</option><option value="promo_4">Banner 4 — Featured Campaign</option></select></div>
   <div class="field"><label for="homepageBannerTitle">Title / Label</label><input id="homepageBannerTitle" maxlength="160" placeholder="e.g. Winter Offer 2026"></div>
   <div class="field"><label for="homepageBannerImageFile">Upload Banner Image</label><input id="homepageBannerImageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><span class="note">JPG, PNG, WEBP or GIF · Maximum 5 MB.</span></div>
   <div class="field"><label for="homepageBannerImage">Or use an Image URL (HTTPS)</label><input id="homepageBannerImage" type="url" maxlength="1000" placeholder="https://..."></div>
@@ -476,7 +476,7 @@ async function loadBanners(){
  if(!bannerRows.length){list.textContent='No homepage banners added yet.';return}
  bannerRows.forEach(row=>{
   const card=document.createElement('article');card.className='list-item';
-  const title=document.createElement('strong');title.textContent=(row.banner_type==='cover'?'Cover Photo':'Seasonal Offer')+' — '+(row.title||'Untitled');
+  const typeLabels={cover:'Cover Photo Slider',seasonal:'Banner 1 — Seasonal Offer',promo_2:'Banner 2 — Special Deal',promo_3:'Banner 3 — New Arrival',promo_4:'Banner 4 — Featured Campaign'};const title=document.createElement('strong');title.textContent=(typeLabels[row.banner_type]||row.banner_type)+' — '+(row.title||'Untitled');
   const meta=document.createElement('p');meta.className='muted';meta.textContent='Order: '+row.display_order+' · '+(row.is_active?'Active':'Inactive');
   const img=document.createElement('img');img.src=row.image_url;img.alt=row.title||'Banner preview';img.className='admin-banner-preview';
   const edit=document.createElement('button');edit.type='button';edit.className='btn light';edit.textContent='Edit';edit.addEventListener('click',()=>{b$('homepageBannerId').value=row.id;b$('homepageBannerType').value=row.banner_type;b$('homepageBannerTitle').value=row.title||'';b$('homepageBannerImage').value=row.image_url;b$('homepageBannerLink').value=row.target_url||'';b$('homepageBannerOrder').value=row.display_order||1;b$('homepageBannerStart').value=localDate(row.starts_at);b$('homepageBannerEnd').value=localDate(row.ends_at);b$('homepageBannerActive').checked=row.is_active===true;b$('homepageBannerCancel').classList.remove('hidden');b$('homepageBannerSave').textContent='Update Banner';b$('homepageBannerForm').scrollIntoView({behavior:'smooth',block:'center'})});
@@ -491,7 +491,7 @@ b$('homepageBannerForm')?.addEventListener('submit',async e=>{
  if(target&&!/^(https:\/\/|\/|#)/i.test(target)){bannerMsg('Use an HTTPS URL or internal path for the link.');return}
  if(!Number.isInteger(order)||order<1){bannerMsg('Display Order must be a whole number of 1 or higher.');return}
  if(type==='cover'&&b$('homepageBannerActive').checked&&bannerRows.filter(x=>x.banner_type==='cover'&&x.is_active&&String(x.id)!==String(id)).length>=4){bannerMsg('A maximum of 4 active Cover Photos is allowed. Deactivate or delete one first.');return}
- if(type==='seasonal'&&b$('homepageBannerActive').checked&&bannerRows.some(x=>x.banner_type==='seasonal'&&x.is_active&&String(x.id)!==String(id))){bannerMsg('Only one active Seasonal Offer Banner is allowed. Deactivate the existing one first.');return}
+ if(type!=='cover'&&b$('homepageBannerActive').checked&&bannerRows.some(x=>x.banner_type===type&&x.is_active&&String(x.id)!==String(id))){bannerMsg('This banner slot already has an active banner. Edit it or deactivate it first.');return}
  const start=b$('homepageBannerStart').value,end=b$('homepageBannerEnd').value;if(start&&end&&new Date(end)<=new Date(start)){bannerMsg('End date must be later than start date.');return}
  b$('homepageBannerSave').disabled=true;bannerMsg(imageFile?'Uploading banner image…':'Saving banner…');let image=imageText,uploadedPath=null;
  try{
