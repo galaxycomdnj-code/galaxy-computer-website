@@ -485,6 +485,7 @@ b$('homepageBannerForm')?.addEventListener('submit',async e=>{
  if(target&&!/^(https:\/\/|\/|#)/i.test(target)){bannerMsg('Use an HTTPS URL or internal path for the link.');return}
  if(!Number.isInteger(order)||order<1){bannerMsg('Display Order must be a whole number of 1 or higher.');return}
  if(type==='cover'&&b$('homepageBannerActive').checked&&bannerRows.filter(x=>x.banner_type==='cover'&&x.is_active&&String(x.id)!==String(id)).length>=4){bannerMsg('A maximum of 4 active Cover Photos is allowed. Deactivate or delete one first.');return}
+ if(type==='seasonal'&&b$('homepageBannerActive').checked&&bannerRows.some(x=>x.banner_type==='seasonal'&&x.is_active&&String(x.id)!==String(id))){bannerMsg('Only one active Seasonal Offer Banner is allowed. Deactivate the existing one first.');return}
  const start=b$('homepageBannerStart').value,end=b$('homepageBannerEnd').value;if(start&&end&&new Date(end)<=new Date(start)){bannerMsg('End date must be later than start date.');return}
  const payload={banner_type:type,title:b$('homepageBannerTitle').value.trim()||null,image_url:image,target_url:target||null,display_order:order,is_active:b$('homepageBannerActive').checked,starts_at:start?new Date(start).toISOString():null,ends_at:end?new Date(end).toISOString():null,updated_at:new Date().toISOString()};
  b$('homepageBannerSave').disabled=true;bannerMsg('Saving banner…');
