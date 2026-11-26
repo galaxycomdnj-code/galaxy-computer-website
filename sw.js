@@ -22,7 +22,7 @@ self.addEventListener('fetch', event => {
 
   // Always check the network for JavaScript and CSS so deployed fixes are not
   // hidden behind an older cache-first asset. Keep a cached fallback offline.
-  if (/\\.(?:js|css)$/.test(url.pathname)) {
+  if (/\.(?:js|css)$/.test(url.pathname)) {
     event.respondWith(fetch(request).then(response => {
       if (!response.ok) return response;
       const responseToCache = response.clone();
