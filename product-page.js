@@ -205,7 +205,7 @@
         if (value === '' || value === null || value === undefined) return;
         const row = document.createElement('div');
         row.className = 'product-detail-price-row' + (className ? ' ' + className : '');
-        const key = document.createElement('span'); key.textContent = name;
+        const key = document.createElement('span'); key.textContent = name + ':';
         const val = document.createElement('strong'); val.textContent = value;
         row.append(key, val); priceTable.append(row);
       };
@@ -213,7 +213,7 @@
       const oldPrice = firstValue(product,['old_price','previous_price','compare_at_price','crossed_price']);
       const priceRow = document.createElement('div');
       priceRow.className = 'product-detail-price-row current-price-row';
-      const priceKey = document.createElement('span'); priceKey.textContent = 'Price';
+      const priceKey = document.createElement('span'); priceKey.textContent = 'Price:';
       const priceValue = document.createElement('strong'); priceValue.textContent = currentPrice;
       if (oldPrice !== '' && Number(oldPrice) > Number(product.price)) {
         const oldPriceText = document.createElement('del');
@@ -226,10 +226,6 @@
       if (productCode !== '') addPriceRow('Product Code', textValue(productCode));
       if (brandName !== '') addPriceRow('Brand', textValue(brandName));
       summaryMeta.append(priceTable);
-      const reassurance = document.createElement('p');
-      reassurance.className = 'product-detail-note';
-      reassurance.textContent = 'Availability and final price will be confirmed by Galaxy Computer.';
-      summaryMeta.append(reassurance);
       summary.append(summaryMeta);
 
       const structuredSpecs = detailSpecs(product);
