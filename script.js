@@ -430,7 +430,7 @@ let activeSubcategory = '';
 let activeBrandTerm = '';
 let activeCategoryLabel = '';
 const normalizeCategoryText = value => String(value || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ').trim();
-function categoryDisplayName(){return activeBrandTerm||activeSubcategory||activeCategoryLabel||activeCategoryTerms.join(' / ')||($('productCategoryFilter')?.value||'');}
+function categoryDisplayName(){return activeSubcategory||activeCategoryLabel||activeCategoryTerms.join(' / ')||($('productCategoryFilter')?.value||'');}
 function categoryBaseProducts(){const selected=($('productCategoryFilter')?.value||'').trim().toLowerCase();return productsCache.filter(p=>{const cat=!selected||String(p.category||'').toLowerCase()===selected;const sub=!activeSubcategory||normalizeCategoryText(p.subcategory)===normalizeCategoryText(activeSubcategory);const text=normalizeCategoryText([p.name,p.category,p.subcategory].filter(Boolean).join(' '));const match=!activeCategoryTerms.length||activeCategoryTerms.some(w=>{const t=normalizeCategoryText(w);return t&&(' '+text+' ').includes(' '+t+' ');});return cat&&sub&&match;});}
 function renderCategoryLanding(){
  const landing=$('categoryLanding'),help=$('categoryHelp');if(!landing)return;const selected=($('productCategoryFilter')?.value||'').trim();const active=Boolean(activeCategoryLabel||activeCategoryTerms.length||activeSubcategory||activeBrandTerm||selected);
@@ -521,7 +521,7 @@ function renderDynamicSpecFilters(){
 function filterProducts(term) {
   const catalogLayout = document.querySelector('.catalog-layout');
   const hasCategoryContext = Boolean(
-    activeCategoryTerms.length || activeSubcategory || activeBrandTerm ||
+    activeCategoryTerms.length || activeSubcategory || activeBrandTerm || activeCategoryLabel ||
     ($('productCategoryFilter')?.value || '').trim()
   );
   catalogLayout?.classList.toggle('has-category-context', hasCategoryContext);
@@ -643,6 +643,7 @@ $('clearProductSearch')?.addEventListener('click', () => {
   activeCategoryTerms = [];
   activeSubcategory = '';
   activeBrandTerm = '';
+  activeCategoryLabel = '';
   renderDynamicSpecFilters();filterProducts('');
 });
 document.querySelectorAll('.category-tile').forEach(tile => {
