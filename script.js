@@ -629,7 +629,9 @@ function filterProducts(term) {
     if (priceB === null) return -1;
     return (priceA - priceB) * direction;
   };
-  if (sort === 'price-asc') filtered.sort((a, b) => comparePrice(a, b, 1));
+  if (collection === 'featured') filtered.sort((a,b) => Number(a.featured_order || 1) - Number(b.featured_order || 1) || String(b.created_at || '').localeCompare(String(a.created_at || '')));
+  else if (collection === 'flash-sale') filtered.sort((a,b) => Number(a.flash_sale_order || 1) - Number(b.flash_sale_order || 1) || String(b.created_at || '').localeCompare(String(a.created_at || '')));
+  else if (sort === 'price-asc') filtered.sort((a, b) => comparePrice(a, b, 1));
   else if (sort === 'price-desc') filtered.sort((a, b) => comparePrice(a, b, -1));
   else if (sort === 'name-asc') filtered.sort((a,b) => String(a.name || '').localeCompare(String(b.name || ''), undefined, { sensitivity: 'base' }));
   else filtered.sort((a,b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
