@@ -1639,3 +1639,28 @@ button{cursor:pointer}
  .category-page-mode #catalogFilterBody.is-open{display:block}
 }
 @media(min-width:761px){.mobile-filter-title,#mobileFilterOpen{display:none!important}}
+
+
+/* Category filter drawer refinements */
+#dynamicBrandFilters .filter-group:first-child{padding-top:4px}
+#dynamicBrandFilters .filter-group summary,
+#dynamicSpecFilters .filter-group summary{display:flex;align-items:center;justify-content:space-between;padding:2px 0}
+#dynamicBrandFilters .filter-group label,
+#dynamicSpecFilters .filter-group label{padding:2px 0}
+@media(max-width:760px){
+ .category-page-mode .product-toolbar-controls{display:flex;align-items:center;flex-wrap:nowrap;gap:4px;width:100%;min-width:0}
+ .category-page-mode .toolbar-select-label{font-size:9px;gap:3px;white-space:nowrap}
+ .category-page-mode .toolbar-select-label select{font-size:10px;padding:6px 3px;max-width:70px;min-width:0}
+ .category-page-mode .toolbar-select-label:nth-child(2) select{max-width:88px}
+ .category-page-mode .mobile-filter-title{font-size:9px;letter-spacing:-.2px}
+ .category-page-mode #mobileFilterOpen{font-size:10px;padding:6px 8px;margin-left:0;white-space:nowrap}
+ .category-page-mode .catalog-filters{padding:18px 20px}
+ .category-page-mode .catalog-filter-heading h3{font-size:19px}
+ .category-page-mode .filter-group{padding:14px 0}
+ .category-page-mode .filter-group h4,
+ .category-page-mode .filter-group summary{font-size:15px;font-weight:500}
+ .category-page-mode .filter-group label{font-size:13px;padding:3px 0}
+ .category-page-mode .filter-group input[type=checkbox]{width:16px;height:16px}
+ .category-page-mode .price-range-sliders label{font-size:12px}
+ .category-page-mode .price-filter-inputs input{font-size:13px;padding:10px}
+}
