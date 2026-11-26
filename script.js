@@ -453,7 +453,11 @@ function renderDynamicSpecFilters(){
  const base=productsCache.filter(product=>{
   const categoryMatch=!category||String(product.category||'').toLowerCase()===category;
   const subMatch=!activeSubcategory||normalizeCategoryText(product.subcategory)===normalizeCategoryText(activeSubcategory);
-  const shortcutMatch=!activeCategoryTerms.length||activeCategoryTerms.some(word=>[product.name,product.category,product.subcategory].filter(Boolean).join(' ').toLowerCase().includes(word));
+  const categoryText=normalizeCategoryText([product.name,product.category,product.subcategory].filter(Boolean).join(' '));
+  const shortcutMatch=!activeCategoryTerms.length||activeCategoryTerms.some(word=>{
+   const term=normalizeCategoryText(word);
+   return term && (' '+categoryText+' ').includes(' '+term+' ');
+  });
   return categoryMatch&&subMatch&&shortcutMatch;
  });
  const preferred=[
@@ -510,7 +514,11 @@ function filterProducts(term) {
     const searchable = [product.name, product.description, product.category, product.subcategory].filter(Boolean).join(' ').toLowerCase();
     const matchesQuery = !query || searchable.includes(query);
     const matchesCategory = !selectedCategory || String(product.category || '').toLowerCase() === selectedCategory;
-    const matchesShortcut = !activeCategoryTerms.length || activeCategoryTerms.some(word => searchable.includes(word));
+    const categorySearchable = normalizeCategoryText([product.name, product.category, product.subcategory].filter(Boolean).join(' '));
+    const matchesShortcut = !activeCategoryTerms.length || activeCategoryTerms.some(word => {
+      const term = normalizeCategoryText(word);
+      return term && (' ' + categorySearchable + ' ').includes(' ' + term + ' ');
+    });
     const normalizedFilter = normalizeCategoryText(activeSubcategory);
     const productType = normalizeCategoryText(product.subcategory || '');
     const productCategory = normalizeCategoryText(product.category || '');
