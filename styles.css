@@ -1598,3 +1598,9 @@ button{cursor:pointer}
     word-break:normal;
   }
 }
+
+
+/* Category selection: keep Featured Products on the homepage only */
+.featured-products-section.is-hidden-for-category{
+  display:none !important;
+}
