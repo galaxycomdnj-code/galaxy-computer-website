@@ -1,4 +1,4 @@
-const CACHE_NAME = 'galaxy-computer-shell-v122';
+const CACHE_NAME = 'galaxy-computer-shell-v123';
 const APP_SHELL = [
   '/', '/index.html', '/product.html', '/styles.css', '/script.js', '/product-page.js', '/manifest.webmanifest', '/admin-manifest.webmanifest', '/admin.html',
   '/hero-banner.webp', '/logo-mark.svg', '/logo-mark-dark.svg', '/admin-full-logo.svg', '/cover.png', '/logo.jpg', '/parts.png',
@@ -19,6 +19,20 @@ self.addEventListener('fetch', event => {
     event.respondWith(fetch(request).catch(() => caches.match('/index.html')));
     return;
   }
+
+  // Always check the network for JavaScript and CSS so deployed fixes are not
+  // hidden behind an older cache-first asset. Keep a cached fallback offline.
+  if (/\\.(?:js|css)$/.test(url.pathname)) {
+    event.respondWith(fetch(request).then(response => {
+      if (!response.ok) return response;
+      const responseToCache = response.clone();
+      return caches.open(CACHE_NAME)
+        .then(cache => cache.put(request, responseToCache))
+        .then(() => response);
+    }).catch(() => caches.match(request)));
+    return;
+  }
+
   event.respondWith(caches.match(request).then(cached => {
     if (cached) return cached;
     return fetch(request).then(response => {
