@@ -665,14 +665,16 @@ $('productSearch')?.addEventListener('input', event => { activeCategoryTerms = [
 $('productCategoryFilter')?.addEventListener('change', () => { activeCategoryTerms = []; activeSubcategory = ''; activeBrandTerm = ''; selectedSpecificationFilters={};renderDynamicSpecFilters();filterProducts($('productSearch')?.value || ''); });
 $('productSort')?.addEventListener('change', () => filterProducts($('productSearch')?.value || ''));
 $('clearProductSearch')?.addEventListener('click', () => {
+  // Clear active filters while keeping the selected category context.
   $('productSearch').value = '';
-  $('productCategoryFilter').value = '';
-  $('filterMinPrice').value='';$('filterMaxPrice').value='';document.querySelectorAll('.stock-filter').forEach(input=>input.checked=false);selectedSpecificationFilters={};selectedBrandFilters=[];
-  activeCategoryTerms = [];
-  activeSubcategory = '';
+  $('filterMinPrice').value = '';
+  $('filterMaxPrice').value = '';
+  document.querySelectorAll('.stock-filter').forEach(input => input.checked = false);
+  selectedSpecificationFilters = {};
+  selectedBrandFilters = [];
   activeBrandTerm = '';
-  activeCategoryLabel = '';
-  renderDynamicSpecFilters();filterProducts('');
+  renderDynamicSpecFilters();
+  filterProducts('');
 });
 document.querySelectorAll('.category-tile').forEach(tile => {
   tile.addEventListener('click', () => {
