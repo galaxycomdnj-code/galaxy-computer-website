@@ -1664,3 +1664,26 @@ button{cursor:pointer}
  .category-page-mode .price-range-sliders label{font-size:12px}
  .category-page-mode .price-filter-inputs input{font-size:13px;padding:10px}
 }
+
+
+/* Category filter panel: collapsed by default on desktop and mobile */
+.category-page-mode .catalog-layout.has-category-context{grid-template-columns:minmax(0,1fr)}
+.category-page-mode .catalog-layout.has-category-context .catalog-filters{display:none}
+.category-page-mode .catalog-layout.has-category-context .catalog-filters.mobile-filter-open{display:block}
+.category-page-mode .mobile-filter-title{display:none!important}
+.category-page-mode #mobileFilterOpen{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid #dedede;background:#fff;border-radius:8px;padding:8px 12px;color:#222;font:700 11px var(--font-brand),sans-serif;white-space:nowrap;cursor:pointer}
+.category-page-mode #mobileFilterOpen .filter-button-icon{width:15px;height:15px;flex:0 0 15px}
+@media(min-width:761px){
+ .category-page-mode .product-toolbar{display:flex;align-items:center;gap:12px}
+ .category-page-mode .product-toolbar-controls{display:flex;align-items:center;flex-wrap:nowrap;gap:10px;width:auto}
+ .category-page-mode .product-toolbar-controls .toolbar-select-label{white-space:nowrap}
+ .category-page-mode .product-toolbar-controls .clear-filter{white-space:nowrap}
+ .category-page-mode .catalog-layout.has-category-context{grid-template-columns:minmax(0,1fr)}
+ .category-page-mode .catalog-layout.has-category-context .catalog-filters.mobile-filter-open{display:block;position:relative;top:auto;grid-column:1;grid-row:1;max-height:none;overflow:visible}
+ .category-page-mode .catalog-layout.has-category-context .catalog-results{grid-column:1;grid-row:2}
+ .category-page-mode .catalog-filter-heading button{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #ddd;background:#fff;border-radius:6px;font-size:20px}
+}
+@media(max-width:760px){
+ .category-page-mode .product-toolbar-controls{flex-wrap:nowrap}
+ .category-page-mode #mobileFilterOpen{margin-left:auto}
+}
