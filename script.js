@@ -457,8 +457,9 @@ function resetCategoryLanding(){
  renderDynamicSpecFilters();filterProducts('');
 }
 document.querySelectorAll('a[href="#home"]').forEach(link=>link.addEventListener('click',()=>resetCategoryLanding()));
-function setCategoryLanding(key,label){const aliases={laptop:['laptop','notebook'],desktop:['desktop','pc'],monitor:['monitor'],processor:['processor','cpu'],ram:['ram','memory'],ssd:['ssd','solid state'],graphics:['graphics','gpu','vga'],accessories:['accessory','accessories','keyboard','mouse','headphone'],software:['software','operating system'],components:['components','motherboard','processor','graphics','ram','ssd','casing'],gaming:['gaming'],networking:['network','router','switch'],printer:['printer','scanner'],power:['ups','power supply'],cctv:['cctv','security'],cables:['cable','converter'],tv:['tv','sound'],gadget:['gadget','smart watch','earbuds']};activeCategoryLabel=label||key;activeCategoryTerms=aliases[key]||[key];activeSubcategory='';activeBrandTerm='';selectedSpecificationFilters={};if($('productSearch'))$('productSearch').value='';if($('productCategoryFilter'))$('productCategoryFilter').value='';renderDynamicSpecFilters();filterProducts('');$('products')?.scrollIntoView({behavior:'smooth',block:'start'});}
+function setCategoryLanding(key,label){const aliases={laptop:['laptop','notebook'],desktop:['desktop','pc'],monitor:['monitor'],processor:['processor','cpu'],ram:['ram','memory'],ssd:['ssd','solid state'],graphics:['graphics','gpu','vga'],accessories:['accessory','accessories','keyboard','mouse','headphone'],software:['software','operating system'],components:['components','motherboard','processor','graphics','ram','ssd','casing'],gaming:['gaming'],networking:['network','router','switch'],printer:['printer','scanner'],power:['ups','power supply'],cctv:['cctv','security'],cables:['cable','converter'],tv:['tv','sound'],gadget:['gadget','smart watch','earbuds']};setMobileFilterOpen(false);activeCategoryLabel=label||key;activeCategoryTerms=aliases[key]||[key];activeSubcategory='';activeBrandTerm='';selectedSpecificationFilters={};selectedBrandFilters=[];if($('productSearch'))$('productSearch').value='';if($('productCategoryFilter'))$('productCategoryFilter').value='';renderDynamicSpecFilters();filterProducts('');$('products')?.scrollIntoView({behavior:'smooth',block:'start'});}
 function selectSubcategory(term) {
+  setMobileFilterOpen(false);
   activeSubcategory = String(term || '').trim();
   activeCategoryLabel = activeSubcategory;
   activeCategoryTerms=[];activeBrandTerm='';selectedSpecificationFilters={};
@@ -739,7 +740,7 @@ document.querySelectorAll('.stock-filter').forEach(input=>input.addEventListener
 $('productLimit')?.addEventListener('change',()=>filterProducts($('productSearch')?.value||''));
 function setMobileFilterOpen(open){const body=$('catalogFilterBody'),panel=document.querySelector('.catalog-filters');body?.classList.toggle('is-open',open);panel?.classList.toggle('mobile-filter-open',open);$('mobileFilterToggle')?.setAttribute('aria-expanded',String(open));$('mobileFilterOpen')?.setAttribute('aria-expanded',String(open));document.body.classList.toggle('filter-drawer-open',open);}
 $('mobileFilterToggle')?.addEventListener('click',()=>setMobileFilterOpen(false));
-$('mobileFilterOpen')?.addEventListener('click',()=>setMobileFilterOpen(true));
+$('mobileFilterOpen')?.addEventListener('click',()=>setMobileFilterOpen(!$('mobileFilterOpen')?.getAttribute('aria-expanded')||$('mobileFilterOpen')?.getAttribute('aria-expanded')!=='true'));
 loadProducts();
 
 function addServiceReadMore(grid) {
