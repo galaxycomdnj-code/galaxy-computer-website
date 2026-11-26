@@ -446,6 +446,16 @@ function renderCategoryLanding(){
  const faq=$('categoryFaq');faq.replaceChildren();const fh=document.createElement('h2');fh.textContent='কেনার আগে সাধারণ প্রশ্ন';faq.append(fh);[['কোন পণ্যটি আমার জন্য উপযুক্ত?','আপনার ব্যবহার, প্রয়োজনীয় ফিচার ও বাজেট অনুযায়ী পণ্য বেছে নিন। প্রয়োজনে Galaxy Computer-এর সঙ্গে যোগাযোগ করুন।'],['পণ্যের দাম ও স্টক কি নিশ্চিত?','ওয়েবসাইটে দেখানো দাম ও স্টক পরিবর্তিত হতে পারে। অর্ডারের আগে আমাদের টিমের কাছ থেকে চূড়ান্ত দাম ও প্রাপ্যতা নিশ্চিত করুন।'],['সঠিক মডেল বাছাই করতে সাহায্য পাব কি?','হ্যাঁ। পণ্যের নাম বা Product Code উল্লেখ করে ফোন বা WhatsApp-এ পরামর্শ নিতে পারেন।']].forEach(([q,a])=>{const d=document.createElement('details'),sm=document.createElement('summary'),p=document.createElement('p');sm.textContent=q;p.textContent=a;d.append(sm,p);faq.append(d);});
  const rel=$('categoryRelated');rel.replaceChildren();const rh=document.createElement('h2');rh.textContent='আরও পণ্য খুঁজুন';rel.append(rh);[['Laptop','laptop'],['Desktop','desktop'],['Monitor','monitor'],['Components','components'],['Accessories','accessories'],['Gaming','gaming']].filter(([,k])=>!keys.includes(k)&&k!==dk).forEach(([n,k])=>{const a=document.createElement('a');a.href='#products';a.className='related-category-link';a.textContent=n;a.onclick=e=>{e.preventDefault();setCategoryLanding(k,n);};rel.append(a);});
 }
+function resetCategoryLanding(){
+ activeCategoryTerms=[];activeSubcategory='';activeBrandTerm='';activeCategoryLabel='';selectedSpecificationFilters={};
+ if($('productSearch'))$('productSearch').value='';
+ if($('productCategoryFilter'))$('productCategoryFilter').value='';
+ if($('filterMinPrice'))$('filterMinPrice').value='';
+ if($('filterMaxPrice'))$('filterMaxPrice').value='';
+ document.querySelectorAll('.stock-filter').forEach(input=>input.checked=false);
+ renderDynamicSpecFilters();filterProducts('');
+}
+document.querySelectorAll('a[href="#home"]').forEach(link=>link.addEventListener('click',()=>resetCategoryLanding()));
 function setCategoryLanding(key,label){const aliases={laptop:['laptop','notebook'],desktop:['desktop','pc'],monitor:['monitor','display'],processor:['processor','cpu'],ram:['ram','memory'],ssd:['ssd','solid state'],graphics:['graphics','gpu','vga'],accessories:['accessory','accessories','keyboard','mouse','headphone'],software:['software','operating system'],components:['components','motherboard','processor','graphics','ram','ssd','casing'],gaming:['gaming'],networking:['network','router','switch'],printer:['printer','scanner'],power:['ups','power supply'],cctv:['cctv','security'],cables:['cable','converter'],tv:['tv','sound'],gadget:['gadget','smart watch','earbuds']};activeCategoryLabel=label||key;activeCategoryTerms=aliases[key]||[key];activeSubcategory='';activeBrandTerm='';selectedSpecificationFilters={};if($('productSearch'))$('productSearch').value='';if($('productCategoryFilter'))$('productCategoryFilter').value='';renderDynamicSpecFilters();filterProducts('');$('products')?.scrollIntoView({behavior:'smooth',block:'start'});}
 function selectSubcategory(term) {
   activeSubcategory = String(term || '').trim();
