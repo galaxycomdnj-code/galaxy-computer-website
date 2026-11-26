@@ -1761,3 +1761,5 @@ button{cursor:pointer}
 @media(max-width:760px){.hero::after{background:linear-gradient(90deg,#ffffffed 0%,#ffffffc9 60%,#ffffff4a 100%)}.seasonal-offer-section{padding:12px 0}.seasonal-offer-inner img{max-height:145px}.section-heading .collection-view-all{font-size:10px}}@media(prefers-reduced-motion:reduce){.cover-slide{transition:none}}
 
 #homepageBannerManager .admin-banner-preview{display:block;width:min(100%,520px);max-height:150px;object-fit:cover;border:1px solid #e5e5e5;border-radius:8px;margin:8px 0 12px}.admin-banner-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.admin-banner-form .field{margin:0}@media(max-width:650px){.admin-banner-form{grid-template-columns:1fr}}
+
+.category-page-mode .merchandising-section,.category-page-mode .seasonal-offer-section{display:none!important}
