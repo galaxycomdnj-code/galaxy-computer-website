@@ -229,7 +229,8 @@ const productGrid = $('productGrid');
 const featuredProductsGrid = $('featuredProductsGrid');
 let productsCache = [];
 let allProductsCache = [];
-let selectedSpecificationFilters = {};
+let selectedSpecificationFilters = {}; selectedBrandFilters = [];
+let selectedBrandFilters = [];
 
 function showProductMessage(message, className = 'product-empty', targetGrid = productGrid) {
   if (!targetGrid) return;
@@ -447,7 +448,7 @@ function renderCategoryLanding(){
  const rel=$('categoryRelated');rel.replaceChildren();const rh=document.createElement('h2');rh.textContent='আরও পণ্য খুঁজুন';rel.append(rh);[['Laptop','laptop'],['Desktop','desktop'],['Monitor','monitor'],['Components','components'],['Accessories','accessories'],['Gaming','gaming']].filter(([,k])=>!keys.includes(k)&&k!==dk).forEach(([n,k])=>{const a=document.createElement('a');a.href='#products';a.className='related-category-link';a.textContent=n;a.onclick=e=>{e.preventDefault();setCategoryLanding(k,n);};rel.append(a);});
 }
 function resetCategoryLanding(){
- activeCategoryTerms=[];activeSubcategory='';activeBrandTerm='';activeCategoryLabel='';selectedSpecificationFilters={};
+ activeCategoryTerms=[];activeSubcategory='';activeBrandTerm='';activeCategoryLabel='';selectedSpecificationFilters={};selectedBrandFilters=[];
  if($('productSearch'))$('productSearch').value='';
  if($('productCategoryFilter'))$('productCategoryFilter').value='';
  if($('filterMinPrice'))$('filterMinPrice').value='';
@@ -477,18 +478,26 @@ function populateCategoryFilter() {
   select.value = categories.includes(current) ? current : '';
 }
 function renderDynamicSpecFilters(){
- const host=$('dynamicSpecFilters');if(!host)return;host.replaceChildren();
- const category=($('productCategoryFilter')?.value||'').trim().toLowerCase();
- const base=productsCache.filter(product=>{
-  const categoryMatch=!category||String(product.category||'').toLowerCase()===category;
-  const subMatch=!activeSubcategory||normalizeCategoryText(product.subcategory)===normalizeCategoryText(activeSubcategory);
-  const categoryText=normalizeCategoryText([product.name,product.category,product.subcategory].filter(Boolean).join(' '));
-  const shortcutMatch=!activeCategoryTerms.length||activeCategoryTerms.some(word=>{
-   const term=normalizeCategoryText(word);
-   return term && (' '+categoryText+' ').includes(' '+term+' ');
+ const specHost=$('dynamicSpecFilters'),brandHost=$('dynamicBrandFilters');
+ if(specHost)specHost.replaceChildren();
+ if(brandHost)brandHost.replaceChildren();
+ const base=categoryBaseProducts();
+ const brands=[...new Set(base.map(product=>String(product.brand||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{sensitivity:'base'}));
+ if(brandHost&&brands.length){
+  const group=document.createElement('details');group.className='filter-group';group.open=true;
+  const heading=document.createElement('summary');heading.textContent='Brand';group.append(heading);
+  brands.forEach(brand=>{
+   const label=document.createElement('label'),input=document.createElement('input');
+   input.type='checkbox';input.value=brand;input.checked=selectedBrandFilters.includes(brand);
+   input.addEventListener('change',()=>{
+    selectedBrandFilters=input.checked?[...selectedBrandFilters,brand]:selectedBrandFilters.filter(value=>value!==brand);
+    filterProducts($('productSearch')?.value||'');
+   });
+   label.append(input,document.createTextNode(' '+brand));group.append(label);
   });
-  return categoryMatch&&subMatch&&shortcutMatch;
- });
+  brandHost.append(group);
+ }
+ if(!specHost)return;
  const preferred=[
   {label:'CPU Socket',aliases:['cpu socket','cpu sockets','processor socket','socket']},
   {label:'RAM Type',aliases:['ram type','memory type','memory technology','ram technology']},
@@ -519,13 +528,21 @@ function renderDynamicSpecFilters(){
  });
  [...otherFacets.entries()].sort(([a],[b])=>a.localeCompare(b)).forEach(([key,values])=>groups.push({key,values:[...values]}));
  groups.forEach(({key,values})=>{
-  const group=document.createElement('details');group.className='filter-group';group.open=true;
+  const group=document.createElement('details');group.className='filter-group';
   const heading=document.createElement('summary');heading.textContent=key;group.append(heading);
   values.sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'})).forEach(value=>{
-   const label=document.createElement('label');const input=document.createElement('input');input.type='checkbox';input.value=value;input.dataset.specKey=key;input.checked=(selectedSpecificationFilters[key]||[]).includes(value);
-   input.addEventListener('change',()=>{const chosen=new Set(selectedSpecificationFilters[key]||[]);if(input.checked)chosen.add(value);else chosen.delete(value);selectedSpecificationFilters[key]=[...chosen];if(!selectedSpecificationFilters[key].length)delete selectedSpecificationFilters[key];filterProducts($('productSearch')?.value||'');});
+   const label=document.createElement('label'),input=document.createElement('input');
+   input.type='checkbox';input.value=value;input.dataset.specKey=key;input.checked=(selectedSpecificationFilters[key]||[]).includes(value);
+   input.addEventListener('change',()=>{
+    const chosen=new Set(selectedSpecificationFilters[key]||[]);
+    if(input.checked)chosen.add(value);else chosen.delete(value);
+    selectedSpecificationFilters[key]=[...chosen];
+    if(!selectedSpecificationFilters[key].length)delete selectedSpecificationFilters[key];
+    filterProducts($('productSearch')?.value||'');
+   });
    label.append(input,document.createTextNode(' '+value));group.append(label);
-  });host.append(group);
+  });
+  specHost.append(group);
  });
 }
 function filterProducts(term) {
@@ -556,7 +573,7 @@ function filterProducts(term) {
     const brandSearchable = normalizeCategoryText([product.brand, product.name].filter(Boolean).join(' '));
     const normalizedBrand = normalizeCategoryText(activeBrandTerm);
 
-    const matchesBrand = !activeBrandTerm || brandSearchable.includes(normalizedBrand);
+    const matchesBrand = (!activeBrandTerm || brandSearchable.includes(normalizedBrand)) && (!selectedBrandFilters.length || selectedBrandFilters.some(brand => normalizeCategoryText(product.brand) === normalizeCategoryText(brand)));
     const price=product.price===null||product.price===undefined||product.price===''?null:Number(product.price);
     const minText=$('filterMinPrice')?.value.trim()||'',maxText=$('filterMaxPrice')?.value.trim()||'';
     const matchesMin=!minText||(price!==null&&Number.isFinite(price)&&price>=Number(minText));
@@ -602,12 +619,12 @@ function filterProducts(term) {
   const visible=limit==='all'?filtered:filtered.slice(0,Number(limit)||20);
   renderProducts(visible);
   if ($('productCount')) {
-    const categoryTitle = activeBrandTerm || activeSubcategory || (activeCategoryTerms.length ? activeCategoryTerms.join(' / ') : selectedCategory);
+    const categoryTitle = activeBrandTerm || activeSubcategory || categoryDisplayName() || selectedCategory;
     $('productCount').textContent = hasCategoryContext && categoryTitle
       ? categoryTitle
       : (english ? (total+' product'+(total===1?'':'s')) : (total+'টি পণ্য'));
   }
-  $('clearProductSearch').hidden = !(query || selectedCategory || activeCategoryTerms.length || activeSubcategory || activeBrandTerm || $('filterMinPrice')?.value || $('filterMaxPrice')?.value || Object.keys(selectedSpecificationFilters).length || document.querySelector('.stock-filter:checked'));
+  $('clearProductSearch').hidden = !(query || selectedCategory || activeCategoryTerms.length || activeSubcategory || activeBrandTerm || $('filterMinPrice')?.value || $('filterMaxPrice')?.value || selectedBrandFilters.length || Object.keys(selectedSpecificationFilters).length || document.querySelector('.stock-filter:checked'));
 }
 
 async function loadProducts() {
