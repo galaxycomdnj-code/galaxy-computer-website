@@ -1604,3 +1604,16 @@ button{cursor:pointer}
 .featured-products-section.is-hidden-for-category{
   display:none !important;
 }
+
+/* Dynamic category listing */
+.category-page-mode .hero,.category-page-mode .category-shortcuts,.category-page-mode .featured-products-section,.category-page-mode .service-promo,.category-page-mode .services-section,.category-page-mode .home-service,.category-page-mode .about-section,.category-page-mode .contact-section{display:none!important}
+.category-page-mode .products-section{padding-top:26px;padding-bottom:38px}
+.category-landing{padding:4px 0 22px}.category-landing[hidden],.category-help[hidden]{display:none!important}
+.category-breadcrumb{display:flex;align-items:center;gap:10px;color:#858585;font-size:12px;margin:0 0 26px}.category-breadcrumb a:hover{color:var(--orange-dark)}.category-breadcrumb strong{color:#444;font-weight:600}
+.category-landing h1{font:500 clamp(25px,3vw,36px)/1.25 var(--font-brand),var(--font-bn),sans-serif;color:#34435f;margin:0 0 12px}.category-landing-description{font-size:14px;line-height:1.8;color:#5f6368;margin:0 0 22px;max-width:1100px}
+.category-brand-chips{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:0 0 20px}.brand-chip-label{font-weight:700;color:#555;font-size:12px;margin-right:4px}.brand-chip{border:1px solid #e5e5e5;background:#fff;border-radius:24px;padding:8px 17px;color:#666;font-size:12px;transition:.2s}.brand-chip:hover,.brand-chip.active{border-color:var(--orange);background:#fff8ed;color:#a85b00}
+.category-page-mode .product-toolbar{margin-top:4px}.category-help{padding:42px 0 10px}.category-help-heading{text-align:center;margin-bottom:22px}.category-help-heading h2,.category-faq h2,.category-related h2{font:700 22px var(--font-brand),var(--font-bn),sans-serif;margin:7px 0;color:#171717}.category-help-heading p{font-size:13px;color:#707070}
+.category-guide-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.category-guide-card{background:#fff;border:1px solid #e9e9e9;border-radius:12px;padding:20px}.category-guide-card h3{font:700 14px var(--font-brand),var(--font-bn),sans-serif;margin:0 0 8px}.category-guide-card p,.category-faq details p{font-size:12px;line-height:1.8;color:#6c6c6c;margin:0}
+.category-faq{margin-top:30px}.category-faq h2,.category-related h2{font-size:18px;margin-bottom:12px}.category-faq details{background:#fff;border:1px solid #e9e9e9;border-radius:9px;padding:13px 16px;margin:8px 0}.category-faq summary{font-weight:700;font-size:13px;cursor:pointer}.category-faq details p{padding-top:9px}
+.category-related{margin-top:28px}.related-category-link{display:inline-flex;border:1px solid #e5e5e5;border-radius:20px;padding:8px 15px;margin:0 8px 8px 0;font-size:12px;color:#555}.related-category-link:hover{border-color:var(--orange);color:#a85b00}
+@media(max-width:700px){.category-page-mode .products-section{padding-top:18px}.category-breadcrumb{font-size:11px;gap:7px;margin-bottom:18px}.category-landing h1{font-size:24px}.category-landing-description{font-size:12px}.brand-chip{padding:7px 12px;font-size:11px}.category-guide-grid{grid-template-columns:1fr}.category-help{padding-top:28px}}
