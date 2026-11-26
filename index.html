@@ -162,14 +162,14 @@
           <span id="productCount" role="status" aria-live="polite" aria-atomic="true">পণ্য লোড হচ্ছে...</span>
           <div class="product-toolbar-controls">
             <label class="toolbar-select-label">Show <select id="productLimit" aria-label="Products per page"><option value="20">20</option><option value="40">40</option><option value="all">All</option></select></label>
-            <label class="toolbar-select-label">Sort by <select id="productSort" aria-label="Sort products"><option value="newest">Default</option><option value="price-asc">Price: Low to High</option><option value="price-desc">Price: High to Low</option><option value="name-asc">Name: A to Z</option></select></label>
+            <label class="toolbar-select-label">Sort by <select id="productSort" aria-label="Sort products"><option value="newest">Default</option><option value="price-asc">Price: Low to High</option><option value="price-desc">Price: High to Low</option><option value="name-asc">Name: A to Z</option></select></label><span class="mobile-filter-title">Filter Products</span><button type="button" id="mobileFilterOpen" aria-expanded="false">Filters</button>
             <select id="productCategoryFilter" aria-label="Filter by category"><option value="">All categories</option></select>
             <button type="button" id="clearProductSearch" class="clear-filter" hidden>Clear filters ×</button>
           </div>
         </div>
         <div class="catalog-layout">
           <aside class="catalog-filters" aria-label="Product filters">
-            <div class="catalog-filter-heading"><h3>Filter Products</h3><button type="button" id="mobileFilterToggle" aria-expanded="false">Filters</button></div>
+            <div class="catalog-filter-heading"><h3>Filter Products</h3><button type="button" id="mobileFilterToggle" aria-expanded="false" aria-label="Close filters">×</button></div>
             <div id="catalogFilterBody">
               <section class="filter-group"><h4>Price Range</h4><div class="price-range-sliders"><label for="filterMinRange">Min: <strong id="filterMinRangeValue">৳ 0</strong></label><input id="filterMinRange" type="range" min="0" max="200000" step="100" value="0" aria-label="Minimum price slider"><label for="filterMaxRange">Max: <strong id="filterMaxRangeValue">৳ 200000</strong></label><input id="filterMaxRange" type="range" min="0" max="200000" step="100" value="200000" aria-label="Maximum price slider"></div><div class="price-filter-inputs"><input id="filterMinPrice" type="number" min="0" placeholder="Min ৳" aria-label="Minimum price"><input id="filterMaxPrice" type="number" min="0" placeholder="Max ৳" aria-label="Maximum price"></div></section>
               <section class="filter-group"><h4>Availability</h4><label><input type="checkbox" class="stock-filter" value="available_on_order"> Available on Order</label><label><input type="checkbox" class="stock-filter" value="out_of_stock"> Out of Stock</label><label><input type="checkbox" class="stock-filter" value="price_on_request"> Price on Request</label></section>
@@ -270,6 +270,6 @@
   </footer>
 
   <a class="floating-wa" href="https://wa.me/8801621422327?text=আসসালামু%20আলাইকুম,%20Galaxy%20Computer" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">◉</a>
-  <script src="script.js?v=20261126-category-landing-v3"></script>
+  <script src="script.js?v=20261126-category-drawer-v1"></script>
 </body>
 </html>
