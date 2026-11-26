@@ -80,8 +80,6 @@
 </section>
 </div>
 <section class="panel-card section-gap"><div class="panel-head"><div><h2>Customer Orders</h2><p class="muted">Orders submitted through website checkout.</p></div><button class="btn light" id="refreshOrders" type="button">Refresh orders</button></div><p id="ordersMessage" class="message" role="status"></p><div id="ordersList" class="list"><div class="empty">Loading orders…</div></div></section>
-</section>
-
 <section class="panel-card section-gap" id="homepageBannerManager">
  <div class="panel-head"><div><h2>Homepage Banners</h2><p class="muted">Manage the Cover Photo Slider and Seasonal Offer separately.</p></div></div>
  <form id="homepageBannerForm" class="admin-banner-form">
@@ -89,7 +87,7 @@
   <div class="field"><label for="homepageBannerType">Banner Type</label><select id="homepageBannerType"><option value="cover">Cover Photo Slider</option><option value="seasonal">Seasonal Offer Banner</option></select></div>
   <div class="field"><label for="homepageBannerTitle">Title / Label</label><input id="homepageBannerTitle" maxlength="160" placeholder="e.g. Winter Offer 2026"></div>
   <div class="field"><label for="homepageBannerImage">Image URL (HTTPS)</label><input id="homepageBannerImage" type="url" maxlength="1000" required placeholder="https://..."></div>
-  <div class="field"><label for="homepageBannerLink">Click-through Link (optional)</label><input id="homepageBannerLink" type="url" maxlength="1000" placeholder="https://..."></div>
+  <div class="field"><label for="homepageBannerLink">Click-through Link (optional)</label><input id="homepageBannerLink" type="text" maxlength="1000" placeholder="https://..."></div>
   <div class="field"><label for="homepageBannerOrder">Display Order</label><input id="homepageBannerOrder" type="number" min="1" step="1" value="1"></div>
   <div class="field"><label for="homepageBannerStart">Start Date &amp; Time (optional)</label><input id="homepageBannerStart" type="datetime-local"></div>
   <div class="field"><label for="homepageBannerEnd">End Date &amp; Time (optional)</label><input id="homepageBannerEnd" type="datetime-local"></div>
@@ -97,6 +95,9 @@
   <div class="form-actions"><button class="btn" id="homepageBannerSave" type="submit">Save Banner</button><button class="btn light hidden" id="homepageBannerCancel" type="button">Cancel</button></div>
  </form><p id="homepageBannerMessage" class="message" role="status"></p><div id="homepageBannerList" class="list"><div class="empty">Loading banners…</div></div>
 </section>
+</section>
+
+
 </main>
 <script>
 if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {})); }
