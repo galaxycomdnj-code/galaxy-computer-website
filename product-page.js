@@ -209,8 +209,11 @@
         const val = document.createElement('strong'); val.textContent = value;
         row.append(key, val); priceTable.append(row);
       };
-      const currentPrice = (product.stock_status === 'price_on_request' || product.price === null || product.price === undefined || String(product.price).trim() === '') ? 'Contact for Price' : money(product.price);
-      const oldPrice = firstValue(product,['old_price','previous_price','compare_at_price','crossed_price']);
+      const saleEnd = product.flash_sale_end_at ? Date.parse(product.flash_sale_end_at) : null;
+      const salePrice = product.flash_sale_enabled === true && Number.isFinite(Number(product.flash_sale_price)) && Number(product.flash_sale_price) > 0 && Number(product.flash_sale_price) < Number(product.price) && (!saleEnd || saleEnd > Date.now()) ? Number(product.flash_sale_price) : null;
+      const effectivePrice = salePrice !== null ? salePrice : product.price;
+      const currentPrice = (product.stock_status === 'price_on_request' || effectivePrice === null || effectivePrice === undefined || String(effectivePrice).trim() === '') ? 'Contact for Price' : money(effectivePrice);
+      const oldPrice = salePrice !== null ? product.price : firstValue(product,['old_price','previous_price','compare_at_price','crossed_price']);
       const priceRow = document.createElement('div');
       priceRow.className = 'product-detail-price-row current-price-row';
       const priceKey = document.createElement('span'); priceKey.textContent = 'Price:';
@@ -274,7 +277,7 @@
           else cart.push({
             id,
             name: product.name || 'Product',
-            price: product.price !== null && product.price !== undefined && String(product.price).trim() !== '' && Number.isFinite(Number(product.price)) ? Number(product.price) : null,
+            price: effectivePrice !== null && effectivePrice !== undefined && String(effectivePrice).trim() !== '' && Number.isFinite(Number(effectivePrice)) ? Number(effectivePrice) : null,
             image_url: product.image_url || '',
             quantity: 1
           });
