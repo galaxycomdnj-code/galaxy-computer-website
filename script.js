@@ -625,7 +625,7 @@ function filterProducts(term) {
       ? categoryTitle
       : (english ? (total+' product'+(total===1?'':'s')) : (total+'টি পণ্য'));
   }
-  $('clearProductSearch').hidden = !(query || selectedCategory || activeCategoryTerms.length || activeSubcategory || activeBrandTerm || $('filterMinPrice')?.value || $('filterMaxPrice')?.value || selectedBrandFilters.length || Object.keys(selectedSpecificationFilters).length || document.querySelector('.stock-filter:checked'));
+  $('clearProductSearch').hidden = !(query || activeBrandTerm || $('filterMinPrice')?.value || $('filterMaxPrice')?.value || selectedBrandFilters.length || Object.keys(selectedSpecificationFilters).length || document.querySelector('.stock-filter:checked'));
 }
 
 async function loadProducts() {
