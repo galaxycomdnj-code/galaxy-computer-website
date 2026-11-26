@@ -574,6 +574,8 @@ function filterProducts(term) {
   const selectedCategory = ($('productCategoryFilter')?.value || '').trim().toLowerCase();
   const collection = new URLSearchParams(window.location.search).get('collection');
   if (collection) { $('products')?.removeAttribute('hidden'); if ($('productLimit')) $('productLimit').value = 'all'; }
+  const collectionHeading = document.querySelector('#products .section-heading h2');
+  if (collectionHeading) collectionHeading.textContent = ({featured:'Featured Products',latest:'Latest Products','flash-sale':'Flash Sale'})[collection] || 'All Products';
   let collectionProducts = productsCache;
   if (collection === 'featured') collectionProducts = collectionProducts.filter(product => product.is_featured === true);
   else if (collection === 'flash-sale') collectionProducts = collectionProducts.filter(product => getActiveSalePrice(product) !== null);
