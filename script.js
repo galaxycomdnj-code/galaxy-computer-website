@@ -57,12 +57,21 @@ function saveCart() {
 function formatBDT(value) {
   return '৳ ' + Number(value || 0).toLocaleString('en-BD');
 }
+function getActiveSalePrice(product) {
+  const regular = Number(product?.price), sale = Number(product?.flash_sale_price);
+  const end = product?.flash_sale_end_at ? Date.parse(product.flash_sale_end_at) : null;
+  return product?.flash_sale_enabled === true && Number.isFinite(regular) && Number.isFinite(sale) && sale > 0 && sale < regular && (!end || end > Date.now()) ? sale : null;
+}
+function getEffectiveProductPrice(product) {
+  const sale = getActiveSalePrice(product);
+  return sale !== null ? sale : (product?.price !== null && product?.price !== undefined && product?.price !== '' && Number.isFinite(Number(product.price)) ? Number(product.price) : null);
+}
 function addToCart(product) {
-  const id = String(product.id || product.name);
+  const id = String(product.id || product.name), currentPrice = getEffectiveProductPrice(product);
   const existing = cartItems.find(item => String(item.id) === id);
-  if (existing) existing.quantity += 1;
+  if (existing) { existing.quantity += 1; existing.price = currentPrice; }
   else cartItems.push({
-    id, name: product.name || 'Product', price: Number.isFinite(Number(product.price)) && product.price !== null && product.price !== '' ? Number(product.price) : null,
+    id, name: product.name || 'Product', price: currentPrice,
     image_url: product.image_url || '', quantity: 1
   });
   saveCart();
@@ -392,9 +401,14 @@ function renderProducts(products, targetGrid = productGrid, countTarget = $('pro
     }
 
     if (product.stock_status !== 'price_on_request' && product.price !== null && product.price !== undefined && product.price !== '') {
-      const price = document.createElement('div');
-      price.className = 'product-price';
-      price.textContent = `৳ ${Number(product.price).toLocaleString('en-BD')}`;
+      const price = document.createElement('div'), salePrice = getActiveSalePrice(product);
+      price.className = salePrice !== null ? 'product-price product-price-sale' : 'product-price';
+      if (salePrice !== null) {
+        const current = document.createElement('strong'); current.textContent = `৳ ${salePrice.toLocaleString('en-BD')}`;
+        const regular = document.createElement('del'); regular.textContent = `৳ ${Number(product.price).toLocaleString('en-BD')}`;
+        const badge = document.createElement('span'); badge.className = 'sale-price-badge'; badge.textContent = 'FLASH SALE';
+        price.append(current, regular, badge);
+      } else price.textContent = `৳ ${Number(product.price).toLocaleString('en-BD')}`;
       productLink.append(price);
     }
     card.append(productLink);
@@ -558,7 +572,12 @@ function filterProducts(term) {
   document.querySelector('.featured-products-section')?.classList.toggle('is-hidden-for-category', hasCategoryContext);
   const query = (term || '').trim().toLowerCase();
   const selectedCategory = ($('productCategoryFilter')?.value || '').trim().toLowerCase();
-  let filtered = productsCache.filter(product => {
+  const collection = new URLSearchParams(window.location.search).get('collection');
+  if (collection) $('products')?.removeAttribute('hidden');
+  let collectionProducts = productsCache;
+  if (collection === 'featured') collectionProducts = collectionProducts.filter(product => product.is_featured === true);
+  else if (collection === 'flash-sale') collectionProducts = collectionProducts.filter(product => getActiveSalePrice(product) !== null);
+  let filtered = collectionProducts.filter(product => {
     const searchable = [product.name, product.description, product.category, product.subcategory].filter(Boolean).join(' ').toLowerCase();
     const matchesQuery = !query || searchable.includes(query);
     const matchesCategory = !selectedCategory || String(product.category || '').toLowerCase() === selectedCategory;
@@ -632,7 +651,7 @@ async function loadProducts() {
   if (!productGrid && !featuredProductsGrid) return;
   try {
     const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/products?select=id,name,brand,model,description,price,image_url,category,subcategory,stock_status,created_at,is_featured,featured_order,specifications_data&order=created_at.desc`,
+      `${SUPABASE_URL}/rest/v1/products?select=id,name,brand,model,description,price,image_url,category,subcategory,stock_status,created_at,is_featured,featured_order,specifications_data,flash_sale_enabled,flash_sale_price,flash_sale_end_at,flash_sale_order&order=created_at.desc`,
       { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
     );
     if (!response.ok) throw new Error(`Product request failed (${response.status})`);
@@ -642,7 +661,8 @@ async function loadProducts() {
     setupPriceRangeSliders();
     const featuredProducts = productsCache
       .filter(product => product.is_featured === true)
-      .sort((a, b) => Number(a.featured_order || 1) - Number(b.featured_order || 1) || String(b.created_at || '').localeCompare(String(a.created_at || '')));
+      .sort((a, b) => Number(a.featured_order || 1) - Number(b.featured_order || 1) || String(b.created_at || '').localeCompare(String(a.created_at || '')))
+      .slice(0, 8);
     renderProducts(featuredProducts, featuredProductsGrid, null, english ? 'No featured products selected yet.' : 'এখনো কোনো Featured Product নির্বাচন করা হয়নি।');
     populateDynamicCategorySubmenus();
     populateCategoryFilter();
@@ -658,6 +678,7 @@ async function loadProducts() {
 
 $('productSearchForm')?.addEventListener('submit', event => {
   event.preventDefault();
+  $('products')?.removeAttribute('hidden');
   filterProducts($('productSearch').value);
   $('products').scrollIntoView({ behavior: 'smooth' });
 });
@@ -693,8 +714,12 @@ $('clearProductSearch')?.addEventListener('click', event => {
   renderDynamicSpecFilters();
   filterProducts('');
 });
+document.addEventListener('click', event => {
+  if (event.target.closest('.nav-links a[href="#products"], .category-tile, .category-drawer a[href="#products"]')) $('products')?.removeAttribute('hidden');
+}, true);
 document.querySelectorAll('.category-tile').forEach(tile => {
   tile.addEventListener('click', () => {
+    $('products')?.removeAttribute('hidden');
     const category = tile.dataset.category || '';
     setCategoryLanding(category,tile.querySelector('b')?.textContent.trim()||category);
     const aliases = {
