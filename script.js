@@ -229,7 +229,7 @@ const productGrid = $('productGrid');
 const featuredProductsGrid = $('featuredProductsGrid');
 let productsCache = [];
 let allProductsCache = [];
-let selectedSpecificationFilters = {}; selectedBrandFilters = [];
+let selectedSpecificationFilters = {};
 let selectedBrandFilters = [];
 
 function showProductMessage(message, className = 'product-empty', targetGrid = productGrid) {
@@ -666,7 +666,7 @@ $('productSort')?.addEventListener('change', () => filterProducts($('productSear
 $('clearProductSearch')?.addEventListener('click', () => {
   $('productSearch').value = '';
   $('productCategoryFilter').value = '';
-  $('filterMinPrice').value='';$('filterMaxPrice').value='';document.querySelectorAll('.stock-filter').forEach(input=>input.checked=false);selectedSpecificationFilters={};
+  $('filterMinPrice').value='';$('filterMaxPrice').value='';document.querySelectorAll('.stock-filter').forEach(input=>input.checked=false);selectedSpecificationFilters={};selectedBrandFilters=[];selectedBrandFilters=[];
   activeCategoryTerms = [];
   activeSubcategory = '';
   activeBrandTerm = '';
