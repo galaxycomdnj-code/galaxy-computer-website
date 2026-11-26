@@ -1763,3 +1763,5 @@ button{cursor:pointer}
 #homepageBannerManager .admin-banner-preview{display:block;width:min(100%,520px);max-height:150px;object-fit:cover;border:1px solid #e5e5e5;border-radius:8px;margin:8px 0 12px}.admin-banner-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.admin-banner-form .field{margin:0}@media(max-width:650px){.admin-banner-form{grid-template-columns:1fr}}
 
 .category-page-mode .merchandising-section,.category-page-mode .seasonal-offer-section{display:none!important}
+
+.seasonal-offer-inner{position:relative}.seasonal-offer-caption{position:absolute;left:clamp(12px,3vw,32px);bottom:clamp(10px,2vw,24px);max-width:80%;padding:8px 14px;border-radius:7px;background:#111d;color:#fff;font:700 clamp(13px,2vw,21px) var(--font-brand),var(--font-bn),sans-serif;text-shadow:0 1px 2px #000}
