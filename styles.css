@@ -117,7 +117,7 @@ button{cursor:pointer}
 .service-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .service-card{background:#fff;border:1px solid #e9e9e9;border-radius:12px;padding:20px;transition:.2s}
 .service-card:hover{border-color:#FF8004;box-shadow:0 8px 20px #0000000c;transform:translateY(-3px)}
-.service-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:10px;background:#FF8004;color:#FF8004;font:700 22px var(--font-brand)}
+.service-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:10px;background:#FF8004;color:#111;font:700 22px var(--font-brand)}
 .service-card h3{font:700 13px var(--font-brand),sans-serif;margin:12px 0 5px}
 .service-card p{font-size:11px;color:#777;margin:0}
 /* home service */
@@ -455,7 +455,7 @@ button{cursor:pointer}
 .service-grid{gap:16px}
 .service-card{min-height:142px;padding:21px;border-radius:13px}
 .service-card p{line-height:1.7}
-.service-icon{box-shadow:inset 0 0 0 1px #FF8004}
+.service-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:10px;background:#FF8004;color:#111;font:700 22px var(--font-brand)}
 .home-service{padding-block:24px}
 .home-service-inner{padding-block:54px}
 .about-grid{gap:clamp(28px,5vw,70px)}
@@ -806,7 +806,7 @@ button{cursor:pointer}
   .nav-category-dropdown .nav-category-type-link:hover,.nav-category-nested:hover>.nav-category-type-link,.nav-category-nested:focus-within>.nav-category-type-link{background:#FF8004;color:#111!important}
   .nav-category-brand-dropdown{display:none;position:absolute;left:calc(100% + 3px);top:-9px;z-index:90;min-width:155px;max-width:220px;padding:8px;background:#fff;border:1px solid #e8e8e8;border-left:3px solid var(--orange);border-radius:0 8px 8px 0;box-shadow:0 12px 28px #0002;flex-direction:column;gap:4px}
   .nav-category-nested:hover>.nav-category-brand-dropdown,.nav-category-nested:focus-within>.nav-category-brand-dropdown{display:flex}
-  .nav-category-brand-dropdown a:hover{background:#FF8004;color:#FF8004!important}
+  .nav-category-brand-dropdown a:hover{background:#FF8004;color:#111!important}
   .nav-category-dropdown a:hover,.nav-category-dropdown a:focus{background:#FF8004;color:#111!important}
 }
 
@@ -1366,9 +1366,9 @@ button{cursor:pointer}
 .product-card .cart-add-btn:hover:not(:disabled){color:#111;background:#FF8004;border-color:#FF8004;box-shadow:0 5px 13px #FF800438;transform:translateY(-1px);}
 .product-card .cart-add-btn:disabled{opacity:1;color:#666;background:#f1f1f1;border-color:#dedede;cursor:not-allowed;box-shadow:none;transform:none;}
 .product-card .product-details-btn{margin-bottom:0;background:#fff;border:1px solid #FF8004;color:#242424}
-.product-card .product-details-btn:hover{background:#FF8004;border-color:#FF8004;box-shadow:0 2px 7px #FF80041c}
+.product-card .product-details-btn:hover{color:#111;background:#FF8004;border-color:#FF8004;box-shadow:0 3px 9px #FF800418;transform:translateY(-1px);}
 .product-page-compare-btn{min-height:40px;padding:10px 15px;border:1px solid #FF8004;border-radius:8px;background:#fff;color:#FF8004;font:700 12px var(--font-brand),sans-serif;cursor:pointer;transition:background .18s,border-color .18s}
-.product-page-compare-btn:hover{background:#FF8004;border-color:#FF8004}
+.product-page-compare-btn:hover{background:#FF8004;border-color:#FF8004;color:#111}
 .detail-compare-item{display:inline-flex;width:auto;min-height:28px;align-items:center;justify-content:center;margin-top:6px;padding:5px 9px;border:1px solid #FF8004;border-radius:6px;background:#fff;color:#FF8004;font:700 10px/1.2 var(--font-brand),sans-serif;cursor:pointer;white-space:nowrap}
 .detail-compare-item:hover,.detail-compare-item.is-selected{border-color:#FF8004;background:#FF8004;color:#111}
 
@@ -1397,13 +1397,7 @@ button{cursor:pointer}
   border:1px solid #d8d8d8;
   box-shadow:0 1px 3px #00000008;
 }
-.product-card .product-details-btn:hover{
-  color:#FF8004;
-  background:#FF8004;
-  border-color:#FF8004;
-  box-shadow:0 3px 9px #FF800418;
-  transform:translateY(-1px);
-}
+.product-card .product-details-btn:hover{color:#111;background:#FF8004;border-color:#FF8004;box-shadow:0 3px 9px #FF800418;transform:translateY(-1px);}
 .product-card .cart-add-btn:focus-visible,
 .product-card .product-details-btn:focus-visible{
   outline:3px solid #FF800455;
