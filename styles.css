@@ -1789,3 +1789,27 @@ button{cursor:pointer}
  .footer .footer-full-wordmark{width:190px!important;}
  .footer .footer-col h3{color:#111!important;}
 }
+
+
+/* Final responsive sizing for the complete unified brand lockup */
+.header-main .brand{flex:0 1 auto!important;min-width:0!important;width:auto!important;max-width:100%!important;}
+.header-main .brand .brand-full-wordmark{
+ display:block!important;width:clamp(170px,19vw,250px)!important;
+ max-width:min(250px,calc(100vw - 180px))!important;
+ height:auto!important;max-height:62px!important;object-fit:contain!important;
+}
+.footer .footer-brand{min-width:0!important;width:100%!important;max-width:100%!important;}
+.footer .footer-brand-lockup{display:inline-flex!important;width:min(260px,100%)!important;max-width:100%!important;}
+.footer .footer-full-wordmark{display:block!important;width:100%!important;max-width:100%!important;height:auto!important;max-height:100px!important;object-fit:contain!important;}
+@media(max-width:760px){
+ .header-main .brand .brand-full-wordmark{
+  width:clamp(145px,42vw,180px)!important;
+  max-width:calc(100vw - 175px)!important;
+  max-height:48px!important;
+ }
+ .footer .footer-brand-lockup{width:min(220px,100%)!important;}
+ .footer .footer-full-wordmark{max-height:84px!important;}
+}
+@media(max-width:380px){
+ .header-main .brand .brand-full-wordmark{width:calc(100vw - 180px)!important;max-width:calc(100vw - 180px)!important;}
+}
