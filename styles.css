@@ -1773,3 +1773,19 @@ button{cursor:pointer}
 
 /* Keep the main product catalogue hidden on the homepage unless opened intentionally. */
 #products[hidden]{display:none!important}
+
+/* Unified full GALAXY / COMPUTER & TECHNOLOGY wordmark in header and footer */
+.header-main .brand{display:flex!important;align-items:center!important;gap:0!important;min-width:0!important;flex:0 0 auto!important;}
+.header-main .brand .brand-full-wordmark{display:block!important;width:190px!important;height:auto!important;max-width:190px!important;object-fit:contain!important;}
+.header-main .brand .brand-mark,.header-main .brand .brand-wordmark{display:none!important;}
+.footer{background:#fff!important;color:#111!important;border-top:1px solid #e7e7e7!important;}
+.footer .footer-full-wordmark{display:block!important;width:230px!important;max-width:100%!important;height:auto!important;object-fit:contain!important;}
+.footer .footer-col h3{color:#111!important;}
+.footer .footer-col a,.footer .footer-col span{color:#555!important;}
+.footer .footer-col a:hover{color:#FF8004!important;}
+.footer .footer-bottom{color:#666!important;border-color:#e2e2e2!important;}
+@media(max-width:760px){
+ .header-main .brand .brand-full-wordmark{width:150px!important;max-width:calc(100vw - 190px)!important;}
+ .footer .footer-full-wordmark{width:190px!important;}
+ .footer .footer-col h3{color:#111!important;}
+}
