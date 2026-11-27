@@ -1829,3 +1829,17 @@ button{cursor:pointer}
 @media(max-width:380px){
  .header-main .brand{flex-basis:145px!important;width:145px!important;max-width:40vw!important;}
 }
+
+/* Exact approved master lockup proportions */
+.header-main .brand{flex:0 1 290px!important;width:290px!important;max-width:34%!important;min-width:0!important;}
+.header-main .brand-full-wordmark{display:block!important;width:100%!important;height:auto!important;max-height:62px!important;object-fit:contain!important;}
+.footer .footer-brand-lockup{display:block!important;width:min(300px,100%)!important;max-width:100%!important;}
+.footer .footer-full-wordmark{display:block!important;width:100%!important;height:auto!important;max-height:none!important;object-fit:contain!important;}
+@media(max-width:760px){
+ .header-main .brand{flex:0 1 205px!important;width:205px!important;max-width:48vw!important;}
+ .header-main .brand-full-wordmark{width:100%!important;max-height:48px!important;}
+ .footer .footer-brand-lockup{width:min(260px,100%)!important;}
+}
+@media(max-width:380px){
+ .header-main .brand{flex-basis:180px!important;width:180px!important;max-width:46vw!important;}
+}
