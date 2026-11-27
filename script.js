@@ -578,6 +578,13 @@ function filterProducts(term) {
   if (collectionHeading) collectionHeading.textContent = ({featured:'Featured Products',latest:'Latest Products','flash-sale':'Flash Sale'})[collection] || 'All Products';
   let collectionProducts = productsCache;
   if (collection === 'featured') collectionProducts = collectionProducts.filter(product => product.is_featured === true);
+  else if (collection === 'latest') {
+    const latestCutoff = Date.now() - 24 * 60 * 60 * 1000;
+    collectionProducts = collectionProducts.filter(product => {
+      const uploadedAt = Date.parse(product.created_at || '');
+      return Number.isFinite(uploadedAt) && uploadedAt >= latestCutoff;
+    });
+  }
   else if (collection === 'flash-sale') collectionProducts = collectionProducts.filter(product => getActiveSalePrice(product) !== null);
   let filtered = collectionProducts.filter(product => {
     const searchable = [product.name, product.description, product.category, product.subcategory].filter(Boolean).join(' ').toLowerCase();
