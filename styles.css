@@ -1231,7 +1231,7 @@ button{cursor:pointer}
 /* Product availability labels */
 .product-stock-status{display:inline-flex;align-items:center;width:max-content;max-width:100%;margin:7px 0;padding:5px 9px;border-radius:5px;background:#e8f6ee;color:#187044;font:700 10px 'Sora',sans-serif;}
 .product-stock-status.out_of_stock{background:#fff0f0;color:#b42318;}
-.product-stock-status.price_on_request{background:#FF8004;color:#111;}
+.product-stock-status.price_on_request{background:#e8f6ee;color:#187044;}
 .product-card .cart-add-btn:disabled,.product-page-buy-now:disabled{opacity:.58;cursor:not-allowed;filter:grayscale(.2);}
 
 
@@ -1770,3 +1770,6 @@ button{cursor:pointer}
   .hero{aspect-ratio:16 / 9}
   .hero-dots{bottom:6px}
 }
+
+/* Keep the main product catalogue hidden on the homepage unless opened intentionally. */
+#products[hidden]{display:none!important}
