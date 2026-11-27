@@ -1843,3 +1843,17 @@ button{cursor:pointer}
 @media(max-width:380px){
  .header-main .brand{flex-basis:180px!important;width:180px!important;max-width:46vw!important;}
 }
+
+/* Exact supplied master logo: preserve complete artwork and aspect ratio */
+.header-main .brand{flex:0 1 250px!important;width:250px!important;max-width:34%!important;min-width:0!important;}
+.header-main .brand-full-wordmark{display:block!important;width:100%!important;height:auto!important;max-height:none!important;object-fit:contain!important;}
+.footer .footer-brand-lockup{display:block!important;width:min(290px,100%)!important;max-width:100%!important;}
+.footer .footer-full-wordmark{display:block!important;width:100%!important;height:auto!important;max-height:none!important;object-fit:contain!important;}
+@media(max-width:760px){
+ .header-main .brand{flex:0 1 215px!important;width:215px!important;max-width:48vw!important;}
+ .header-main .brand-full-wordmark{width:100%!important;max-height:none!important;}
+ .footer .footer-brand-lockup{width:min(250px,100%)!important;}
+}
+@media(max-width:380px){
+ .header-main .brand{flex-basis:195px!important;width:195px!important;max-width:48vw!important;}
+}
