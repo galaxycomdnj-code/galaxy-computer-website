@@ -1813,3 +1813,19 @@ button{cursor:pointer}
 @media(max-width:380px){
  .header-main .brand .brand-full-wordmark{width:calc(100vw - 180px)!important;max-width:calc(100vw - 180px)!important;}
 }
+
+/* Approved complete brand lockup: no decorative star shapes; preserve full logo */
+.header-main .brand{flex:0 1 300px!important;width:300px!important;max-width:32%!important;min-width:0!important;}
+.header-main .brand-full-wordmark{display:block!important;width:100%!important;height:auto!important;max-height:64px!important;object-fit:contain!important;}
+.footer .footer-brand{min-width:0!important;max-width:100%!important;}
+.footer .footer-brand-lockup{display:block!important;width:min(300px,100%)!important;max-width:100%!important;}
+.footer .footer-full-wordmark{display:block!important;width:100%!important;height:auto!important;max-height:110px!important;object-fit:contain!important;}
+@media(max-width:760px){
+ .header-main .brand{flex:0 1 165px!important;width:165px!important;max-width:42vw!important;}
+ .header-main .brand-full-wordmark{width:100%!important;max-height:48px!important;}
+ .footer .footer-brand-lockup{width:min(240px,100%)!important;}
+ .footer .footer-full-wordmark{max-height:90px!important;}
+}
+@media(max-width:380px){
+ .header-main .brand{flex-basis:145px!important;width:145px!important;max-width:40vw!important;}
+}
