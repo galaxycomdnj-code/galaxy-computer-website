@@ -2088,3 +2088,34 @@ button{cursor:pointer}
  .footer .footer-bottom{flex-direction:column;gap:6px;font-size:10px}
 }
 @media(max-width:360px){.footer .footer-main{column-gap:12px!important}.footer .footer-col a{overflow-wrap:anywhere}}
+
+
+/* Confirmed header/footer layout: black, orange accents, mobile footer in two columns */
+:root{--gc-black:#080b12;--gc-orange:#ff8004;}
+.site-header,.site-header .header-main,.site-header .main-nav{background:#080b12!important;color:#f4f6fa!important;}
+.site-header{border-bottom:1px solid #29313d!important;}
+.main-nav{border-top:1px solid #202936!important;border-bottom:1px solid #303846!important;}
+.main-nav .nav-links a{color:#e6eaf0!important;}
+.main-nav .nav-links a:hover,.main-nav .nav-links a.active{color:#ff8004!important;}
+.header-contact{display:none!important;}
+.header-actions .cart-trigger{background:#151c27!important;color:#fff!important;border:1px solid #394454!important;}
+.header-actions .header-whatsapp{background:#ff8004!important;color:#101010!important;}
+.search-form{border-color:#394454!important;}
+.search-form input{background:#151c27!important;color:#fff!important;}
+.search-form input::placeholder{color:#aeb8c7!important;}
+.search-form button,.category-open-btn{background:#ff8004!important;color:#111!important;}
+.footer{background:#080b12!important;color:#f4f6fa!important;border-top:1px solid #29313d!important;}
+.footer .footer-main{display:grid!important;grid-template-columns:minmax(220px,1.5fr) repeat(3,minmax(125px,1fr))!important;gap:32px!important;padding-top:44px!important;padding-bottom:36px!important;}
+.footer .footer-col h3{color:#fff!important;}
+.footer .footer-col a,.footer .footer-col span{color:#b9c2cf!important;}
+.footer .footer-col a:hover{color:#ff8004!important;}
+.footer .footer-bottom{border-top:1px solid #303846!important;color:#9ca8b8!important;}
+@media(max-width:900px){.footer .footer-main{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:25px 20px!important;}}
+@media(max-width:760px){
+ .site-header,.site-header .header-main,.site-header .main-nav{background:#080b12!important;}
+ .header-contact{display:none!important;}
+ .footer .footer-main{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:23px 17px!important;padding-top:32px!important;padding-bottom:26px!important;}
+ .footer .footer-brand{grid-column:1/-1!important;}
+ .footer .footer-brand-copy{max-width:100%;}
+ .footer .footer-bottom{flex-direction:column;align-items:flex-start;gap:6px;}
+}
