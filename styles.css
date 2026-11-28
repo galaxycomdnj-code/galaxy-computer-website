@@ -1940,3 +1940,77 @@ button{cursor:pointer}
     display:none!important;
   }
 }
+
+
+/* Mobile header: match the desktop contact action and remove the utility strip */
+@media (max-width:760px){
+  .topbar{display:none!important}
+  .header-main{
+    min-height:66px!important;
+    padding-top:8px!important;
+    padding-bottom:8px!important;
+    gap:8px!important;
+    flex-wrap:wrap!important;
+  }
+  .header-main .brand{
+    flex:0 1 auto!important;
+    width:clamp(112px,42vw,165px)!important;
+    max-width:46%!important;
+    min-width:0!important;
+    margin-right:auto!important;
+  }
+  .header-main .brand .brand-full-wordmark{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    height:auto!important;
+    max-height:none!important;
+  }
+  .header-actions{
+    display:flex!important;
+    flex:0 0 auto!important;
+    align-items:center!important;
+    gap:7px!important;
+    margin-left:0!important;
+  }
+  .header-contact{display:none!important}
+  .header-actions .cart-trigger{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:4px!important;
+    min-height:38px!important;
+    padding:6px 8px!important;
+    white-space:nowrap!important;
+  }
+  .header-actions .header-whatsapp{
+    display:flex!important;
+    flex:0 0 auto!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-height:38px!important;
+    padding:6px 9px!important;
+    border-radius:7px!important;
+    border-bottom-width:2px!important;
+    white-space:nowrap!important;
+    text-align:center!important;
+  }
+  .header-actions .header-whatsapp span{font-size:10px!important}
+  .header-actions .header-whatsapp b{display:block!important;font-size:8px!important}
+  .menu-toggle{display:none!important}
+  .search-form{
+    order:5!important;
+    flex:1 0 100%!important;
+    max-width:none!important;
+    margin:0 0 2px!important;
+    height:39px!important;
+  }
+}
+@media (max-width:380px){
+  .header-main .brand{width:clamp(108px,39vw,140px)!important;max-width:41%!important}
+  .header-actions{gap:5px!important}
+  .header-actions .cart-trigger{padding-inline:6px!important;font-size:11px!important}
+  .header-actions .header-whatsapp{padding-inline:7px!important}
+  .header-actions .header-whatsapp span{font-size:9px!important}
+  .header-actions .header-whatsapp b{font-size:7px!important}
+}
