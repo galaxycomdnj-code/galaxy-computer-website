@@ -854,6 +854,27 @@ async function loadManagedServices() {
       card.append(title, description);
       grid.append(card);
     });
+
+    // Keep the Dhaka home-service booking option visible alongside Supabase-managed services.
+    const homeCard = document.createElement('article');
+    homeCard.className = 'service-card service-home-booking';
+    const homeIcon = document.createElement('span');
+    homeIcon.className = 'service-icon';
+    homeIcon.setAttribute('aria-hidden', 'true');
+    homeIcon.textContent = '⌂';
+    const homeTitle = document.createElement('h3');
+    homeTitle.textContent = 'Home Service In Dhaka City';
+    const homeDescription = document.createElement('p');
+    homeDescription.textContent = 'Get computer support at your doorstep in Dhaka. Book a technician visit via WhatsApp.';
+    const homeLink = document.createElement('a');
+    homeLink.className = 'service-home-booking-link';
+    homeLink.href = 'https://wa.me/8801621422327?text=আসসালামু%20আলাইকুম,%20আমি%20ঢাকায়%20হোম%20সার্ভিস%20বুক%20করতে%20চাই';
+    homeLink.target = '_blank';
+    homeLink.rel = 'noopener';
+    homeLink.textContent = 'Book via WhatsApp ↗';
+    homeCard.append(homeIcon, homeTitle, homeDescription, homeLink);
+    grid.append(homeCard);
+
     addServiceReadMore(grid);
   } catch (error) {
     console.warn('Managed services could not be loaded; showing default services.', error);
