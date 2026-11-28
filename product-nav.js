@@ -6,6 +6,19 @@
   const normalize = value => String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
   const groups = [...source.querySelectorAll(':scope > .category-group')];
 
+  // Product detail pages use a compact, expandable mobile navigation.
+  const menuButton = document.querySelector('.product-page .menu-toggle');
+  menuButton?.addEventListener('click', () => {
+    const isOpen = nav.classList.toggle('open');
+    menuButton.setAttribute('aria-expanded', String(isOpen));
+    menuButton.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+  });
+  nav.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+    nav.classList.remove('open');
+    menuButton?.setAttribute('aria-expanded', 'false');
+    menuButton?.setAttribute('aria-label', 'Open menu');
+  }));
+
   nav.querySelectorAll('a[data-nav-category]').forEach(link => {
     const group = groups.find(item => {
       const name = item.querySelector(':scope > .category-item')?.childNodes[0]?.textContent?.trim() ||
