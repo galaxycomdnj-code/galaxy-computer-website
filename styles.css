@@ -2041,3 +2041,50 @@ button{cursor:pointer}
   .footer .footer-main{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(prefers-reduced-motion:reduce){.service-home-booking-link{transition:none}}
+
+
+/* Black premium header and structured four-column footer */
+:root{--gc-black:#080b12;--gc-black-soft:#101722;--gc-orange:#ff8004}
+.site-header{background:var(--gc-black)!important;color:#fff!important;border-bottom:1px solid #252b35!important}
+.header-main{background:var(--gc-black)!important}
+.main-nav{background:var(--gc-black)!important;border-top:1px solid #202631!important;border-bottom:1px solid #2a303a!important}
+.main-nav .nav-inner{background:transparent!important}
+.main-nav .nav-links a{color:#e7eaf0!important}
+.main-nav .nav-links a:hover,.main-nav .nav-links a.active{color:var(--gc-orange)!important}
+.category-open-btn{background:var(--gc-orange)!important;color:#101010!important;border:0!important;border-radius:6px!important}
+.header-actions .cart-trigger{background:#151c27!important;color:#fff!important;border:1px solid #343c49!important}
+.header-actions .header-contact{color:#fff!important}
+.header-actions .header-contact small{color:#aeb8c7!important}
+.header-actions .header-whatsapp{background:var(--gc-orange)!important;color:#111!important}
+.search-form{border-color:#3a4351!important}
+.search-form input{background:#151c27!important;color:#fff!important}
+.search-form input::placeholder{color:#aeb8c7!important}
+.search-form button{background:var(--gc-orange)!important;color:#111!important}
+.footer{background:var(--gc-black)!important;color:#e9edf4!important;border-top:1px solid #272e39!important}
+.footer .footer-main{display:grid!important;grid-template-columns:1.5fr 1fr 1fr 1.15fr!important;gap:34px!important;padding-top:48px!important;padding-bottom:38px!important}
+.footer .footer-brand-copy{max-width:310px;margin:18px 0 16px;color:#aeb8c7;font-size:13px;line-height:1.75}
+.footer .footer-col{display:flex;flex-direction:column;align-items:flex-start;gap:11px}
+.footer .footer-col h3{margin:0 0 8px;color:#fff!important;font-size:16px;font-weight:700}
+.footer .footer-col a,.footer .footer-col span{color:#b9c2cf!important;font-size:13px;line-height:1.5;text-decoration:none}
+.footer .footer-col a:hover{color:var(--gc-orange)!important}
+.footer .footer-contact-label{display:block;color:#8995a6!important;font-size:10px!important;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+.footer .footer-location{display:block;margin-top:3px}
+.footer .footer-social-links{display:flex;flex-wrap:wrap;gap:9px}
+.footer .footer-social-links a{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:0 13px;border:1px solid #424b5a;border-radius:6px;color:#f4f6fa!important;font-size:11px;font-weight:700;text-decoration:none}
+.footer .footer-social-links a:hover{border-color:var(--gc-orange);color:var(--gc-orange)!important}
+.footer .footer-bottom{display:flex;justify-content:space-between;gap:12px;padding-top:17px;padding-bottom:18px;border-top:1px solid #2a303a!important;color:#929dad!important;font-size:11px}
+.footer .footer-bottom b{color:var(--gc-orange)}
+@media(max-width:900px){.footer .footer-main{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:28px 22px!important}}
+@media(max-width:760px){
+ .site-header{background:var(--gc-black)!important}
+ .header-main{background:var(--gc-black)!important}
+ .main-nav{background:var(--gc-black)!important}
+ .footer .footer-main{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:25px 18px!important;padding-top:34px!important;padding-bottom:28px!important}
+ .footer .footer-brand{grid-column:1/-1}
+ .footer .footer-brand-copy{max-width:100%;font-size:12px;margin:13px 0}
+ .footer .footer-full-wordmark{max-width:230px}
+ .footer .footer-col h3{font-size:14px!important}
+ .footer .footer-col a,.footer .footer-col span{font-size:12px!important}
+ .footer .footer-bottom{flex-direction:column;gap:6px;font-size:10px}
+}
+@media(max-width:360px){.footer .footer-main{column-gap:12px!important}.footer .footer-col a{overflow-wrap:anywhere}}
