@@ -1942,9 +1942,11 @@ button{cursor:pointer}
 }
 
 
-/* Mobile header: match the desktop contact action and remove the utility strip */
+/* Remove the narrow black utility strip on every screen size */
+.topbar{display:none!important}
+
+/* Mobile header: match the desktop contact action */
 @media (max-width:760px){
-  .topbar{display:none!important}
   .header-main{
     min-height:66px!important;
     padding-top:8px!important;
