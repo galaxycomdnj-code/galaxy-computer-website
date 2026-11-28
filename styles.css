@@ -1933,3 +1933,10 @@ button{cursor:pointer}
   .home-service-inner{padding:18px 15px!important;}
   .service-promo h2,.home-service h2{font-size:18px!important;}
 }
+
+/* Mobile category cleanup: use the All Categories drawer instead of a partial shortcut grid */
+@media (max-width:760px){
+  .category-shortcuts{
+    display:none!important;
+  }
+}
